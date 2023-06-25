@@ -16,9 +16,6 @@ dependencies:
   vue-router:
     specifier: ^4.0.3
     version: 4.0.3(vue@3.2.13)
-  vuex:
-    specifier: ^4.0.0
-    version: 4.0.0(vue@3.2.13)
 
 devDependencies:
   '@babel/core':
@@ -27,6 +24,9 @@ devDependencies:
   '@babel/eslint-parser':
     specifier: ^7.12.16
     version: 7.12.16(@babel/core@7.12.16)(eslint@7.32.0)
+  '@vue/babel-preset-app':
+    specifier: ^5.0.8
+    version: 5.0.8(@babel/core@7.12.16)(core-js@3.8.3)(vue@3.2.13)
   '@vue/cli-plugin-babel':
     specifier: ~5.0.0
     version: 5.0.0(@vue/cli-service@5.0.1)(core-js@3.8.3)(vue@3.2.13)
@@ -1904,12 +1904,12 @@ packages:
     resolution: {integrity: sha512-JkqXfCkUDp4PIlFdDQ0TdXoIejMtTHP67/pvxlgeY+u5k3LEdKuWZ3LK6xkxo52uDoABIVyRwqVkfLQJhk7VBA==}
     dev: true
 
-  /@vue/babel-helper-vue-transform-on@1.1.2:
-    resolution: {integrity: sha512-CKdDLTYS02f8FDjfN1pWWzeu+G20r2ckVACu3sgNE5AJiGZVSGsidikADKoWvhGoYKKSWnMR+tPuqjkrO99icQ==}
+  /@vue/babel-helper-vue-transform-on@1.1.3:
+    resolution: {integrity: sha512-iSaE7+1+/tPp79XnvsAVjaCjuY7dHjfsArPozi+1USJ1A5lf5JUovCP90Hbc+L9BUSHGlXMEYuQrL2vS3Yz9ow==}
     dev: true
 
-  /@vue/babel-plugin-jsx@1.1.2(@babel/core@7.12.16):
-    resolution: {integrity: sha512-RHQtiT1yq+MVJVEDSXVtyxvA6b/ywEU3LNekmq3HuQFAICtMOcsnkxrN8frw0GEo1L5IhA5Dpp3dk/t8m08pUg==}
+  /@vue/babel-plugin-jsx@1.1.3(@babel/core@7.12.16):
+    resolution: {integrity: sha512-q4ekWt6KcWmM7GNTZjBO53EOM/5uczu7q1Ks39Sz0d0PJFJ+oNi6xyu17WZ/uoSi/s81ouq99G18cLoEX9X1OA==}
     peerDependencies:
       '@babel/core': ^7.0.0-0
     dependencies:
@@ -1919,7 +1919,7 @@ packages:
       '@babel/template': 7.22.5
       '@babel/traverse': 7.22.5
       '@babel/types': 7.22.5
-      '@vue/babel-helper-vue-transform-on': 1.1.2
+      '@vue/babel-helper-vue-transform-on': 1.1.3
       camelcase: 6.3.0
       html-tags: 3.3.1
       svg-tags: 1.0.0
@@ -1963,7 +1963,7 @@ packages:
       '@babel/plugin-transform-runtime': 7.22.5(@babel/core@7.12.16)
       '@babel/preset-env': 7.22.5(@babel/core@7.12.16)
       '@babel/runtime': 7.22.5
-      '@vue/babel-plugin-jsx': 1.1.2(@babel/core@7.12.16)
+      '@vue/babel-plugin-jsx': 1.1.3(@babel/core@7.12.16)
       '@vue/babel-preset-jsx': 1.4.0(@babel/core@7.12.16)(vue@3.2.13)
       babel-plugin-dynamic-import-node: 2.3.3
       core-js: 3.8.3
@@ -7845,14 +7845,6 @@ packages:
       '@vue/runtime-dom': 3.2.13
       '@vue/server-renderer': 3.2.13(vue@3.2.13)
       '@vue/shared': 3.2.13
-
-  /vuex@4.0.0(vue@3.2.13):
-    resolution: {integrity: sha512-56VPujlHscP5q/e7Jlpqc40sja4vOhC4uJD1llBCWolVI8ND4+VzisDVkUMl+z5y0MpIImW6HjhNc+ZvuizgOw==}
-    peerDependencies:
-      vue: ^3.0.2
-    dependencies:
-      vue: 3.2.13
-    dev: false
 
   /watchpack@2.4.0:
     resolution: {integrity: sha512-Lcvm7MGST/4fup+ifyKi2hjyIAwcdI4HRgtvTpIUxBRhB+RFtUh8XtDOxUfctVCnhVi+QQj49i91OyvzkJl6cg==}
