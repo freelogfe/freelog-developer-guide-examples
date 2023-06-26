@@ -4,14 +4,18 @@ import App from './App.vue'
 import './registerServiceWorker'
 import routes from './router'
 import { createPinia } from 'pinia'
-
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 import { createRouter, createWebHistory } from 'vue-router';
 
 let pinia = null;
-
 let router = null;
 let instance = null;
 
+/**
+ * 
+ * 渲染方法
+ */
 function render(props = {}) {
     const { container } = props;
     router = createRouter({
@@ -19,24 +23,27 @@ function render(props = {}) {
         routes,
     });
     pinia = createPinia()
-    instance = createApp(App);
+    instance = createApp(App)
     instance.use(pinia)
-    instance.use(router);
-    instance.mount(container ? container.querySelector('#app') : '#app');
+    instance.use(router)
+    instance.use(ElementPlus)
+    instance.mount(container ? container.querySelector('#app') : '#app')
 }
 
 /**
  * 启动阶段：可以在这里准备一些加载时需要的数据
  */
 export async function bootstrap() {
-    console.log('%c ', 'color: green;', 'vue3.0 app bootstraped');
+    console.log('%c ', 'color: green;', 'vue3.0 app bootstraped')
 }
 
 /**
  * 加载阶段
  */
 export async function mount(props) {
-    console.log(props.onGlobalStateChange)
+    /**
+     * 测试一下主题插件的全局通信
+     */
     storeTest(props);
     render(props);
     instance.config.globalProperties.$onGlobalStateChange = props.onGlobalStateChange;
@@ -55,7 +62,7 @@ export async function unmount() {
 
 /**
  * 
- * 全局通信 
+ * 全局通信测试
  */
 function storeTest(props) {
     if (props.onGlobalStateChange) {

@@ -24,7 +24,7 @@ function render(props:any = {}) {
   instance.use(router);
   instance.use(pinia)
   instance.mount(container ? container.querySelector('#app') : '#app');
-  props.registerApi({
+  props.registerApi && props.registerApi({
     // 这个对象会给到父插件
     changeMe:()=>{
       const store = useCounterStore();

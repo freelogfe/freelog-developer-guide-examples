@@ -1,5 +1,7 @@
 <template>
   <button @click="add" style="margin-top: 50px;font-size: 30px;">点我加1</button>
+  <el-button>我是utton</el-button>
+
   <div id="freelog-single"></div>
 </template>
 <script setup>
@@ -30,6 +32,8 @@ const mountSubWidget = async () => {
 const add = () => {
   app.getApi().changeMe();
 };
+
+
 // 加载展品类型的插件s
 const mountExhibitWidget = async () => {
   const res = await window.freelogApp.getExhibitListByPaging({
