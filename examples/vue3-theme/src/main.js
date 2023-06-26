@@ -7,7 +7,7 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { createRouter, createWebHistory } from 'vue-router';
-
+const freelogApp = window.freelogApp
 let pinia = null;
 let router = null;
 let instance = null;
@@ -44,6 +44,15 @@ export async function mount(props) {
     /**
      * 测试一下主题插件的全局通信
      */
+    // 初始化可以跟插件通信的全局数据,仅主题可以用，但主题可以通过传递config给插件使用
+    console.log(freelogApp.initGlobalState)
+    freelogApp.initGlobalState({
+        ignore: props.name,
+        user: {
+            name: props.name,
+        },
+    });
+    console.log(props)
     storeTest(props);
     render(props);
     instance.config.globalProperties.$onGlobalStateChange = props.onGlobalStateChange;
@@ -67,7 +76,7 @@ export async function unmount() {
 function storeTest(props) {
     if (props.onGlobalStateChange) {
         props.onGlobalStateChange(
-            (value, prev) => console.log(`[onGlobalStateChange - ${props.name}]:`, value, prev),
+            (value, prev) => console.log(`[主题 - ${props.name}]:`, value, prev),
             true,
         );
     }

@@ -1,7 +1,7 @@
 <template>
-  <button @click="add" style="margin-top: 50px;font-size: 30px;">点我 加 1</button>
-  <el-button>我是utton</el-button>
-
+  <button @click="add" style="margin-top: 50px; font-size: 30px">
+    我是主题：点我给插件加1
+  </button>
   <div id="freelog-single"></div>
 </template>
 <script setup>
@@ -11,15 +11,15 @@ const mountSubWidget = async () => {
   const subData = await window.freelogApp.getSubDep();
   subData.subDep.some(async (sub, index) => {
     if (index === 1) return true;
-    app = await window.freelogApp.mountWidget(
-      sub,
-      document.getElementById("freelog-single2"),
-      subData,
-      "",
-      "",
-      "http://localhost:8001"
-    );
-    // 插件加载完成
+    app = await window.freelogApp.mountWidget({
+      widget: sub, // 必传，子插件数据
+      container: document.getElementById("freelog-single"), // 必传，自定义一个让插件挂载的div容器
+      topExhibitData: subData, // 必传，最外层展品数据（子孙插件都需要用）
+      config: {}, // 子插件配置数据，需要另外获取作品上的配置数据
+      seq: null, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
+      widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件
+    });
+    // 使用此函数可以在插件加载完成后
     app.mountPromise.then(() => {
       // 卸载与重载
       // app.unmount.then(() => {
@@ -33,7 +33,6 @@ const add = () => {
   app.getApi().changeMe();
 };
 
-
 // 加载展品类型的插件s
 const mountExhibitWidget = async () => {
   const res = await window.freelogApp.getExhibitListByPaging({
@@ -41,17 +40,18 @@ const mountExhibitWidget = async () => {
     isLoadVersionProperty: 1,
   });
   const widgets = res.data.data.dataList;
+  console.log(widgets)
   widgets.some(async (widget, index) => {
     if (index === 1) return true;
     // widget.exhibitId = widget.exhibitId + '111'
-    app = await window.freelogApp.mountWidget(
-      widget,
-      document.getElementById("freelog-single"),
-      null,
-      null,
-      null,
-      "http://localhost:8002"
-    );
+    app = await window.freelogApp.mountWidget({
+      widget: widget, // 必传，子插件数据
+      container: document.getElementById("freelog-single"), // 必传，自定义一个让插件挂载的div容器
+      topExhibitData: null, // 必传，最外层展品数据（子孙插件都需要用）
+      config: {}, // 子插件配置数据，需要另外获取作品上的配置数据
+      seq: null, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
+      widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件
+    });
   });
 };
 mountExhibitWidget();

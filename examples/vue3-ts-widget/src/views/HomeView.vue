@@ -1,7 +1,7 @@
 <template>
   <div class="home" >
     <img alt="Vue logo" src="../assets/logo.png" />
-    <div style="font-size: 50px;">{{ count }}</div> 
+    <div style="font-size: 50px;">我是插件数字展示：{{ count }}</div> 
   </div>
 </template>
 

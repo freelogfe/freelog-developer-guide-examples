@@ -3,7 +3,9 @@
     <router-link to="/">Ho me</router-link> |
     <router-link to="/about">About</router-link>
   </nav>
-  <router-view/>
+  <keep-alive>
+    <router-view />
+  </keep-alive>
 </template>
 
 <style lang="scss">
