@@ -27,6 +27,8 @@ module.exports = defineConfig(async () => {
       },
       hot: true,
       port,
+      historyApiFallback: true,
+      allowedHosts: 'all',
       headers: {
         'Access-Control-Allow-Origin': '*',
       },

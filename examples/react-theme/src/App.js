@@ -52,7 +52,7 @@ function App() {
   mountExhibitWidget()
   return (
     <div className="App">
-      <button onClick={add}>点我加1</button> 
+      <button onClick={add}>点我加 1</button> 
       <div id="freelog-single"></div>
     </div>
   );

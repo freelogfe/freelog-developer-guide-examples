@@ -1,5 +1,5 @@
 <template>
-  <button @click="add" style="margin-top: 50px;font-size: 30px;">点我加1</button>
+  <button @click="add" style="margin-top: 50px;font-size: 30px;">点我 加 1</button>
   <el-button>我是utton</el-button>
 
   <div id="freelog-single"></div>
