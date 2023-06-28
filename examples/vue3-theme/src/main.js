@@ -45,13 +45,13 @@ export async function mount(props) {
      * 测试一下主题插件的全局通信
      */
     // 初始化可以跟插件通信的全局数据,仅主题可以用，但主题可以通过传递config给插件使用
-    console.log(freelogApp.initGlobalState)
-    freelogApp.initGlobalState({
-        ignore: props.name,
-        user: {
-            name: props.name,
-        },
-    });
+    // console.log(freelogApp.initGlobalState)
+    // freelogApp.initGlobalState({
+    //     ignore: props.name,
+    //     user: {
+    //         name: props.name,
+    //     },
+    // });
     console.log(props)
     storeTest(props);
     render(props);

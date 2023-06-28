@@ -6,6 +6,7 @@ const paths = require('./paths');
 
 // Make sure that including paths.js after env.js will read .env variables.
 delete require.cache[require.resolve('./paths')];
+process.env.HTTPS = 'true' 
 
 const NODE_ENV = process.env.NODE_ENV;
 if (!NODE_ENV) {
@@ -13,7 +14,7 @@ if (!NODE_ENV) {
     'The NODE_ENV environment variable is required but was not specified.'
   );
 }
-process.env.PORT = '7001' // 端口自行定
+process.env.PORT = '7101' // 端口自行定
 if (NODE_ENV === 'development') {
   process.env.WDS_SOCKET_HOST = 'localhost'
   // process.env.WDS_SOCKET_PATH = 'localhost:' + process.env.PORT // webpack5设置为空 ''

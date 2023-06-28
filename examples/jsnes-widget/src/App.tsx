@@ -1,9 +1,17 @@
 import React, { useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import RunPage from "./views/RunPage";
+
 import { useAppSelector, useAppDispatch } from "./store/hooks";
 import { increment, decrement } from "./store/features/sample";
-
+/**
+ * 产品结构：获取由主题给过来的ROM，然后开始加载
+ * 目前先不考虑主题给过来的rom
+ * 1.加载器
+ * 2.手柄控制器
+ * 3.按键控制器
+ */
 function App(props:any) {
   const counter = useAppSelector((state: any) => state.counter);
   const dispatch = useAppDispatch();
@@ -12,20 +20,8 @@ function App(props:any) {
   }, []);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React {counter.count}
-        </a>
-      </header>
+      <RunPage/>
+     
     </div>
   );
 }

@@ -10,7 +10,7 @@ let app = null;
 const mountSubWidget = async () => {
   const subData = await window.freelogApp.getSubDep();
   subData.subDep.some(async (sub, index) => {
-    if (index === 1) return true;
+    if (index === 0) return true;
     app = await window.freelogApp.mountWidget({
       widget: sub, // 必传，子插件数据
       container: document.getElementById("freelog-single"), // 必传，自定义一个让插件挂载的div容器
@@ -19,9 +19,9 @@ const mountSubWidget = async () => {
       seq: null, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
       widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件
     });
-    // 使用此函数可以在插件加载完成后
+    // 使用此函数可以保证在插件加载完成后 再执行
     app.mountPromise.then(() => {
-      // 卸载与重载
+      // 卸载之后重新加载
       // app.unmount.then(() => {
       //   app.mount.then(() => {
       //   })
@@ -40,9 +40,11 @@ const mountExhibitWidget = async () => {
     isLoadVersionProperty: 1,
   });
   const widgets = res.data.data.dataList;
-  console.log(widgets)
+  console.log(widgets);
   widgets.some(async (widget, index) => {
-    if (index === 1) return true;
+    if (index === 1) { 
+      return true;
+    }
     // widget.exhibitId = widget.exhibitId + '111'
     app = await window.freelogApp.mountWidget({
       widget: widget, // 必传，子插件数据

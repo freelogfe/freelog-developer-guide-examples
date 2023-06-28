@@ -1,27 +1,46 @@
-# 文档修改与案例计划
+# Getting Started with Create React App
 
-## 1.基础模板
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-### 1.1提供react18、vue3、的ts与js模板
+## Available Scripts
 
-### 1.2在模板比原生新增的配置当中提供详细的注释，解释用途
+In the project directory, you can run:
 
-### 1.3尝试把react18 与vue3 像字节的garfish一样，封装生命周期，提供路由对象，减少配置代码（实际将配置代码封装起来）
+### `npm start`
 
-## 2.静态文件处理
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### 2.1 文档中提供原理说明，当前需要更加突出说明
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
-### 2.2 案例中需要针对图片和字体的处理，再次尝试解决大字体文件引入的问题
+### `npm test`
 
-## 3.生命周期
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### 3.1 在文档中体现基础的说明，最好提供图示（参考vue的文档）
+### `npm run build`
 
-### 3.2 在案例中体现详细的用法
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## 4.https的问题（重点要解决的）
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-### 4.1 尝试是否能否不用安装chocolatey
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### 4.2 
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).

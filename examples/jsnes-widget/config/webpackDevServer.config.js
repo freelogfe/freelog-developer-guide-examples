@@ -13,7 +13,7 @@ const sockHost = process.env.WDS_SOCKET_HOST;
 const sockPath = process.env.WDS_SOCKET_PATH; // default: '/ws'
 const sockPort = process.env.WDS_SOCKET_PORT;
 
-module.exports = function (proxy, allowedHost) {
+module.exports = function (proxy, allowedHost, https) {
   const disableFirewall =
     !proxy || process.env.DANGEROUSLY_DISABLE_HOST_CHECK === 'true';
   return {
@@ -91,7 +91,7 @@ module.exports = function (proxy, allowedHost) {
       publicPath: paths.publicUrlOrPath.slice(0, -1),
     },
 
-    https: getHttpsConfig(),
+    https: https, // getHttpsConfig(),
     host,
     historyApiFallback: {
       // Paths with dots should still use the history fallback.
