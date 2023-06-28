@@ -7,7 +7,10 @@ import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useCounterStore } from "./stores/counter";
-import "./assets/css/index.scss"
+// import "./assets/css/index.scss";
+import ElementPlus from "element-plus";
+import "element-plus/dist/index.css";
+import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 
 const freelogApp = window.freelogApp;
 
@@ -27,15 +30,10 @@ function render(props: any = {}) {
   pinia = createPinia();
   instance.use(router);
   instance.use(pinia);
+  instance.use(ElementPlus);
   instance.mount(container ? container.querySelector("#app") : "#app");
-  if (props.registerApi) {
-    props.registerApi({
-      // 这个对象会给到父插件
-      changeMe: () => {
-        const store = useCounterStore();
-        store.increment();
-      },
-    });
+  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    instance.component(key, component);
   }
 }
 
@@ -48,6 +46,16 @@ export async function bootstrap() {
 }
 
 function storeTest(props: any) {
+  /**
+   * 测试一下主题插件的全局通信
+   */
+  // 初始化可以跟插件通信的全局数据,仅主题可以用，但主题可以通过config传递给插件使用
+  freelogApp.initGlobalState({
+    ignore: props.name,
+    user: {
+      name: props.name,
+    },
+  });
   if (props.onGlobalStateChange) {
     props.onGlobalStateChange(
       (value: any, prev: any) =>

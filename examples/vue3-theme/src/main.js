@@ -19,7 +19,7 @@ let instance = null;
 function render(props = {}) {
     const { container } = props;
     router = createRouter({
-        history: createWebHistory(window.__POWERED_BY_FREELOG__ ? '/vue3' : '/'),
+        history: createWebHistory(window.__POWERED_BY_FREELOG__ ? '/theme' : '/'),
         routes,
     });
     pinia = createPinia()
