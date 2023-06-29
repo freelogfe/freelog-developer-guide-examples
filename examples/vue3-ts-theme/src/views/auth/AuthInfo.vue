@@ -1,13 +1,13 @@
 <template>
   <div class="home" >
-    <img alt="Vue logo" src="../assets/logo.png" />
+    <img alt="Vue logo" src="@/assets/logo.png" />
     <div style="font-size: 50px;">我是插件数字展示：{{ count }}</div> 
   </div>
 </template>
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { useCounterStore } from "../stores/counter";
+import { useCounterStore } from "@/stores/counter";
 
 const store = useCounterStore();
 // `name` and `doubleCount` are reactive refs
