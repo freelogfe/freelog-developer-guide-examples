@@ -5,10 +5,12 @@ import authRoutes from "./modules/auth";
 import exhibitRoutes from "./modules/exhibit";
 
 const routes: Array<RouteRecordRaw> = [
-  ...widgetRoutes,
-  ...userRoutes,
-  ...authRoutes,
-  ...exhibitRoutes,
+  {
+    path: "/",
+    name: "home",
+    redirect: "/widget-dep",
+    children: [...widgetRoutes, ...userRoutes, ...authRoutes, ...exhibitRoutes],
+  },
 ];
 
 // const router = createRouter({

@@ -56,7 +56,7 @@ export default defineComponent({
     const openKeys = ref<string[]>(["widget"]);
     const router = useRouter();
     const handleClick: MenuProps["onClick"] = (e) => {
-      console.log("click", e);
+      router.push("/" + e.key);
     };
     const titleClick = (e: Event) => {
       console.log("titleClick", e);

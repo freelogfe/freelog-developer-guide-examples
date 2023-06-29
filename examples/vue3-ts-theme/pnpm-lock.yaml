@@ -16,6 +16,9 @@ dependencies:
   element-plus:
     specifier: ^2.3.7
     version: 2.3.7(vue@3.3.4)
+  freelog-runtime:
+    specifier: ^1.0.4
+    version: 1.0.4
   pinia:
     specifier: ^2.0.33
     version: 2.1.4(typescript@4.5.5)(vue@3.3.4)
@@ -5139,6 +5142,11 @@ packages:
   /fraction.js@4.2.0:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: true
+
+  /freelog-runtime@1.0.4:
+    resolution: {integrity: sha512-TLaKb7Mhh/fSqyY5lWa9oR57RT5cEw8O2oQxLLOSS/HoBkjT374seI2FLKtYSp7S8Lw4j2qGSi9dkg/l7z8SKA==}
+    engines: {node: '>=10'}
+    dev: false
 
   /fresh@0.5.2:
     resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}

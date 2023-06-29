@@ -2,15 +2,6 @@ import { RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
-    name: "home",
-    redirect: "/widget-dep",
-  },
-  {
-    path: "",
-    redirect: "/widget-dep",
-  },
-  {
     path: "widget-dep",
     name: "widgetDep",
     component: () => import("@/views/widget/WidgetDep.vue"),

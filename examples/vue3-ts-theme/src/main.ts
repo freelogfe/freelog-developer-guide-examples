@@ -24,7 +24,7 @@ let instance: any = null;
 function render(props: any = {}) {
   const { container } = props;
   router = createRouter({
-    history: createWebHistory(window.__POWERED_BY_FREELOG__ ? "/widget" : "/"),
+    history: createWebHistory(window.__POWERED_BY_FREELOG__ ? "/" : "/"),
     routes,
   });
   instance = createApp(App);

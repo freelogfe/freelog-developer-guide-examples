@@ -1,18 +1,25 @@
 <template>
-  <div class="home" >
+  <div class="home">
     <img alt="Vue logo" src="@/assets/logo.png" />
-    <div style="font-size: 50px;">我是插件数字展示：{{ count }}</div> 
+    <div style="font-size: 50px">我是插件数字展示：</div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-import { useCounterStore } from "@/stores/counter";
-
-const store = useCounterStore();
-// `name` and `doubleCount` are reactive refs
-// This will also extract refs for properties added by plugins
-// but skip any action or non reactive (non ref/reactive) property
-const { count } = storeToRefs(store);
-// the increment action can just be destructured
+import { freelogApp } from "freelog-runtime";
+import { reactive } from "vue";
+freelogApp.getSubDep().then((res: any) => {
+  if (res.subDep) {
+    let str: Array<string> = [];
+    res.subDep.forEach((sub: any) => {
+      str.push(sub.nid);
+    });
+    console.log(res, freelogApp.getSelfExhibitId())
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    freelogApp.getExhibitDepInfo(freelogApp.getSelfExhibitId(), str.join(",")).then((res)=>{
+      console.log(res)
+    });
+  }
+});
 </script>
