@@ -6,12 +6,10 @@ import "./registerServiceWorker";
 import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
-import { useCounterStore } from "./stores/counter";
-// import "./assets/css/index.scss";
-import ElementPlus from "element-plus";
-import "element-plus/dist/index.css";
-import * as ElementPlusIconsVue from "@element-plus/icons-vue";
-
+import 'ant-design-vue/dist/antd.css';
+import Antd from 'ant-design-vue';
+import { message } from 'ant-design-vue';
+import "@/assets/css/index.scss"
 const freelogApp = window.freelogApp;
 
 let pinia: any = null;
@@ -30,11 +28,8 @@ function render(props: any = {}) {
   pinia = createPinia();
   instance.use(router);
   instance.use(pinia);
-  instance.use(ElementPlus);
+  instance.use(Antd);
   instance.mount(container ? container.querySelector("#app") : "#app");
-  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    instance.component(key, component);
-  }
 }
 
 if (!window.__POWERED_BY_FREELOG__) {
@@ -87,6 +82,8 @@ export async function mount(props: any) {
   instance.config.globalProperties.$onGlobalStateChange =
     props.onGlobalStateChange;
   instance.config.globalProperties.$setGlobalState = props.setGlobalState;
+  instance.config.globalProperties.$message = message;
+
 }
 
 export async function unmount() {

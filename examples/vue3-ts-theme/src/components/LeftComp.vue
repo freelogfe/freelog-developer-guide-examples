@@ -1,95 +1,74 @@
 <template>
-  <el-row class="tac">
-    <el-col :span="12">
-      <h5 class="mb-2">Default colors</h5>
-      <el-menu
-        default-active="2"
-        class="el-menu-vertical-demo"
-        @open="handleOpen"
-        @close="handleClose"
-      >
-        <el-sub-menu index="1">
-          <template #title>
-            <el-icon><location /></el-icon>
-            <span>Navigator One</span>
-          </template>
-          <el-menu-item-group title="Group One">
-            <el-menu-item index="1-1">item one</el-menu-item>
-            <el-menu-item index="1-2">item two</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="Group Two">
-            <el-menu-item index="1-3">item three</el-menu-item>
-          </el-menu-item-group>
-          <el-sub-menu index="1-4">
-            <template #title>item four</template>
-            <el-menu-item index="1-4-1">item one</el-menu-item>
-          </el-sub-menu>
-        </el-sub-menu>
-        <el-menu-item index="2">
-          <el-icon><Menu /></el-icon>
-          <span>Navigator Two</span>
-        </el-menu-item>
-        <el-menu-item index="3" disabled>
-          <el-icon><document /></el-icon>
-          <span>Navigator Three</span>
-        </el-menu-item>
-        <el-menu-item index="4">
-          <el-icon><setting /></el-icon>
-          <span>Navigator Four</span>
-        </el-menu-item>
-      </el-menu>
-    </el-col>
-    <el-col :span="12">
-      <h5 class="mb-2">Custom colors</h5>
-      <el-menu
-        active-text-color="#ffd04b"
-        background-color="#545c64"
-        class="el-menu-vertical-demo"
-        default-active="2"
-        text-color="#fff"
-        @open="handleOpen"
-        @close="handleClose"
-      >
-        <el-sub-menu index="1">
-          <template #title>
-            <el-icon><location /></el-icon>
-            <span>Navigator One</span>
-          </template>
-          <el-menu-item-group title="Group One">
-            <el-menu-item index="1-1">item one</el-menu-item>
-            <el-menu-item index="1-2">item two</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="Group Two">
-            <el-menu-item index="1-3">item three</el-menu-item>
-          </el-menu-item-group>
-          <el-sub-menu index="1-4">
-            <template #title>item four</template>
-            <el-menu-item index="1-4-1">item one</el-menu-item>
-          </el-sub-menu>
-        </el-sub-menu>
-        <el-menu-item index="2">
-          <el-icon><Menu /></el-icon>
-          <span>Navigator Two</span>
-        </el-menu-item>
-        <el-menu-item index="3" disabled>
-          <el-icon><document /></el-icon>
-          <span>Navigator Three</span>
-        </el-menu-item>
-        <el-menu-item index="4">
-          <el-icon><setting /></el-icon>
-          <span>Navigator Four</span>
-        </el-menu-item>
-      </el-menu>
-    </el-col>
-  </el-row>
+  <a-menu
+    id="dddddd"
+    v-model:openKeys="openKeys"
+    v-model:selectedKeys="selectedKeys"
+    style="width: 256px; overflow-x: hidden"
+    mode="inline"
+    class="h-100x y-auto"
+    @click="handleClick"
+  >
+    <a-sub-menu key="widget" @titleClick="titleClick">
+      <template #title>插件相关</template>
+      <a-menu-item key="widget-dep">获取自身依赖</a-menu-item>
+      <a-menu-item key="widget-config">插件配置数据</a-menu-item>
+      <a-menu-item key="widget-mount">加载插件</a-menu-item>
+      <a-menu-item key="widget-control">控制插件与通信</a-menu-item>
+      <a-menu-item key="widget-static">静态资源路径获取</a-menu-item>
+    </a-sub-menu>
+    <a-sub-menu key="exhibit" @titleClick="titleClick">
+      <template #title>展品获取</template>
+      <a-menu-item key="exhibit-1">展品信息、列表、查找</a-menu-item>
+      <a-menu-item key="exhibit-2">获取展品作品文件</a-menu-item>
+      <a-menu-item key="exhibit-3">展品子依赖</a-menu-item>
+    </a-sub-menu>
+    <a-sub-menu key="auth" @titleClick="titleClick">
+      <template #title>授权处理</template>
+      <a-menu-item key="auth-1">授权信息</a-menu-item>
+      <a-menu-item key="auth-2">授权流程</a-menu-item>
+    </a-sub-menu>
+    <a-sub-menu key="user" @titleClick="titleClick">
+      <template #title>用户相关</template>
+      <a-menu-item key="user-1">登录处理</a-menu-item>
+      <a-menu-item key="user-2">用户信息</a-menu-item>
+    </a-sub-menu>
+  </a-menu>
 </template>
+<script lang="ts">
+import { defineComponent, ref, watch } from "vue";
+import {
+  MailOutlined,
+  QqOutlined,
+  AppstoreOutlined,
+  SettingOutlined,
+} from "@ant-design/icons-vue";
+import type { MenuProps } from "ant-design-vue";
+export default defineComponent({
+  components: {
+    // MailOutlined,
+    // QqOutlined,
+    // AppstoreOutlined,
+    // SettingOutlined,
+  },
+  setup() {
+    const selectedKeys = ref<string[]>(["widget-dep"]);
+    const openKeys = ref<string[]>(["widget"]);
+    const handleClick: MenuProps["onClick"] = (e) => {
+      console.log("click", e);
+    };
+    const titleClick = (e: Event) => {
+      console.log("titleClick", e);
+    };
+    watch(openKeys, (val) => {
+      console.log("openKeys", val);
+    });
+    return {
+      selectedKeys,
+      openKeys,
 
-<script lang="ts" setup>
- 
-const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
-};
-const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
-};
+      handleClick,
+      titleClick,
+    };
+  },
+});
 </script>

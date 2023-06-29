@@ -1,19 +1,18 @@
 <template>
-  <div class="base-container">
-    <LeftComp />
-    <keep-alive>
-      <router-view />
-    </keep-alive>
-  </div>
+  <a-layout class="w-100x h-100x">
+    <a-layout-header>Header</a-layout-header>
+    <a-layout>
+      <a-layout-sider><LeftComp /></a-layout-sider>
+      <a-layout-content>
+        <keep-alive> <router-view /> </keep-alive
+      ></a-layout-content>
+    </a-layout>
+  </a-layout>
 </template>
 <script lang="ts" setup>
 import LeftComp from "./components/LeftComp.vue";
-const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
-};
-const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
-};
+import HeaderComp from "./components/HeaderComp.vue";
+import FooterComp from "./components/FooterComp.vue";
 </script>
 <style lang="scss">
 #app {
@@ -24,21 +23,5 @@ const handleClose = (key: string, keyPath: string[]) => {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-.base-container{
-  display: inline;
-   
-}
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
 }
 </style>
