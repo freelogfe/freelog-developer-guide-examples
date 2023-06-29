@@ -6,18 +6,21 @@ import "./registerServiceWorker";
 import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
-import 'ant-design-vue/dist/antd.css';
-import Antd from 'ant-design-vue';
-import { message } from 'ant-design-vue';
-import "@/assets/css/index.scss"
-const freelogApp = window.freelogApp;
-
+import "ant-design-vue/dist/antd.css";
+import Antd from "ant-design-vue";
+import { message } from "ant-design-vue";
+import "@/assets/css/index.scss";
+import { freelogApp } from "@/utils";
 let pinia: any = null;
 
 // createApp(App).use(store).use(router).mount("#app")
 let router: any = null;
 let instance: any = null;
 
+/**
+ *
+ * 渲染方法
+ */
 function render(props: any = {}) {
   const { container } = props;
   router = createRouter({
@@ -36,10 +39,40 @@ if (!window.__POWERED_BY_FREELOG__) {
   render();
 }
 
+/**
+ * 启动阶段：可以在这里准备一些加载时需要的数据
+ */
 export async function bootstrap() {
   console.log("%c ", "color: green;", "vue3.0 app bootstraped");
 }
 
+/**
+ * 加载阶段
+ */
+export async function mount(props: any) {
+  storeTest(props);
+  render(props);
+  instance.config.globalProperties.$onGlobalStateChange =
+    props.onGlobalStateChange;
+  instance.config.globalProperties.$setGlobalState = props.setGlobalState;
+  instance.config.globalProperties.$message = message;
+}
+
+/**
+ * 卸载阶段：为了防止内存溢出，必须卸载vue实例 以及将 router与pinina置为null
+ */
+export async function unmount() {
+  instance.unmount();
+  instance._container.innerHTML = "";
+  instance = null;
+  router = null;
+  pinia = null;
+}
+
+/**
+ *
+ * 全局通信测试
+ */
 function storeTest(props: any) {
   /**
    * 测试一下主题插件的全局通信
@@ -74,22 +107,4 @@ function storeTest(props: any) {
       },
     });
   }
-}
-
-export async function mount(props: any) {
-  storeTest(props);
-  render(props);
-  instance.config.globalProperties.$onGlobalStateChange =
-    props.onGlobalStateChange;
-  instance.config.globalProperties.$setGlobalState = props.setGlobalState;
-  instance.config.globalProperties.$message = message;
-
-}
-
-export async function unmount() {
-  instance.unmount();
-  instance._container.innerHTML = "";
-  instance = null;
-  router = null;
-  pinia = null;
 }
