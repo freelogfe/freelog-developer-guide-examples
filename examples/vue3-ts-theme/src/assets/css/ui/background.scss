@@ -7,10 +7,12 @@
 }
 
 .bg-content {
-    background-color: #FAFBFC;
+    background-color: #fafbfc;
 }
 
-
+.bg-dark {
+    background-color: #0d0d0e;
+}
 // color
 .bg-success {
     background-color: $success;
@@ -46,7 +48,7 @@
     background-color: $bt-active;
 }
 .bg-disabled {
-  opacity: 0.4;
+    opacity: 0.4;
 }
 
 .bg-c-main {
@@ -59,24 +61,22 @@
 
 .bg-c-active {
     background-color: $bt-c-active;
-} 
-
-
+}
 
 .bg-end {
     background-color: $end;
 }
 
 // 授权状态
-.bg-auth{
-    background-color: $success; 
+.bg-auth {
+    background-color: $success;
 }
-.bg-auth-none{
-    background-color: $warn; 
+.bg-auth-none {
+    background-color: $warn;
 }
-.bg-auth-error{
-    background-color: $error; 
+.bg-auth-error {
+    background-color: $error;
 }
-.bg-auth-end{
+.bg-auth-end {
     background: #999999;
 }
