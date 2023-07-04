@@ -11,9 +11,9 @@
     <a-sub-menu key="widget" @titleClick="titleClick">
       <template #title>插件相关</template>
       <a-menu-item key="widget-dep">获取自身依赖</a-menu-item>
-      <a-menu-item key="widget-config">插件配置数据</a-menu-item>
-      <a-menu-item key="widget-mount">加载插件</a-menu-item>
-      <a-menu-item key="widget-control">控制插件与通信</a-menu-item>
+      <a-menu-item key="widget-config">主题插件自身数据</a-menu-item>
+      <a-menu-item key="widget-mount">加载插件与通信</a-menu-item>
+      <!-- <a-menu-item key="widget-control">控制插件与通信</a-menu-item> -->
       <a-menu-item key="widget-static">静态资源路径获取</a-menu-item>
     </a-sub-menu>
     <a-sub-menu key="exhibit" @titleClick="titleClick">

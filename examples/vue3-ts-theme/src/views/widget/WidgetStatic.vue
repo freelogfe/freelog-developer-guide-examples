@@ -1,18 +1,16 @@
 <template>
-  <div class="home" >
-    <img alt="Vue logo" src="@/assets/logo.png" />
-    <div style="font-size: 50px;">我是插件数字展示：{{ count }}</div> 
+  <div class="w-100x h-100x p-40 flex-column">
+    <div class="f-title-3">下面是取自public路径中的css中背景图片</div>
+    <div class="back flex-1 w-100x"></div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-import { useCounterStore } from "@/stores/counter";
-
-const store = useCounterStore();
-// `name` and `doubleCount` are reactive refs
-// This will also extract refs for properties added by plugins
-// but skip any action or non reactive (non ref/reactive) property
-const { count } = storeToRefs(store);
-// the increment action can just be destructured
+import { freelogApp } from "freelog-runtime";
+const path = "url(" + freelogApp.getStaticPath("logo.png") + ") no-repeat  center";
 </script>
+<style scoped>
+.back {
+  background:  v-bind(path);
+}
+</style>

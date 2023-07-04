@@ -29,8 +29,8 @@ function render(props: any = {}) {
   instance.use(pinia);
   instance.mount(container ? container.querySelector("#app") : "#app");
   if (props.registerApi) {
+    // 暴露api给父插件或主题
     props.registerApi({
-      // 这个对象会给到父插件
       changeMe: () => {
         const store = useCounterStore();
         store.increment();
