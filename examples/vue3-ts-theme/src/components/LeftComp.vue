@@ -55,15 +55,24 @@ export default defineComponent({
     const selectedKeys = ref<string[]>(["widget-dep"]);
     const openKeys = ref<string[]>(["widget"]);
     const router = useRouter();
+    const route = useRoute();
     const handleClick: MenuProps["onClick"] = (e) => {
       router.push("/" + e.key);
     };
     const titleClick = (e: Event) => {
       console.log("titleClick", e);
     };
-    watch(openKeys, (val) => {
-      console.log("openKeys", val);
-    });
+    watch(
+      () => route.path,
+      (val: any) => {
+        console.log(val);
+        if (!val) return;
+        val = val.replace("/", "").split("?")[0];
+        selectedKeys.value = [val];
+        openKeys.value = [val.split("-")[0], ...openKeys.value];
+      },
+      { immediate: true }
+    );
     return {
       selectedKeys,
       openKeys,
