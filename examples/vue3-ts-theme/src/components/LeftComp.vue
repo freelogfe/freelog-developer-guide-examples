@@ -18,9 +18,9 @@
     </a-sub-menu>
     <a-sub-menu key="exhibit" @titleClick="titleClick">
       <template #title>展品获取</template>
-      <a-menu-item key="exhibit-info">展品信息、列表、查找</a-menu-item>
-      <a-menu-item key="exhibit-data">获取展品作品文件</a-menu-item>
+      <a-menu-item key="exhibit-info">展品列表</a-menu-item>
       <a-menu-item key="exhibit-sub">展品子依赖</a-menu-item>
+      <a-menu-item key="exhibit-data">玩个游戏</a-menu-item>
     </a-sub-menu>
     <a-sub-menu key="auth" @titleClick="titleClick">
       <template #title>授权处理</template>

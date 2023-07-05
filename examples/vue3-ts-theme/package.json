@@ -17,6 +17,7 @@
     "register-service-worker": "^1.7.2",
     "vue": "^3.3.4",
     "vue-class-component": "^8.0.0-0",
+    "vue-request": "^2.0.3",
     "vue-router": "^4.0.3"
   },
   "devDependencies": {
@@ -34,7 +35,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^9.15.1",
-    "freelog-runtime": "^1.0.6",
+    "freelog-runtime": "^1.0.8",
     "prettier": "^2.4.1",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",

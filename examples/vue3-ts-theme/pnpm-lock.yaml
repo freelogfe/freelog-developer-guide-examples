@@ -28,6 +28,9 @@ dependencies:
   vue-class-component:
     specifier: ^8.0.0-0
     version: 8.0.0-rc.1(vue@3.3.4)
+  vue-request:
+    specifier: ^2.0.3
+    version: 2.0.3(vue@3.3.4)
   vue-router:
     specifier: ^4.0.3
     version: 4.2.2(vue@3.3.4)
@@ -76,8 +79,8 @@ devDependencies:
     specifier: ^9.15.1
     version: 9.15.1(eslint@7.32.0)
   freelog-runtime:
-    specifier: ^1.0.6
-    version: 1.0.6
+    specifier: ^1.0.8
+    version: 1.0.8
   prettier:
     specifier: ^2.4.1
     version: 2.8.8
@@ -5134,8 +5137,8 @@ packages:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: true
 
-  /freelog-runtime@1.0.6:
-    resolution: {integrity: sha512-iKqVnklcUuZzPdCcSGJZfbojnUcId85644D2nIb+JcTwOU9IjwYDZg+K/HwK5SwkgwAwjIPxu9DvSJzoCUIIeg==}
+  /freelog-runtime@1.0.8:
+    resolution: {integrity: sha512-iuygMWsy7kFagyCz4Ptu/w0HupGRuCH4pyxJlw3P8yKOdDX4Rxn2u9qGByo6KrysUJo5ZYEX8KEb+MQO4GXvEQ==}
     engines: {node: '>=10'}
     dev: true
 
@@ -8456,6 +8459,20 @@ packages:
       watchpack: 2.4.0
       webpack: 5.88.0
     dev: true
+
+  /vue-request@2.0.3(vue@3.3.4):
+    resolution: {integrity: sha512-eO90vlfrm1JFReurVjorwie/NvIUT6S5wvxr0VxpC1GoTDWZl/dBewxdScQh98HxZNeYDfjvSS8FiQISg8thww==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^2.0.0 || >=3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      vue: 3.3.4
+      vue-demi: 0.14.5(vue@3.3.4)
+    dev: false
 
   /vue-router@4.2.2(vue@3.3.4):
     resolution: {integrity: sha512-cChBPPmAflgBGmy3tBsjeoe3f3VOSG6naKyY5pjtrqLGbNEXdzCigFUHgBvp9e3ysAtFtEx7OLqcSDh/1Cq2TQ==}

@@ -54,6 +54,9 @@ const reload = (obj: any) => {
     // 插件卸载完成 setTimeout只是为了效果，可以直接加载
     setTimeout(() => {
       obj.mount();
+      obj.mountPromise.then(()=>{
+        // 加载完成后
+      })
     },500);
   });
 };
