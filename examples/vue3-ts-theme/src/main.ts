@@ -10,9 +10,10 @@ import "ant-design-vue/dist/antd.css";
 import Antd from "ant-design-vue";
 import { message } from "ant-design-vue";
 import "@/assets/css/index.scss";
-import { freelogApp } from "@/utils";
+import { freelogApp } from "freelog-runtime";
 let pinia: any = null;
 
+window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
 // createApp(App).use(store).use(router).mount("#app")
 let router: any = null;
 let instance: any = null;
@@ -78,7 +79,7 @@ function storeTest(props: any) {
    * 测试一下主题插件的全局通信
    */
   // 初始化可以跟插件通信的全局数据,仅主题可以用，但主题可以通过config传递给插件使用
-  freelogApp.initGlobalState({
+  (freelogApp as any).initGlobalState({
     ignore: props.name,
     user: {
       name: props.name,

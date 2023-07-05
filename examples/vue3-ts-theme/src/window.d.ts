@@ -1,5 +1,5 @@
 interface Window {
-    freelogApp: any;
+    FREELOG_RESOURCENAME: any;
     isMobile: any;
     isTest: boolean;
     userInfo: any;

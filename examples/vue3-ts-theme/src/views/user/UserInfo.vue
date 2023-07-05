@@ -1,18 +1,45 @@
 <template>
-  <div class="home" >
-    <img alt="Vue logo" src="@/assets/logo.png" />
-    <div style="font-size: 50px;">我是插件数字展示：{{ count }}</div> 
+  <div class="home p-40">
+    <a-button
+      type="primary"
+      class="mr-20"
+      @click="setData('visitCount', (userData.visitCount || 10) + 1)"
+      >设置数据：访问次数每次加一</a-button
+    >
+    <a-button
+      type="primary"
+      @click="setData('adCount', (userData.adCount || 10) + 1)"
+      >设置数据：观看广告次数</a-button
+    >
+    <div class="text-align-left f-title-3 mr-10 mb-10">当前用户：</div>
+    <div class="text-align-left pl-40 mb-10">
+      <span class="f-title-3 mr-10">访问次数: </span>
+      <span class="f-title-4">{{ userData.visitCount }}</span>
+    </div>
+    <div class="text-align-left pl-40 mb-10">
+      <span class="f-title-3 mr-10">观看广告次数: </span>
+      <span class="f-title-4">{{ userData.adCount }}</span>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-import { useCounterStore } from "@/stores/counter";
+import { ref } from "vue";
 
-const store = useCounterStore();
-// `name` and `doubleCount` are reactive refs
-// This will also extract refs for properties added by plugins
-// but skip any action or non reactive (non ref/reactive) property
-const { count } = storeToRefs(store);
-// the increment action can just be destructured
+import { freelogApp } from "freelog-runtime";
+const userData = ref({} as any);
+let rawData: any = {};
+// 根据自定义的key获取 存储的用户数据，主题、不同的插件与插件 保存数据都是隔离的
+freelogApp.getUserData("testData").then((data: any) => {
+  rawData = data;
+  userData.value = data || {};
+});
+const setData = async (key: string, value: any) => {
+  userData.value[key] = value;
+  await freelogApp.setUserData("testData", {
+    ...rawData,
+    visitCount: userData.value.visitCount,
+    adCount: userData.value.adCount,
+  });
+};
 </script>
