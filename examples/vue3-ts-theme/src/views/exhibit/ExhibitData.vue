@@ -63,7 +63,7 @@ const mountExhibitWidget = async () => {
   });
   const widgets = res.data.data.dataList;
   console.log(widgets);
-  widgets.some(async (widget: any, index: number) => {
+  widgets.forEach(async (widget: any, index: number) => {
     if (widget.exhibitName === "nes-widget") {
       // widget.exhibitId = widget.exhibitId + '111'
       exhibitWidget = await freelogApp.mountWidget({
