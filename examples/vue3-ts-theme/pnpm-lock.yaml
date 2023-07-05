@@ -79,7 +79,7 @@ devDependencies:
     specifier: ^9.15.1
     version: 9.15.1(eslint@7.32.0)
   freelog-runtime:
-    specifier: ^1.0.8
+    specifier: 1.0.8
     version: 1.0.8
   prettier:
     specifier: ^2.4.1

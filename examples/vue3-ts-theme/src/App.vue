@@ -4,15 +4,21 @@
     <div class="w-100x flex-1 over-h flex-row">
       <div class="shrink-0 h-100x over-h p-relative"><LeftComp /></div>
       <div class="flex-1 h-100x over-h p-relative">
-        <keep-alive> <router-view /> </keep-alive>
+        <keep-alive> <router-view v-if="!loading"/> </keep-alive>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import LeftComp from "./components/LeftComp.vue";
-import HeaderComp from "./components/HeaderComp.vue";
-import FooterComp from "./components/FooterComp.vue";
+import { freelogApp } from "freelog-runtime";
+import { userStore } from "@/stores/user";
+
+import { ref } from "vue";
+const loading = ref(true)
+const store = userStore();
+store.setUserInfo(freelogApp.getCurrentUser())
+loading.value = false
 </script>
 <style lang="scss">
 #app {
