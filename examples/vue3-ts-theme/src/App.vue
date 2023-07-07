@@ -1,6 +1,6 @@
 <template>
   <div class="w-100x h-100x flex-column over-h">
-    <div class="h-60 flex-row bg-dark"></div>
+    <HeaderComp ></HeaderComp>
     <div class="w-100x flex-1 over-h flex-row">
       <div class="shrink-0 h-100x over-h p-relative"><LeftComp /></div>
       <div class="flex-1 h-100x over-h p-relative">
@@ -11,6 +11,8 @@
 </template>
 <script lang="ts" setup>
 import LeftComp from "./components/LeftComp.vue";
+
+import HeaderComp from "./components/HeaderComp.vue";
 import { freelogApp } from "freelog-runtime";
 import { userStore } from "@/stores/user";
 
