@@ -28,40 +28,35 @@ import { ref, onUnmounted } from "vue";
 let exhibitWidget: any = null;
 
 const data = ref([] as any[]);
-const gameUrl = ref("");
 const gameName = ref("");
+const gameId = ref("");
 freelogApp
   .getExhibitListByPaging({
     skip: 0,
     limit: 20,
     articleResourceTypes: "nesrom,红白机",
   })
-  .then(async (res: any) => {
+  .then((res: any) => {
     data.value = res.data.data.dataList;
     gameName.value = data.value[0].exhibitName;
-    gameUrl.value = await freelogApp.getExhibitFileStream(
-      data.value[0].exhibitId,
-      {
-        returnUrl: true,
-      }
-    );
-    mountExhibitWidget(gameUrl.value);
+    gameId.value = data.value[0].exhibitId;
+    mountExhibitWidget();
   });
 const show = async (data: any) => {
   gameName.value = data.exhibitName;
-  gameUrl.value = await freelogApp.getExhibitFileStream(
-    data.exhibitId,
-    {
-      returnUrl: true,
-    }
-  );
-  exhibitWidget.getApi().startGame(gameUrl.value);
+  gameId.value = data.exhibitId;
+  exhibitWidget.unmount();
+  exhibitWidget.unmountPromise.then(() => {
+    setTimeout(() => {
+      exhibitWidget.mount();
+    }, 300);
+  });
 };
 // 离开记得卸载插件喔
 onUnmounted(async () => {
   await exhibitWidget?.unmount();
 });
-const mountExhibitWidget = async (url: string) => {
+const mountExhibitWidget = async () => {
   const res = await freelogApp.getExhibitListByPaging({
     articleResourceTypes: "插件",
     isLoadVersionProperty: 1,
@@ -76,7 +71,13 @@ const mountExhibitWidget = async (url: string) => {
         container: document.getElementById("freelog-game"), // 必传，自定义一个让插件挂载的div容器
         topExhibitData: null, // 必传，最外层展品数据（子孙插件都需要用）
         config: {
-          defaultGameUrl: url,
+          // 传递给插件，让其自己获取展品内容
+          getGame: () => {
+            return {
+              gameName: gameName.value,
+              gameId: gameId.value,
+            };
+          },
         }, // 传递给子插件配置数据，会合并到作品上的配置数据
         seq: null, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
         widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件

@@ -31,7 +31,7 @@
               <div
                 class="brs-4 b-1 px-10 py-4 cur-pointer"
                 v-else
-                @click="selectedKey = key"
+                @click="setSelectKey(key)"
               >
                 {{ p1Keys[key] }}
               </div>
@@ -61,7 +61,7 @@
               <div
                 class="brs-4 b-1 px-10 py-4 cur-pointer"
                 v-else
-                @click="selectedKey = key"
+                @click="setSelectKey(key)"
               >
                 {{ p2Keys[key] }}
               </div>
@@ -113,6 +113,9 @@ const $emit = defineEmits(["cancel", "save"]);
 const keys = ref(Object.keys(p1));
 const p1Keys = reactive({ ...props.p1Keys });
 const p2Keys = reactive({ ...props.p2Keys });
+const setSelectKey = (key: string) => {
+  selectedKey.value = key;
+};
 const setDefault = (value: number) => {
   if (value === 1) {
     Object.keys(p1Keys).forEach((key: string) => {
@@ -124,6 +127,8 @@ const setDefault = (value: number) => {
       p2Keys[key] = p2[key];
     });
   }
+  inputValue.value = "";
+  selectedKey.value = "";
 };
 const pressChange = (e: KeyboardEvent, key: string) => {
   if (activeKey.value === "1") {
@@ -134,7 +139,7 @@ const pressChange = (e: KeyboardEvent, key: string) => {
     });
     if (exist) {
       message.error({
-        content: "按键重复",
+        content: "玩家1按键重复",
         duration: 2,
       });
       inputValue.value = "";
@@ -157,33 +162,28 @@ const pressChange = (e: KeyboardEvent, key: string) => {
     }
     p2Keys[key] = e.code;
   }
+  inputValue.value = "";
   selectedKey.value = "";
 };
 const userData = ref({} as any);
 let rawData: any = {};
 // 根据自定义的key获取 存储的用户数据，主题、不同的插件与插件 保存数据都是隔离的
-freelogApp.getUserData("testData").then((data: any) => {
-  rawData = data;
+freelogApp.getUserData("nesKeys").then((data: any) => {
+  rawData = data || {};
   userData.value = data || {};
 });
 const setData = async (key: string, value: any) => {
-  userData.value[key] = value;
-  await freelogApp.setUserData("testData", {
+  await freelogApp.setUserData("nesKeys", {
     ...rawData,
-    visitCount: userData.value.visitCount,
-    adCount: userData.value.adCount,
+    ...value,
   });
 };
 const handleOk = async (e: MouseEvent) => {
-  const setData = async (key: string, value: any) => {
-    userData.value[key] = value;
-    await freelogApp.setUserData("testData", {
-      ...rawData,
-      visitCount: userData.value.visitCount,
-      adCount: userData.value.adCount,
-    });
-  };
-  console.log(e);
+  console.log(p1Keys, p2Keys);
+  setData("nesKeys", {
+    p1Keys: { ...p1Keys },
+    p2Keys: { ...p2Keys },
+  });
   $emit("save");
 };
 const cancel = (e: MouseEvent) => {

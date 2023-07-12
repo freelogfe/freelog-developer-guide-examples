@@ -1,5 +1,5 @@
 interface Window {
-    freelogApp: any;
+    FREELOG_RESOURCENAME: any;
     isMobile: any;
     isTest: boolean;
     userInfo: any;
@@ -7,5 +7,4 @@ interface Window {
     freelogAuth: any;
     __POWERED_BY_FREELOG__: any;
     ENV: string;
-    FREELOG_RESOURCENAME: string;
 }

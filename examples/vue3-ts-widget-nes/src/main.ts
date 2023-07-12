@@ -6,13 +6,12 @@ import "./registerServiceWorker";
 import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
-import { useCounterStore } from "./stores/counter";
+import { useGameUrlStore } from "./stores/url";
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import "./assets/css/index.scss"
-
-const freelogApp = window.freelogApp;
-
+window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
+ 
 let pinia: any = null;
 
 // createApp(App).use(store).use(router).mount("#app")
@@ -36,9 +35,9 @@ function render(props: any = {}) {
   if (props?.registerApi) {
     // 暴露api给父插件或主题
     props.registerApi({
-      changeMe: () => {
-        const store = useCounterStore();
-        store.increment();
+      startGame: (url:string) => {
+        const store = useGameUrlStore();
+        store.setUrl(url);
       },
     });
   }
