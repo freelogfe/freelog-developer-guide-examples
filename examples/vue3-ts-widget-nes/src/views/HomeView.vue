@@ -3,28 +3,30 @@
     <div class="flex-column-center w-100x">
       <div class="flex-row pt-40 space-between w-800 mb-10">
         <div class="flex-row">
-          <!-- <Slider
+          <a-slider
             :autofocus="false"
             class="w-200 mr-10"
             v-model:value="voiceValue"
             ref="slider"
             @afterChange="sliderChange"
             :disabled="voiceDisabled"
-          /> -->
+          />
           <a-button type="primary" class="mr-20" @click="closeVoice">{{
             voiceValue === 0 ? "打开声音" : "关闭声音"
           }}</a-button>
         </div>
-
-        <a-button type="primary" class="mr-20" @click="setKeyVisible = true"
-          >设置按键</a-button
-        >
+        <div class="flex-row">
+          <a-button type="primary" class="mr-20" @click="setKeyVisible = true"
+            >设置按键</a-button
+          >
+          <a-button type="primary" @click="requestFullScreen">全屏</a-button>
+        </div>
       </div>
     </div>
 
     <nes-vue
-      width="800"
-      height="700"
+      :width="width"
+      :height="height"
       :gain="voiceValue"
       ref="nes"
       label="点击开始游戏"
@@ -40,7 +42,6 @@
       @cancel="setKeyVisible = false"
       @save="setKeys"
       :p1Keys="p1Keys"
-      
       :p2Keys="p2Keys"
     />
   </div>
@@ -55,6 +56,8 @@ import { freelogApp } from "freelog-runtime";
 import { useGameUrlStore } from "@/stores/url";
 
 const voiceValue = ref<number>(100);
+const width = ref<number>(800);
+const height = ref<number>(700);
 const setKeyVisible = ref(false);
 const voiceDisabled = ref(false);
 const slider = ref<any>(null);
@@ -63,9 +66,9 @@ const urlStore = useGameUrlStore();
 const urlValue = ref<string>(urlStore.url);
 watch(
   () => urlStore.url,
-  (value:string) => {
-    console.log(23423424,value)
-    urlValue.value = value
+  (value: string) => {
+    console.log(23423424, value);
+    urlValue.value = value;
     /* ... */
   }
 );
@@ -94,7 +97,6 @@ const p2 = {
 const p1Keys = ref({ ...p1 });
 const p2Keys = ref({ ...p2 });
 const sliderChange = () => {
-  console.log(slider.value);
   slider?.value?.blur();
 };
 freelogApp.getUserData("nesKeys").then((data: any) => {
@@ -127,6 +129,9 @@ function closeVoice() {
   }
   // document.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyW" }));
 }
-
+function requestFullScreen() {
+  console.log(nes.value.$el);
+  nes.value.$el.requestFullscreen();
+}
 // the increment action can just be destructured
 </script>
