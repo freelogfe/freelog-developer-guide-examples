@@ -172,12 +172,14 @@ freelogApp.getUserData("nesKeys").then((data: any) => {
   rawData = data || {};
   userData.value = data || {};
 });
+
 const setData = async (key: string, value: any) => {
   await freelogApp.setUserData("nesKeys", {
     ...rawData,
     ...value,
   });
 };
+
 const handleOk = async (e: MouseEvent) => {
   console.log(p1Keys, p2Keys);
   setData("nesKeys", {
