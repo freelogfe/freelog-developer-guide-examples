@@ -69,7 +69,7 @@ const mountExhibitWidget = async (url: string, name: string) => {
   const widgets = res.data.data.dataList;
   console.log(widgets);
   widgets.forEach(async (widget: any, index: number) => {
-    if (widget.exhibitName === "nes-widget") {
+    if (widget.exhibitName === "红白机插件") {
       // widget.exhibitId = widget.exhibitId + '111'
       exhibitWidget = await freelogApp.mountWidget({
         widget: widget, // 必传，子插件数据
@@ -80,7 +80,7 @@ const mountExhibitWidget = async (url: string, name: string) => {
           defaultGameName: name,
         }, // 传递给子插件配置数据，会合并到作品上的配置数据
         seq: null, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
-        widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件
+        // widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件
       });
     }
   });
