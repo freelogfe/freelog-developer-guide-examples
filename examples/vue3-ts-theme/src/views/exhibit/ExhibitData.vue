@@ -45,7 +45,7 @@ freelogApp
         returnUrl: true,
       }
     );
-    mountExhibitWidget(gameUrl.value);
+    mountExhibitWidget(gameUrl.value, gameName.value);
   });
 const show = async (data: any) => {
   gameName.value = data.exhibitName;
@@ -55,13 +55,13 @@ const show = async (data: any) => {
       returnUrl: true,
     }
   );
-  exhibitWidget.getApi().startGame(gameUrl.value);
+  exhibitWidget.getApi().startGame(gameUrl.value,gameName.value);
 };
 // 离开记得卸载插件喔
 onUnmounted(async () => {
   await exhibitWidget?.unmount();
 });
-const mountExhibitWidget = async (url: string) => {
+const mountExhibitWidget = async (url: string, name: string) => {
   const res = await freelogApp.getExhibitListByPaging({
     articleResourceTypes: "插件",
     isLoadVersionProperty: 1,
@@ -77,6 +77,7 @@ const mountExhibitWidget = async (url: string) => {
         topExhibitData: null, // 必传，最外层展品数据（子孙插件都需要用）
         config: {
           defaultGameUrl: url,
+          defaultGameName: name,
         }, // 传递给子插件配置数据，会合并到作品上的配置数据
         seq: null, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
         widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件

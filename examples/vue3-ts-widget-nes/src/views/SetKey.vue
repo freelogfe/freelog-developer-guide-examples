@@ -17,7 +17,7 @@
               >恢复默认</a-button
             >
           </div>
-          <template v-for="key in keys" :key="key">
+          <template v-for="key in key1s" :key="key">
             <div class="flex-row bb-1 py-8">
               <div class="w-80 text-align-right mr-100 shrink-0">
                 {{ key }}：
@@ -47,7 +47,7 @@
               >恢复默认</a-button
             >
           </div>
-          <template v-for="key in keys" :key="key">
+          <template v-for="key in key2s" :key="key">
             <div class="flex-row bb-1 py-8">
               <div class="w-80 text-align-right mr-100 shrink-0">
                 {{ key }}：
@@ -110,7 +110,8 @@ const p2: any = {
   D: "Numpad4",
 };
 const $emit = defineEmits(["cancel", "save"]);
-const keys = ref(Object.keys(p1));
+const key1s = ref(Object.keys(p1));
+const key2s = ref(Object.keys(p2));
 const p1Keys = reactive({ ...props.p1Keys });
 const p2Keys = reactive({ ...props.p2Keys });
 const setSelectKey = (key: string) => {

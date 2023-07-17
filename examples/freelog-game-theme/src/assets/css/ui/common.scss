@@ -1,0 +1,69 @@
+.disabled {
+  pointer-events: none;
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.gray {
+  filter: grayscale(100%);
+}
+
+.input-none{  
+	background:none !important;  
+	outline:none !important;  
+	border:none !important;
+}
+.input-none:focus{   
+  border:none !important;
+  box-shadow: none !important;
+}
+
+.disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.6;
+}
+
+
+
+/*css主要部分的样式*/
+/*定义滚动条宽高及背景，宽高分别对应横竖滚动条的尺寸*/
+
+::-webkit-scrollbar {
+  width: 5px;
+  /*对垂直流动条有效*/
+  height: 5px;
+  /*对水平流动条有效*/
+}
+
+/*定义滚动条的轨道颜色、内阴影及圆角*/
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  background-color: rgb(255, 255, 255);
+  border-radius: 3px;
+}
+
+
+/*定义滑块颜色、内阴影及圆角*/
+::-webkit-scrollbar-thumb {
+  border-radius: 7px;
+  -webkit-box-shadow: inset 0 0 6px rgba(236, 222, 222, 0.3);
+  background-color: #c7c0c0;
+}
+
+/*定义两端按钮的样式*/
+::-webkit-scrollbar-button {
+  background-color: white;
+  height: 0px;
+}
+
+/*定义右下角汇合处的样式*/
+::-webkit-scrollbar-corner {
+  background: khaki;
+}
+
+.hover-light:hover{
+  opacity: 0.85;
+}

@@ -5,16 +5,17 @@
         <div class="flex-row">
           <a-slider
             :autofocus="false"
-            class="w-200 mr-10"
+            class="w-160 mr-10"
             v-model:value="voiceValue"
             ref="slider"
             @afterChange="sliderChange"
             :disabled="voiceDisabled"
           />
           <a-button type="primary" class="mr-20" @click="closeVoice">{{
-            voiceValue === 0 ? "打开声音" : "关闭声音"
+            voiceDisabled ? "打开声音" : "关闭声音"
           }}</a-button>
         </div>
+        <div class="f-title-3 mr-60 ">{{ gameName }}</div>
         <div class="flex-row">
           <a-button type="primary" class="mr-20" @click="setKeyVisible = true"
             >设置按键</a-button
@@ -27,11 +28,12 @@
     <nes-vue
       :width="width"
       :height="height"
-      :gain="voiceValue"
+      :gain="voiceDisabled ? 0 : voiceValue"
       ref="nes"
       label="点击开始游戏"
       :p1="p1Keys"
       :p2="p2Keys"
+      v-if="urlValue"
       :url="urlValue"
     />
     <!-- url="https://taiyuuki.github.io/nes-vue/Super Mario Bros (JU).nes" -->
@@ -53,7 +55,7 @@ import SetKey from "./SetKey.vue";
 import { NesVue } from "nes-vue";
 import { ref, watch } from "vue";
 import { freelogApp } from "freelog-runtime";
-import { useGameUrlStore } from "@/stores/url";
+import { useGameUrlStore } from "@/stores/game";
 
 const voiceValue = ref<number>(100);
 const width = ref<number>(800);
@@ -64,11 +66,13 @@ const slider = ref<any>(null);
 const nes = ref<any>(null);
 const urlStore = useGameUrlStore();
 const urlValue = ref<string>(urlStore.url);
+const gameName = ref<string>(urlStore.gameName);
 watch(
   () => urlStore.url,
   (value: string) => {
     console.log(23423424, value);
     urlValue.value = value;
+    gameName.value = urlStore.gameName
     /* ... */
   }
 );
@@ -118,16 +122,9 @@ function setKeys() {
     setKeyVisible.value = false;
   });
 }
-function upstart() {
-  document.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
-}
+
 function closeVoice() {
-  voiceValue.value = 0;
   voiceDisabled.value = !voiceDisabled.value;
-  if (!voiceDisabled.value) {
-    voiceValue.value = 100;
-  }
-  // document.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyW" }));
 }
 function requestFullScreen() {
   console.log(nes.value.$el);
@@ -135,3 +132,4 @@ function requestFullScreen() {
 }
 // the increment action can just be destructured
 </script>
+@/stores/game

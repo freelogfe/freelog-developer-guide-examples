@@ -6,7 +6,7 @@ import "./registerServiceWorker";
 import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
-import { useGameUrlStore } from "./stores/url";
+import { useGameUrlStore } from "./stores/game";
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import "./assets/css/index.scss"
@@ -35,9 +35,9 @@ function render(props: any = {}) {
   if (props?.registerApi) {
     // 暴露api给父插件或主题
     props.registerApi({
-      startGame: (url:string) => {
+      startGame: (url:string, name: string) => {
         const store = useGameUrlStore();
-        store.setUrl(url);
+        store.setUrl(url, name);
       },
     });
   }
