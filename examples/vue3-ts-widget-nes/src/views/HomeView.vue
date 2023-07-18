@@ -128,7 +128,7 @@ function closeVoice() {
 }
 function requestFullScreen() {
   console.log(nes.value.$el);
-  nes.value.$el.requestFullscreen();
+  nes.value.$el.getElementsByTagName("canvas")[0].requestFullscreen();
 }
 // the increment action can just be destructured
 </script>
