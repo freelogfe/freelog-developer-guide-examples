@@ -67,7 +67,6 @@ const mountExhibitWidget = async (url: string, name: string) => {
     isLoadVersionProperty: 1,
   });
   const widgets = res.data.data.dataList;
-  console.log(widgets);
   widgets.forEach(async (widget: any, index: number) => {
     if (widget.exhibitName === "红白机插件") {
       // widget.exhibitId = widget.exhibitId + '111'

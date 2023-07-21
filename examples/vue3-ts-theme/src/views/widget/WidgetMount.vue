@@ -62,7 +62,6 @@ const reload = (obj: any) => {
 };
 const mountSubWidget = async () => {
   const subData = await freelogApp.getSubDep();
-  console.log(subData.subDep)
   subData.subDep.forEach(async (sub: any, index: number) => {
     if (sub.name === "snnaenu/插件开发演示代码插件") {
       selfWidget = await freelogApp.mountWidget({

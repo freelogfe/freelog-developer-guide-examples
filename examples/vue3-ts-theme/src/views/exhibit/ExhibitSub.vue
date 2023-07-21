@@ -30,7 +30,6 @@ const treeData = ref([] as any[]);
 
 const data = ref([] as any[]);
 const show = async (node: any) => {
-  console.log(node);
   // 顶级的展品id，当前资源的父资源的nid，当前资源的资源id
   imgUrl.value = await freelogApp.getExhibitDepFileStream(
     node.node.exhibitId,

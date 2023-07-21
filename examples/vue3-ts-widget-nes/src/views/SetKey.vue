@@ -182,7 +182,6 @@ const setData = async (key: string, value: any) => {
 };
 
 const handleOk = async (e: MouseEvent) => {
-  console.log(p1Keys, p2Keys);
   setData("nesKeys", {
     p1Keys: { ...p1Keys },
     p2Keys: { ...p2Keys },
@@ -190,7 +189,6 @@ const handleOk = async (e: MouseEvent) => {
   $emit("save");
 };
 const cancel = (e: MouseEvent) => {
-  console.log(e);
   $emit("cancel");
 };
 </script>

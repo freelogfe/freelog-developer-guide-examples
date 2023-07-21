@@ -65,7 +65,6 @@ export default defineComponent({
     watch(
       () => route.path,
       (val: any) => {
-        console.log(val);
         if (!val) return;
         val = val.replace("/", "").split("?")[0];
         selectedKeys.value = [val];

@@ -40,11 +40,8 @@ export default {
     },
     async getSub() {
       const subData = await window.freelogApp.getSubDep();
-      console.log(subData)
       subData.subDep.some(async (sub, index) => {
         if (index === 2) return true;
-        if (index === 2) return true;
-        console.log(sub)
         this.widgetApp = await window.freelogApp.mountWidget(
           sub,
           document.getElementById("freelog-single"),
@@ -74,7 +71,6 @@ export default {
       limit: 20,
       articleResourceTypes: 'nesrom'
     });
-    console.log(res)
     this.gameList = res.data.data.dataList
     this.gameId = res.data.data.dataList[0].exhibitId
     this.gameName = res.data.data.dataList[0].exhibitName

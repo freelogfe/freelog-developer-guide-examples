@@ -38,7 +38,6 @@ const loginOut = () => {
 };
 // 监听其余页面切换用户
 freelogApp.onUserChange(() => {
-  console.log(store.userInfo, freelogApp.getCurrentUser());
   Modal.warning({
     title: "将立刻刷新",
     icon: createVNode(ExclamationCircleOutlined),

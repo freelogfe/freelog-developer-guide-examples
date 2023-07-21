@@ -70,7 +70,6 @@ const gameName = ref<string>(urlStore.gameName);
 watch(
   () => urlStore.url,
   (value: string) => {
-    console.log(23423424, value);
     urlValue.value = value;
     gameName.value = urlStore.gameName
     /* ... */
@@ -127,7 +126,6 @@ function closeVoice() {
   voiceDisabled.value = !voiceDisabled.value;
 }
 function requestFullScreen() {
-  console.log(nes.value.$el);
   nes.value.$el.getElementsByTagName("canvas")[0].requestFullscreen();
 }
 // the increment action can just be destructured

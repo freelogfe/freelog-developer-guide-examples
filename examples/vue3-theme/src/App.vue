@@ -40,7 +40,6 @@ const mountExhibitWidget = async () => {
     isLoadVersionProperty: 1,
   });
   const widgets = res.data.data.dataList;
-  console.log(widgets);
   widgets.some(async (widget, index) => {
     if (index === 1) { 
       return true;

@@ -62,7 +62,6 @@ const mountExhibitWidget = async () => {
     isLoadVersionProperty: 1,
   });
   const widgets = res.data.data.dataList;
-  console.log(widgets);
   widgets.forEach(async (widget: any, index: number) => {
     if (widget.exhibitName === "nes-widget") {
       // widget.exhibitId = widget.exhibitId + '111'

@@ -68,7 +68,6 @@ const show = async (data: any) => {
         immediate: true,
       })
       .then(async (result: any) => {
-        console.log(result)
         if (result.status === freelogApp.resultType.SUCCESS) {
           imgUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {
             returnUrl: true,
