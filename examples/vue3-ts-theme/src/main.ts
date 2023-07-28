@@ -87,8 +87,9 @@ function storeTest(props: any) {
   });
   if (props.onGlobalStateChange) {
     props.onGlobalStateChange(
-      (value: any, prev: any) =>
-        console.log(`[插件 - ${props.name}]:`, value, prev),
+      (value: any, prev: any) =>{
+        // console.log(`[插件 - ${props.name}]:`, value, prev)
+      },
       true
     );
   }

@@ -19,7 +19,5 @@ const { count } = storeToRefs(store);
 // the increment action can just be destructured
 </script>
 <style scoped>
-.home{
-  background-color: red;
-}
+
 </style>
