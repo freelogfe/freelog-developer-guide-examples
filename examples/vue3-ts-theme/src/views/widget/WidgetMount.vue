@@ -35,7 +35,7 @@
 
 <script lang="ts" setup>
 import { freelogApp } from "freelog-runtime";
-import { reactive, ref } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 const activeKey = ref("1");
 let selfWidget: any = null;
 let exhibitWidget: any = null;
@@ -109,7 +109,11 @@ const mountExhibitWidget = async () => {
     return false
   });
 };
-
+// 离开记得卸载插件喔
+onBeforeUnmount(async () => {
+  await selfWidget?.unmount();
+  await exhibitWidget?.unmount();
+});
 mountExhibitWidget();
 mountSubWidget();
 </script>

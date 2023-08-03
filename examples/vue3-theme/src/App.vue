@@ -17,7 +17,7 @@ const mountSubWidget = async () => {
       topExhibitData: subData, // 必传，最外层展品数据（子孙插件都需要用）
       config: {}, // 子插件配置数据，需要另外获取作品上的配置数据
       seq: null, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
-      widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件
+      // widget_entry: "https://localhost:8002", // 本地url，dev模式下，可以使用本地url调试子插件
     });
     // 使用此函数可以保证在插件加载完成后 再执行
     app.mountPromise.then(() => {

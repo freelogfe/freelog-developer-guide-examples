@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import { freelogApp } from "freelog-runtime";
-import { ref, onUnmounted } from "vue";
+import { ref, onBeforeUnmount } from "vue";
 
 let exhibitWidget: any = null;
 
@@ -58,7 +58,7 @@ const show = async (data: any) => {
   exhibitWidget.getApi().startGame(gameUrl.value,gameName.value);
 };
 // 离开记得卸载插件喔
-onUnmounted(async () => {
+onBeforeUnmount(async () => {
   await exhibitWidget?.unmount();
 });
 const mountExhibitWidget = async (url: string, name: string) => {
