@@ -10,7 +10,7 @@ function resolve(dir) {
   return path.join(__dirname, dir);
 }
 
-const port = 8001;
+const port = 8009;
 module.exports = defineConfig(async () => {
   const https = await webpackPlugin.default({
     force: true,
