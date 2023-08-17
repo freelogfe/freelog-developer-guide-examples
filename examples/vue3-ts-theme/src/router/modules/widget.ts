@@ -26,6 +26,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "widgetStatic",
     component: () => import("@/views/widget/WidgetStatic.vue"),
   },
+  {
+    path: "widget-viewport",
+    name: "widgetViewport",
+    component: () => import("@/views/widget/WidgetViewport.vue"),
+  },
 ];
 
 // const router = createRouter({

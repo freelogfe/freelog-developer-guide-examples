@@ -3,7 +3,7 @@
     id="dddddd"
     v-model:openKeys="openKeys"
     v-model:selectedKeys="selectedKeys"
-    style="width: 256px; overflow-x: hidden"
+    style="width: 20vw; overflow-x: hidden"
     mode="inline"
     class="h-100x y-auto"
     @click="handleClick"
@@ -13,7 +13,7 @@
       <a-menu-item key="widget-dep">获取自身依赖</a-menu-item>
       <a-menu-item key="widget-config">主题插件自身数据</a-menu-item>
       <a-menu-item key="widget-mount">加载插件与通信</a-menu-item>
-      <!-- <a-menu-item key="widget-control">控制插件与通信</a-menu-item> -->
+      <a-menu-item key="widget-viewport">移动端viewport适配</a-menu-item>
       <a-menu-item key="widget-static">静态资源路径获取</a-menu-item>
     </a-sub-menu>
     <a-sub-menu key="exhibit" @titleClick="titleClick">

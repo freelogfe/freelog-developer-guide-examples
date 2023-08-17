@@ -1,7 +1,7 @@
 <template>
   <div class="w-100x h-100x flex-column over-h">
     <HeaderComp ></HeaderComp>
-    <div class="w-100x flex-1 over-h flex-row">
+    <div class="w-100x flex-1 flex-row x-auto">
       <div class="shrink-0 h-100x over-h p-relative"><LeftComp /></div>
       <div class="flex-1 h-100x over-h p-relative">
         <keep-alive> <router-view v-if="!loading"/> </keep-alive>
