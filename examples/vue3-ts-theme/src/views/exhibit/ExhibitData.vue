@@ -68,7 +68,7 @@ const mountExhibitWidget = async (url: string, name: string) => {
   });
   const widgets = res.data.data.dataList;
   widgets.forEach(async (widget: any, index: number) => {
-    if (widget.exhibitName === "红白机插件") {
+    if (widget.exhibitName === "nes-widget") {
       // widget.exhibitId = widget.exhibitId + '111'
       exhibitWidget = await freelogApp.mountWidget({
         widget: widget, // 必传，子插件数据

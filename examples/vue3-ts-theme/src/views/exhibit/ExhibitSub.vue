@@ -1,5 +1,5 @@
 <template>
-  <div class="home p-40">
+  <div class="home p-40  y-auto h-100x">
     <a-list :grid="{ gutter: 16, column: 4 }" :data-source="data">
       <template #renderItem="{ item }">
         <a-list-item>

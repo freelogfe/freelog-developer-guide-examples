@@ -1,4 +1,3 @@
-# 文档地址
+# 对应资源名称
 
-https://widget-docs.freelog.com/
-
+插件开发演示代码主题
