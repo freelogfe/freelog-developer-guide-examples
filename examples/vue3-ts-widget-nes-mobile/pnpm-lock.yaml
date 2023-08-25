@@ -4,6 +4,9 @@ dependencies:
   core-js:
     specifier: ^3.8.3
     version: 3.31.0
+  freelog-nes-vue:
+    specifier: ^1.6.10
+    version: 1.6.10
   jsnes:
     specifier: ^1.2.1
     version: 1.2.1
@@ -4979,6 +4982,12 @@ packages:
   /fraction.js@4.2.0:
     resolution: {integrity: sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==}
     dev: true
+
+  /freelog-nes-vue@1.6.10:
+    resolution: {integrity: sha512-e3dyfyBI2LPtxpvk9p3mBtGF9Rm4XOE2OE/T5aRDDr+0fYvPD+u2e20nkcRkwvGqLx4tT9H8gd/rRqFIg7O3HQ==}
+    dependencies:
+      '@taiyuuki/utils': 0.4.5
+    dev: false
 
   /freelog-runtime@1.0.5:
     resolution: {integrity: sha512-smBDynY4Kbw9OofV3RCi+VkhHdha1+JZbTZYdaUjtHIVHSYpCQ2DTwZDLXz+I6p/1aFjgiHhLTpSCLUW6BNXrg==}

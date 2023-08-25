@@ -1,5 +1,8 @@
 <template>
-  <div class="home w-100x h-100x flex-row nes-container justify-center" id="nes-container">
+  <div
+    class="home w-100x h-100x flex-row nes-container justify-center"
+    id="nes-container"
+  >
     <!-- <div class="flex-column-center w-100x">
       <div class="flex-row pt-40 space-between w-800 mb-10">
         <div class="flex-row">
@@ -38,16 +41,16 @@
       <div
         id="joystick_btn_choice"
         class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mt-10"
-        @touchstart="keyStart(p1.SELECT)"
-        @touchend="keyEnd(p1.SELECT)"
+        @touchstart.prevent="keyStart(p1.SELECT)"
+        @touchend.prevent="keyEnd(p1.SELECT)"
       >
         选择
       </div>
       <div
         id="joystick_btn_start"
         class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mt-10"
-        @touchstart="keyStart(p1.START)"
-        @touchend="keyEnd(p1.START)"
+        @touchstart.prevent="keyStart(p1.START)"
+        @touchend.prevent.prevent="keyEnd(p1.START)"
       >
         开始
       </div>
@@ -58,56 +61,56 @@
         <div
           class="darrow w-52 h-62 ml-112"
           id="joystick_rightup"
-          @touchstart="keyMiddleStart(p1.UP, p1.RIGHT)"
-          @touchend="keyMiddleEnd(p1.UP, p1.RIGHT)"
+          @touchstart.prevent="keyMiddleStart(p1.UP, p1.RIGHT)"
+          @touchend.prevent="keyMiddleEnd(p1.UP, p1.RIGHT)"
         ></div>
         <div
           class="darrow w-52 h-62 ml-10"
           id="joystick_leftup"
-          @touchstart="keyMiddleStart(p1.LEFT, p1.UP)"
-          @touchend="keyMiddleEnd(p1.LEFT, p1.UP)"
+          @touchstart.prevent="keyMiddleStart(p1.LEFT, p1.UP)"
+          @touchend.prevent="keyMiddleEnd(p1.LEFT, p1.UP)"
         ></div>
         <div
           class="darrow w-52 h-62 mt-10 ml-10 mt-106"
           id="joystick_leftdown"
-          @touchstart="keyMiddleStart(p1.LEFT, p1.DOWN)"
-          @touchend="keyMiddleEnd(p1.LEFT, p1.DOWN)"
+          @touchstart.prevent="keyMiddleStart(p1.LEFT, p1.DOWN)"
+          @touchend.prevent="keyMiddleEnd(p1.LEFT, p1.DOWN)"
         ></div>
         <div
           class="darrow w-52 h-62 mt-10 ml-108 mt-110"
           id="joystick_rightdown"
-          @touchstart="keyMiddleStart(p1.RIGHT, p1.DOWN)"
-          @touchend="keyMiddleEnd(p1.RIGHT, p1.DOWN)"
+          @touchstart.prevent="keyMiddleStart(p1.RIGHT, p1.DOWN)"
+          @touchend.prevent="keyMiddleEnd(p1.RIGHT, p1.DOWN)"
         ></div>
         <button
           id="joystick_up"
           class="arrow w-52 h-60 ml-8 mt-2"
-          @touchstart="keyStart(p1.UP)"
-          @touchend="keyEnd(p1.UP)"
+          @touchstart.prevent="keyStart(p1.UP)"
+          @touchend.prevent="keyEnd(p1.UP)"
         >
           ▵
         </button>
         <button
           id="joystick_left"
           class="arrow w-52 h-60 mt-10"
-          @touchstart="keyStart(p1.LEFT)"
-          @touchend="keyEnd(p1.LEFT)"
+          @touchstart.prevent="keyStart(p1.LEFT)"
+          @touchend.prevent="keyEnd(p1.LEFT)"
         >
           ▵
         </button>
         <button
           id="joystick_right"
           class="arrow w-52 h-60 mt-10"
-          @touchstart="keyStart(p1.RIGHT)"
-          @touchend="keyEnd(p1.RIGHT)"
+          @touchstart.prevent="keyStart(p1.RIGHT)"
+          @touchend.prevent="keyEnd(p1.RIGHT)"
         >
           ▵
         </button>
         <button
           id="joystick_down"
           class="arrow w-52 h-60 ml-8"
-          @touchstart="keyStart(p1.DOWN)"
-          @touchend="keyEnd(p1.DOWN)"
+          @touchstart.prevent="keyStart(p1.DOWN)"
+          @touchend.prevent="keyEnd(p1.DOWN)"
         >
           ▵
         </button>
@@ -127,21 +130,20 @@
     <div
       class="p-absolute rt-0 w-192 mt-10 flex-column justify-center align-center"
     >
-    <div
+      <div
         id="joystick_btn_start"
         @click="requestFullScreen"
         class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mb-20"
       >
-      全屏
+        {{ fullScreen ? "退出全屏" : "全屏" }}
       </div>
       <div
         id="joystick_btn_start"
         @click="closeVoice"
         class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mb-10"
       >
-      {{voiceDisabled?"打开声音":"关闭声音"}}
+        {{ voiceDisabled ? "打开声音" : "关闭声音" }}
       </div>
-    
     </div>
     <div
       class="joystickpad flex-column align-center p-absolute rb-0 w-192 pb-10 lh-62"
@@ -149,8 +151,8 @@
       <div
         id="joystick_btn_AB"
         class="xbutton joystick_btn_op_2 w-62 h-62"
-        @touchstart="abStart()"
-        @touchend="abEnd()"
+        @touchstart.prevent="abStart()"
+        @touchend.prevent.prevent="abEnd()"
       >
         AB
       </div>
@@ -158,16 +160,16 @@
         <div
           id="joystick_btn_Y"
           class="xbutton joystick_btn_op_2 w-62 h-62 mr-10"
-          @touchstart="keyStart(p1.D)"
-          @touchend="keyEnd(p1.D)"
+          @touchstart.prevent="keyStart(p1.D)"
+          @touchend.prevent.prevent="keyEnd(p1.D)"
         >
           Y
         </div>
         <div
           id="joystick_btn_X"
           class="xbutton joystick_btn_op_2 w-62 h-62"
-          @touchstart="keyStart(p1.C)"
-          @touchend="keyEnd(p1.C)"
+          @touchstart.prevent="keyStart(p1.C)"
+          @touchend.prevent="keyEnd(p1.C)"
         >
           X
         </div>
@@ -176,16 +178,16 @@
         <div
           id="joystick_btn_B"
           class="xbutton joystick_btn_op_2 w-62 h-62 mr-10"
-          @touchstart="keyStart(p1.B)"
-          @touchend="keyEnd(p1.B)"
+          @touchstart.prevent="keyStart(p1.B)"
+          @touchend.prevent="keyEnd(p1.B)"
         >
           B
         </div>
         <div
           id="joystick_btn_A"
           class="xbutton joystick_btn_op_2 w-62 h-62"
-          @touchstart="keyStart(p1.A)"
-          @touchend="keyEnd(p1.A)"
+          @touchstart.prevent="keyStart(p1.A)"
+          @touchend.prevent="keyEnd(p1.A)"
         >
           A
         </div>
@@ -197,7 +199,7 @@
 
 <script lang="ts" setup>
 // import { Controller } from "jsnes";
-import { NesVue } from "nes-vue";
+import { NesVue } from "freelog-nes-vue";
 import { ref, watch } from "vue";
 import { freelogApp } from "freelog-runtime";
 import { useGameUrlStore } from "@/stores/game";
@@ -208,7 +210,7 @@ const height = ref<number | string>("100vmin");
 const voiceDisabled = ref(false);
 const slider = ref<any>(null);
 const nes = ref<any>(null);
-const abInter = ref<any>(null);
+const fullScreen = ref<boolean>(false);
 const urlStore = useGameUrlStore();
 const urlValue = ref<string>(urlStore.url);
 const gameName = ref<string>(urlStore.gameName);
@@ -220,9 +222,9 @@ watch(
     /* ... */
   }
 );
-const restart = ()=>{
+const restart = () => {
   nes.value.reset();
-}
+};
 const p1 = {
   UP: "KeyW",
   DOWN: "KeyS",
@@ -254,9 +256,14 @@ function closeVoice() {
   voiceDisabled.value = !voiceDisabled.value;
 }
 function requestFullScreen() {
+  if (fullScreen.value) {
+    fullScreen.value = false;
+    document.exitFullscreen();
+    return;
+  }
+  fullScreen.value = true;
   document.getElementById("nes-container")?.requestFullscreen();
 }
-requestFullScreen()
 function keyStart(key: string) {
   document.dispatchEvent(new KeyboardEvent("keydown", { code: key }));
 }
@@ -287,7 +294,15 @@ function keyMiddleEnd(key1: string, key2: string) {
   height: 100vmin;
   background: #222;
 
-  *{
+  * {
+    -webkit-touch-callout: none;
+    -moz-touch-callout: none;
+    -ms-touch-callout: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
   }
 }
