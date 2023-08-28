@@ -5,7 +5,7 @@
       <div class="flex-row align-center" v-if="userInfo">
         <div class="h-40 over-h brs-50 mr-20">
           <!-- <img :src="userInfo.headImage" alt="" class="h-100x" /> -->
-          <img src="https://image.freelog.com/headImage/50060" alt="" class="h-100x" >
+          <img :src="userInfo?.headImage" alt="" class="h-100x" >
         </div>
         <a-dropdown>
           <div  @click.prevent class="fc-white fs-18 cur-pointer">

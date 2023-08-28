@@ -33,6 +33,13 @@
     <div id="psp" class="flex-column h-100x align-center p-absolute lt-0 w-192">
       <div
         id="joystick_btn_menu"
+        @click="back"
+        class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mt-5"
+      >
+        返回列表
+      </div>
+      <div
+        id="joystick_btn_menu"
         @click="restart"
         class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mt-10"
       >
@@ -214,6 +221,7 @@ const fullScreen = ref<boolean>(false);
 const urlStore = useGameUrlStore();
 const urlValue = ref<string>(urlStore.url);
 const gameName = ref<string>(urlStore.gameName);
+
 watch(
   () => urlStore.url,
   (value: string) => {
@@ -255,6 +263,10 @@ const sliderChange = () => {
 function closeVoice() {
   voiceDisabled.value = !voiceDisabled.value;
 }
+function back() {
+  nes.value.pause();
+  freelogApp.getSelfConfig()?.showList();
+}
 function requestFullScreen() {
   if (fullScreen.value) {
     fullScreen.value = false;
@@ -265,6 +277,7 @@ function requestFullScreen() {
   document.getElementById("nes-container")?.requestFullscreen();
 }
 function keyStart(key: string) {
+  nes.value.play();
   document.dispatchEvent(new KeyboardEvent("keydown", { code: key }));
 }
 function keyEnd(key: string) {
