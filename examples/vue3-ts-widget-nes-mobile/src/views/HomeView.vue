@@ -134,72 +134,71 @@
       v-if="urlValue"
       :url="urlValue"
     />
-    <div
-      class="p-absolute rt-0 w-192 mt-10 flex-column justify-center align-center"
-    >
-      <div
-        id="joystick_btn_start"
-        @click="requestFullScreen"
-        class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mb-20"
-      >
-        {{ fullScreen ? "退出全屏" : "全屏" }}
-      </div>
-      <div
-        id="joystick_btn_start"
-        @click="closeVoice"
-        class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mb-10"
-      >
-        {{ voiceDisabled ? "打开声音" : "关闭声音" }}
-      </div>
-    </div>
-    <div
-      class="joystickpad flex-column align-center p-absolute rb-0 w-192 pb-10 lh-62"
-    >
-      <div
-        id="joystick_btn_AB"
-        class="xbutton joystick_btn_op_2 w-62 h-62"
-        @touchstart.prevent="abStart()"
-        @touchend.prevent.prevent="abEnd()"
-      >
-        AB
-      </div>
-      <div class="flex-row mt-14">
+    <div class="p-absolute rt-0 w-192 mt-10 flex-column align-center h-100x space-between">
+      <div>
         <div
-          id="joystick_btn_Y"
-          class="xbutton joystick_btn_op_2 w-62 h-62 mr-10"
-          @touchstart.prevent="keyStart(p1.D)"
-          @touchend.prevent.prevent="keyEnd(p1.D)"
+          id="joystick_btn_start"
+          @click="requestFullScreen"
+          class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mb-20"
         >
-          Y
+          {{ fullScreen ? "退出全屏" : "全屏" }}
         </div>
         <div
-          id="joystick_btn_X"
+          id="joystick_btn_start"
+          @click="closeVoice"
+          class="left pspbutton joystick_btn_op_1 text-align-center w-100 h-36 mb-10"
+        >
+          {{ voiceDisabled ? "打开声音" : "关闭声音" }}
+        </div>
+      </div>
+      <div class="joystickpad flex-column align-center w-100x pb-10 lh-62 mb-10">
+        <div
+          id="joystick_btn_AB"
           class="xbutton joystick_btn_op_2 w-62 h-62"
-          @touchstart.prevent="keyStart(p1.C)"
-          @touchend.prevent="keyEnd(p1.C)"
+          @touchstart.prevent="abStart()"
+          @touchend.prevent.prevent="abEnd()"
         >
-          X
+          AB
         </div>
-      </div>
-      <div class="flex-row mt-14">
-        <div
-          id="joystick_btn_B"
-          class="xbutton joystick_btn_op_2 w-62 h-62 mr-10"
-          @touchstart.prevent="keyStart(p1.B)"
-          @touchend.prevent="keyEnd(p1.B)"
-        >
-          B
+        <div class="flex-row mt-14">
+          <div
+            id="joystick_btn_Y"
+            class="xbutton joystick_btn_op_2 w-62 h-62 mr-10"
+            @touchstart.prevent="keyStart(p1.D)"
+            @touchend.prevent.prevent="keyEnd(p1.D)"
+          >
+            Y
+          </div>
+          <div
+            id="joystick_btn_X"
+            class="xbutton joystick_btn_op_2 w-62 h-62"
+            @touchstart.prevent="keyStart(p1.C)"
+            @touchend.prevent="keyEnd(p1.C)"
+          >
+            X
+          </div>
         </div>
-        <div
-          id="joystick_btn_A"
-          class="xbutton joystick_btn_op_2 w-62 h-62"
-          @touchstart.prevent="keyStart(p1.A)"
-          @touchend.prevent="keyEnd(p1.A)"
-        >
-          A
+        <div class="flex-row mt-14">
+          <div
+            id="joystick_btn_B"
+            class="xbutton joystick_btn_op_2 w-62 h-62 mr-10"
+            @touchstart.prevent="keyStart(p1.B)"
+            @touchend.prevent="keyEnd(p1.B)"
+          >
+            B
+          </div>
+          <div
+            id="joystick_btn_A"
+            class="xbutton joystick_btn_op_2 w-62 h-62"
+            @touchstart.prevent="keyStart(p1.A)"
+            @touchend.prevent="keyEnd(p1.A)"
+          >
+            A
+          </div>
         </div>
       </div>
     </div>
+
     <!-- url="https://taiyuuki.github.io/nes-vue/Super Mario Bros (JU).nes" -->
   </div>
 </template>
@@ -210,6 +209,8 @@ import { NesVue } from "freelog-nes-vue";
 import { ref, watch } from "vue";
 import { freelogApp } from "freelog-runtime";
 import { useGameUrlStore } from "@/stores/game";
+import screenfull from 'screenfull'
+import { showToast } from 'vant';
 
 const voiceValue = ref<number>(100);
 const width = ref<number | string>("107vmin");
@@ -268,13 +269,18 @@ function back() {
   freelogApp.getSelfConfig()?.showList();
 }
 function requestFullScreen() {
-  if (fullScreen.value) {
-    fullScreen.value = false;
-    document.exitFullscreen();
-    return;
+  // if (fullScreen.value) {
+  //   fullScreen.value = false;
+  //   document.exitFullscreen();
+  //   return;
+  // }
+  if (!screenfull.isEnabled) {
+    showToast('当前浏览器不支持全屏');
+    return 
   }
-  fullScreen.value = true;
-  document.getElementById("nes-container")?.requestFullscreen();
+  screenfull.toggle();
+  fullScreen.value = !fullScreen.value;
+  // document.getElementById("nes-container")?.requestFullscreen();
 }
 function keyStart(key: string) {
   nes.value.play();
@@ -329,6 +335,8 @@ function keyMiddleEnd(key1: string, key2: string) {
 @media screen and (orientation: landscape) {
   /*横屏 css*/
   .nes-container {
+    // transform: rotate(90deg);
+    // transform-origin: 50vw 50vw;
     // transform: rotate(90deg);
   }
 }
