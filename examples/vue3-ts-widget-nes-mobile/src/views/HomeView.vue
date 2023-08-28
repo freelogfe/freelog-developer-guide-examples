@@ -308,6 +308,10 @@ function keyMiddleEnd(key1: string, key2: string) {
 // the increment action can just be destructured
 </script>
 <style scoped lang="scss">
+.nes-container{
+  width: 100svmax !important;
+  height: 100svmin !important;
+}
 .nes-container {
   width: 100vmax;
   height: 100vmin;
