@@ -1,4 +1,7 @@
 <template>
+  <svg class="icon" aria-hidden="true">
+    <use xlink:href="#icon-shengyinkai"></use>
+  </svg>
   <van-list
     v-model:loading="loading"
     :finished="finished"
@@ -12,7 +15,15 @@
           </div>
           <span class="">{{ item.exhibitName }}</span>
         </div>
-        <van-button  class="w-100" type="primary" size="small" block round @click="start(item)">开始游戏</van-button>
+        <van-button
+          class="w-100"
+          type="primary"
+          size="small"
+          block
+          round
+          @click="start(item)"
+          >开始游戏</van-button
+        >
       </div>
     </template>
   </van-list>

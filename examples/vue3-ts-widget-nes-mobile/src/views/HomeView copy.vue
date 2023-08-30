@@ -72,52 +72,56 @@
         <div
           class="darrow w-52 h-62 ml-112"
           id="joystick_rightup"
-          :data-key="p1.RIGHT" 
-          :data-key2="p1.UP" 
+          @touchstart.prevent="keyMiddleStart(p1.UP, p1.RIGHT)"
+          @touchend.prevent="keyMiddleEnd(p1.UP, p1.RIGHT)"
         ></div>
         <div
           class="darrow w-52 h-62 ml-10"
           id="joystick_leftup"
-          :data-key="p1.LEFT" 
-          :data-key2="p1.UP"  
+          @touchstart.prevent="keyMiddleStart(p1.LEFT, p1.UP)"
+          @touchend.prevent="keyMiddleEnd(p1.LEFT, p1.UP)"
         ></div>
         <div
           class="darrow w-52 h-62 mt-10 ml-10 mt-106"
           id="joystick_leftdown"
-          :data-key="p1.LEFT" 
-          :data-key2="p1.DOWN"  
+          @touchstart.prevent="keyMiddleStart(p1.LEFT, p1.DOWN)"
+          @touchend.prevent="keyMiddleEnd(p1.LEFT, p1.DOWN)"
         ></div>
         <div
           class="darrow w-52 h-62 mt-10 ml-108 mt-110"
           id="joystick_rightdown"
-          :data-key="p1.RIGHT" 
-          :data-key2="p1.DOWN"  
+          @touchstart.prevent="keyMiddleStart(p1.RIGHT, p1.DOWN)"
+          @touchend.prevent="keyMiddleEnd(p1.RIGHT, p1.DOWN)"
         ></div>
         <button
           id="joystick_up"
           class="arrow w-52 h-60 ml-8 mt-2"
-          :data-key="p1.UP" 
+          @touchstart.prevent="keyStart(p1.UP)"
+          @touchend.prevent="keyEnd(p1.UP)"
         >
           ▵
         </button>
         <button
           id="joystick_left"
           class="arrow w-52 h-60 mt-10"
-          :data-key="p1.LEFT"
+          @touchstart.prevent="keyStart(p1.LEFT)"
+          @touchend.prevent="keyEnd(p1.LEFT)"
         >
           ▵
         </button>
         <button
           id="joystick_right"
-          :data-key="p1.RIGHT"
           class="arrow w-52 h-60 mt-10"
+          @touchstart.prevent="keyStart(p1.RIGHT)"
+          @touchend.prevent="keyEnd(p1.RIGHT)"
         >
           ▵
         </button>
         <button
           id="joystick_down"
-          :data-key="p1.DOWN"
-          class="arrow w-52 h-60 ml-8" 
+          class="arrow w-52 h-60 ml-8"
+          @touchstart.prevent="keyStart(p1.DOWN)"
+          @touchend.prevent="keyEnd(p1.DOWN)"
         >
           ▵
         </button>
@@ -152,7 +156,14 @@
         </div>
       </div>
       <div class="joystickpad flex-column align-center w-100x pb-10 lh-62 mb-10">
-       
+        <div
+          id="joystick_btn_AB"
+          class="xbutton joystick_btn_op_2 w-62 h-62"
+          @touchstart.prevent="abStart()"
+          @touchend.prevent.prevent="abEnd()"
+        >
+          AB
+        </div>
         <div class="flex-row mt-14">
           <div
             id="joystick_btn_Y"
@@ -177,11 +188,9 @@
             class="xbutton joystick_btn_op_2 w-62 h-62 mr-10"
             @touchstart.prevent="keyStart(p1.B)"
             @touchend.prevent="keyEnd(p1.B)"
-            @touchmove.prevent="bMove"
           >
             B
           </div>
-          <!-- <div class=""></div> -->
           <div
             id="joystick_btn_A"
             class="xbutton joystick_btn_op_2 w-62 h-62"
@@ -190,14 +199,6 @@
           >
             A
           </div>
-        </div>
-        <div
-          id="joystick_btn_AB"
-          class="xbutton joystick_btn_op_2 w-62 h-62 mt-10"
-          @touchstart.prevent="abStart()"
-          @touchend.prevent="abEnd()"
-        >
-          AB
         </div>
       </div>
     </div>
@@ -221,7 +222,6 @@ const height = ref<number | string>("100vmin");
 const voiceDisabled = ref(false);
 const slider = ref<any>(null);
 const nes = ref<any>(null);
-const upKeys = ref<any>([])
 const fullScreen = ref<boolean>(false);
 const urlStore = useGameUrlStore();
 const urlValue = ref<string>(urlStore.url);
@@ -287,70 +287,20 @@ function requestFullScreen() {
   // document.getElementById("nes-container")?.requestFullscreen();
 }
 function touchStart(e:any){
-  let touch = e.targetTouches[0];
-  let ele = document.elementFromPoint(touch.pageX, touch.pageY);
-  const key = ele?.getAttribute("data-key");
-  const key2 = ele?.getAttribute("data-key2");
-  // 如果当前元素存在key则down
-  if(key){
-    upKeys.value = [key]
-    document.dispatchEvent(new KeyboardEvent("keydown", { code: key }));
-  }
-  if(key2){
-    upKeys.value = [key,key2]
-    document.dispatchEvent(new KeyboardEvent("keydown", { code: key2 }));
-  }
+  console.log(e)
 }
 function touchEnd(e:any){
-  // 存在的key全部up
-  upKeys.value.forEach((key:string)=>{
-    document.dispatchEvent(new KeyboardEvent("keyup", { code: key }));
-  })
+  console.log(e)
 }
 function touchMove(e:any){
-  let touch = e.targetTouches[0];
-  let ele = document.elementFromPoint(touch.pageX, touch.pageY);
-  const key = ele?.getAttribute("data-key");
-  const key2 = ele?.getAttribute("data-key2");
-  // 不存在的key全部up
-  upKeys.value.forEach((str:string)=>{
-    if(![key,key2].includes(str)){
-      document.dispatchEvent(new KeyboardEvent("keyup", { code: str }));
-    }
-  })
-  // 如果当前元素存在key则down
-  if(key){
-    upKeys.value = [key]
-    document.dispatchEvent(new KeyboardEvent("keydown", { code: key }));
-  }
-  if(key2){
-    upKeys.value = [key,key2]
-    document.dispatchEvent(new KeyboardEvent("keydown", { code: key2 }));
-  }
-}
-function bMove(e:any){
-  let touch = e.targetTouches[0];
-  let ele = document.elementFromPoint(touch.pageX + touch.radiusX, touch.pageY);
-  const A = document.getElementById("joystick_btn_A");
-  if(ele == A){
-    upKeys.value.push(p1.A)
-    document.dispatchEvent(new KeyboardEvent("keydown", { code: p1.A }));
-  }else{
-    upKeys.value.includes(p1.A) && document.dispatchEvent(new KeyboardEvent("keyup", { code: p1.A }));
-  }
-  // const B = document.getElementById("joystick_btn_B");
-  // console.log(e,A?.left,A?.offsetLeft ,B)
+  console.log(e)
 }
 function keyStart(key: string) {
-  upKeys.value = [key]
+  nes.value.play();
   document.dispatchEvent(new KeyboardEvent("keydown", { code: key }));
 }
 function keyEnd(key: string) {
-  upKeys.value.forEach((str:string)=>{
-      document.dispatchEvent(new KeyboardEvent("keyup", { code: str }));
-  })
-  upKeys.value = []
-  // document.dispatchEvent(new KeyboardEvent("keyup", { code: key }));
+  document.dispatchEvent(new KeyboardEvent("keyup", { code: key }));
 }
 function abStart() {
   document.dispatchEvent(new KeyboardEvent("keydown", { code: p1.A }));

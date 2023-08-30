@@ -8,7 +8,7 @@ import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useGameUrlStore } from "./stores/game";
 import "./assets/css/index.scss"
- 
+// import "./font_8d5l8fzk5b87iudi.js"
 let pinia: any = null;
 
 // createApp(App).use(store).use(router).mount("#app")
