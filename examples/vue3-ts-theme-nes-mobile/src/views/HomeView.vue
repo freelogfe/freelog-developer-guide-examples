@@ -8,7 +8,7 @@
     finished-text="没有更多了"
   >
     <template v-for="item in list" :key="item">
-      <div class="flex-row space-between px-10 py-10 mt-20">
+      <div class="flex-row space-between px-10 py-10 mt-20 align-center">
         <div class="flex-row align-center">
           <div class="h-40 w-40 over-h mr-20">
             <img :src="item.coverImages[0]" alt="" class="h-100x" />
