@@ -1,3 +1,3 @@
 # 对应资源名称
 
-nes-widget
+nes-widget-mobile
