@@ -134,7 +134,7 @@ const setDefault = (value: number) => {
 const pressChange = (e: KeyboardEvent, key: string) => {
   if (activeKey.value === "1") {
     const exist = Object.keys(p1Keys).some((key2: string) => {
-      if (p1Keys[key2] === e.code) {
+      if (p1Keys[key2] === e.code && key !== key2) {
         return true;
       }
     });
