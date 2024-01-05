@@ -2,17 +2,17 @@ import { RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "exhibit-info",
+    path: "/exhibit-info",
     name: "exhibitInfo",
     component: () => import("@/views/exhibit/ExhibitInfo.vue"),
   },
   {
-    path: "exhibit-data",
+    path: "/exhibit-data",
     name: "exhibitData",
     component: () => import("@/views/exhibit/ExhibitData.vue"),
   },
   {
-    path: "exhibit-sub",
+    path: "/exhibit-sub",
     name: "exhibitSub",
     component: () => import("@/views/exhibit/ExhibitSub.vue"),
   },

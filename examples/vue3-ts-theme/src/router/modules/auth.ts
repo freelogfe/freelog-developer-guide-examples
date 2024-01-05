@@ -2,12 +2,12 @@ import { RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "auth-info",
+    path: "/auth-info",
     name: "authInfo",
     component: () => import("@/views/auth/AuthInfo.vue"),
   },
   {
-    path: "auth-process",
+    path: "/auth-process",
     name: "authProcess",
     component: () => import("@/views/auth/AuthProcess.vue"),
   },

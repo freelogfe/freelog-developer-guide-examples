@@ -8,6 +8,8 @@ import reportWebVitals from "./reportWebVitals";
 import { increment, decrement } from "./store/features/sample";
 import { store } from "./store/store";
 import { Provider } from "react-redux";
+import { freelogApp } from "freelog-runtime";
+
 import { useAppSelector, useAppDispatch } from "./store/hooks";
 
 console.log(increment, decrement);
