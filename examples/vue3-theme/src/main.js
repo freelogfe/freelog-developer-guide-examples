@@ -7,7 +7,7 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { createRouter, createWebHistory } from 'vue-router';
-const freelogApp = window.freelogApp
+import { freelogApp } from "freelog-runtime";
 let pinia = null;
 let router = null;
 let instance = null;

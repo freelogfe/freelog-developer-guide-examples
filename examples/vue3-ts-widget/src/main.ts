@@ -8,8 +8,8 @@ import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useCounterStore } from "./stores/counter";
 import "./assets/css/index.scss"
+import { freelogApp } from "freelog-runtime";
 
-const freelogApp = window.freelogApp;
 
 let pinia: any = null;
 

@@ -10,6 +10,8 @@ import { useGameUrlStore } from "./stores/game";
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import "./assets/css/index.scss"
+import { freelogApp } from "freelog-runtime";
+
 window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
  
 let pinia: any = null;

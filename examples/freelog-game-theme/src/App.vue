@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { freelogApp } from "freelog-runtime";
+
 export default {
   name: "freelog-document-app",
   data() {
@@ -39,10 +41,10 @@ export default {
       }
     },
     async getSub() {
-      const subData = await window.freelogApp.getSubDep();
+      const subData = await freelogApp.getSubDep();
       subData.subDep.some(async (sub, index) => {
         if (index === 2) return true;
-        this.widgetApp = await window.freelogApp.mountWidget(
+        this.widgetApp = await freelogApp.mountWidget(
           sub,
           document.getElementById("freelog-single"),
           subData,
@@ -63,10 +65,10 @@ export default {
     },
   },
   async mounted() {
-    window.freelogApp.onLogin(() => {
+    freelogApp.onLogin(() => {
       window.location.reload();
     });
-    const res = await window.freelogApp.getExhibitListByPaging({
+    const res = await freelogApp.getExhibitListByPaging({
       skip: 0,
       limit: 20,
       articleResourceTypes: 'nesrom'

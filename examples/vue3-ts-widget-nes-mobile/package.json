@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@types/webpack-env": "^1.18.4",
     "core-js": "^3.8.3",
     "freelog-nes-vue": "^1.6.10",
     "jsnes": "^1.2.1",
@@ -36,7 +37,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^9.15.1",
-    "freelog-runtime": "^1.0.5",
+    "freelog-runtime": "1.0.14",
     "postcss-px-to-viewport": "^1.1.1",
     "prettier": "^2.4.1",
     "sass": "^1.32.7",

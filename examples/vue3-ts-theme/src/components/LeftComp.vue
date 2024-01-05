@@ -57,6 +57,7 @@ export default defineComponent({
     const router = useRouter();
     const route = useRoute();
     const handleClick: MenuProps["onClick"] = (e) => {
+      console.log(e.key,3542342343)
       router.push("/" + e.key);
     };
     const titleClick = (e: Event) => {

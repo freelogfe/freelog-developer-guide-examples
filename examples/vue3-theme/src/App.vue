@@ -5,13 +5,15 @@
   <div id="freelog-single"></div>
 </template>
 <script setup>
+import { freelogApp } from "freelog-runtime";
+
 let app = null;
 // 加载自身依赖的插件
 const mountSubWidget = async () => {
-  const subData = await window.freelogApp.getSubDep();
+  const subData = await freelogApp.getSubDep();
   subData.subDep.some(async (sub, index) => {
     if (index === 0) return true;
-    app = await window.freelogApp.mountWidget({
+    app = await freelogApp.mountWidget({
       widget: sub, // 必传，子插件数据
       container: document.getElementById("freelog-single"), // 必传，自定义一个让插件挂载的div容器
       topExhibitData: subData, // 必传，最外层展品数据（子孙插件都需要用）
@@ -35,7 +37,7 @@ const add = () => {
 
 // 加载展品类型的插件s
 const mountExhibitWidget = async () => {
-  const res = await window.freelogApp.getExhibitListByPaging({
+  const res = await freelogApp.getExhibitListByPaging({
     articleResourceTypes: "插件",
     isLoadVersionProperty: 1,
   });
@@ -45,7 +47,7 @@ const mountExhibitWidget = async () => {
       return true;
     }
     // widget.exhibitId = widget.exhibitId + '111'
-    app = await window.freelogApp.mountWidget({
+    app = await freelogApp.mountWidget({
       widget: widget, // 必传，子插件数据
       container: document.getElementById("freelog-single"), // 必传，自定义一个让插件挂载的div容器
       topExhibitData: null, // 必传，最外层展品数据（子孙插件都需要用）

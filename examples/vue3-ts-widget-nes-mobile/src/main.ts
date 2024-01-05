@@ -11,6 +11,8 @@ import "./assets/css/index.scss"
 import "./nes.css"
 // import "./bootstrap-min.css"
 import "./play-mobile.css"
+import { freelogApp } from "freelog-runtime";
+
 // import "./font_4224740_t78uykib6qs"
 window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
  

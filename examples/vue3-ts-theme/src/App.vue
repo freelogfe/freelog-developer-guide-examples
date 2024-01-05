@@ -17,6 +17,7 @@ import { freelogApp } from "freelog-runtime";
 import { userStore } from "@/stores/user";
 
 import { ref } from "vue";
+console.log(freelogApp)
 const loading = ref(true)
 const store = userStore();
 store.setUserInfo(freelogApp.getCurrentUser())
