@@ -30,6 +30,7 @@ const store = userStore();
 const login = () => {
   freelogApp.callLogin(() => {
     store.setUserInfo(freelogApp.getCurrentUser());
+    freelogApp.reload()
   });
 };
 
