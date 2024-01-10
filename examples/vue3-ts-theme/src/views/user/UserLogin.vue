@@ -29,8 +29,9 @@ import { Modal } from "ant-design-vue";
 const store = userStore();
 const login = () => {
   freelogApp.callLogin(() => {
+    console.log(freelogApp.getCurrentUser())
     store.setUserInfo(freelogApp.getCurrentUser());
-    freelogApp.reload()
+    // freelogApp.reload()
   });
 };
 

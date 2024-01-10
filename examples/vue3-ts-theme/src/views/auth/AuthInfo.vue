@@ -62,6 +62,7 @@ const show = async (data: any) => {
       returnUrl: true,
     });
   } else {
+    console.log(data.exhibitId, 9999)
     // 没有授权
     freelogApp
       .addAuth(data.exhibitId, {
