@@ -29,31 +29,29 @@ export async function bootstrap(props?: any) {
 const changeMe = ()=>{
   store.dispatch(increment(1))
 }
-export async function mount(props: any = {}) {
-  const { container } = props;
+export async function mount() {
   root =
     root ||
-    ReactDOM.createRoot(
-      container
-        ? container.querySelector("#root")
-        : document.querySelector("#root")
+    // @ts-ignore
+    ReactDOM.createRoot(document.querySelector("#root")
     );
   root.render(
     <Provider store={store}>
       <App changeMe={changeMe}/>
     </Provider>
   );
-  props.registerApi({
-    // 这个对象会给到父插件
-    changeMe,
-  });
 }
 
-export async function unmount(props: any) {
-  const { container } = props;
+export async function unmount() {
   root.unmount();
 }
 
-if (!window.__POWERED_BY_FREELOG__) {
-  bootstrap().then(mount);
-}
+ 
+if (window.__POWERED_BY_WUJIE__) {
+  window.__WUJIE_MOUNT = () => {
+    mount();
+  };
+  window.__WUJIE_UNMOUNT = () => {
+    unmount();
+  };
+} 

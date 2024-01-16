@@ -20,7 +20,7 @@ let instance: any = null;
 function render(props: any = {}) {
   const { container } = props;
   router = createRouter({
-    history: createWebHistory(window.__POWERED_BY_FREELOG__ ? "/widget" : "/"),
+    history: createWebHistory(window.__POWERED_BY_WUJIE__ ? "/widget" : "/"),
     routes,
   });
   instance = createApp(App);
@@ -39,46 +39,16 @@ function render(props: any = {}) {
   }
 }
 
-if (!window.__POWERED_BY_FREELOG__) {
-  render();
-}
+ 
 
 export async function bootstrap() {
   console.log("%c ", "color: green;", "vue3.0 app bootstraped");
 }
 
-function storeTest(props: any) {
-  if (props.onGlobalStateChange) {
-    props.onGlobalStateChange(
-      (value: any, prev: any) =>
-        console.log(`[插件 - ${props.name}]:`, value, prev),
-      true
-    );
-  }
-  setTimeout(() => {
-    props.setGlobalState({
-      ignore: props.name + "111",
-      user: {
-        name: props.name + "111",
-      },
-    });
-  }, 2500);
-  if (props.setGlobalState) {
-    props.setGlobalState({
-      ignore: props.name,
-      user: {
-        name: props.name,
-      },
-    });
-  }
-}
+ 
 
-export async function mount(props: any) {
-  storeTest(props);
-  render(props);
-  instance.config.globalProperties.$onGlobalStateChange =
-    props.onGlobalStateChange;
-  instance.config.globalProperties.$setGlobalState = props.setGlobalState;
+export async function mount() {
+  render(); 
 }
 
 export async function unmount() {
@@ -87,4 +57,15 @@ export async function unmount() {
   instance = null;
   router = null;
   pinia = null;
+}
+
+if (window.__POWERED_BY_WUJIE__) {
+  window.__WUJIE_MOUNT = () => {
+    mount();
+  };
+  window.__WUJIE_UNMOUNT = () => {
+    unmount();
+  };
+} else {
+  render();
 }

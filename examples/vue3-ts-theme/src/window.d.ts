@@ -5,6 +5,8 @@ interface Window {
     userInfo: any;
     baseURL: string;
     freelogAuth: any;
-    __POWERED_BY_FREELOG__: any;
+    __POWERED_BY_WUJIE__: any;
+    __WUJIE_UNMOUNT: any;
+    __WUJIE_MOUNT:any;
     ENV: string;
 }

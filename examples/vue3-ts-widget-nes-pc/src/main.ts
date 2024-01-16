@@ -7,13 +7,13 @@ import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useGameUrlStore } from "./stores/game";
-import Antd from 'ant-design-vue';
-import 'ant-design-vue/dist/antd.css';
-import "./assets/css/index.scss"
+import Antd from "ant-design-vue";
+import "ant-design-vue/dist/antd.css";
+import "./assets/css/index.scss";
 import { freelogApp } from "freelog-runtime";
 
 window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
- 
+
 let pinia: any = null;
 
 // createApp(App).use(store).use(router).mount("#app")
@@ -23,7 +23,7 @@ let instance: any = null;
 function render(props: any = {}) {
   const { container } = props;
   router = createRouter({
-    history: createWebHistory(window.__POWERED_BY_FREELOG__ ? "/widget" : "/"),
+    history: createWebHistory(window.__POWERED_BY_WUJIE__ ? "/widget" : "/"),
     routes,
   });
   instance = createApp(App);
@@ -37,7 +37,7 @@ function render(props: any = {}) {
   if (props?.registerApi) {
     // 暴露api给父插件或主题
     props.registerApi({
-      startGame: (url:string, name: string) => {
+      startGame: (url: string, name: string) => {
         const store = useGameUrlStore();
         store.setUrl(url, name);
       },
@@ -45,46 +45,8 @@ function render(props: any = {}) {
   }
 }
 
-if (!window.__POWERED_BY_FREELOG__) {
+export async function mount() {
   render();
-}
-
-export async function bootstrap() {
-  console.log("%c ", "color: green;", "vue3.0 app bootstraped");
-}
-
-function storeTest(props: any) {
-  if (props.onGlobalStateChange) {
-    props.onGlobalStateChange(
-      (value: any, prev: any) =>
-        console.log(`[插件 - ${props.name}]:`, value, prev),
-      true
-    );
-  }
-  setTimeout(() => {
-    props.setGlobalState({
-      ignore: props.name + "111",
-      user: {
-        name: props.name + "111",
-      },
-    });
-  }, 2500);
-  if (props.setGlobalState) {
-    props.setGlobalState({
-      ignore: props.name,
-      user: {
-        name: props.name,
-      },
-    });
-  }
-}
-
-export async function mount(props: any) {
-  storeTest(props);
-  render(props);
-  instance.config.globalProperties.$onGlobalStateChange =
-    props.onGlobalStateChange;
-  instance.config.globalProperties.$setGlobalState = props.setGlobalState;
 }
 
 export async function unmount() {
@@ -93,4 +55,15 @@ export async function unmount() {
   instance = null;
   router = null;
   pinia = null;
+}
+
+if (window.__POWERED_BY_WUJIE__) {
+  window.__WUJIE_MOUNT = () => {
+    mount();
+  };
+  window.__WUJIE_UNMOUNT = () => {
+    unmount();
+  };
+} else {
+  render();
 }

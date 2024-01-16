@@ -22,26 +22,28 @@ export async function bootstrap(props) {
 }
 //     </React.StrictMode>,
 
-export async function mount(props = {}) {
-  const { container } = props;
+export async function mount() {
   // eslint-disable-next-line no-undef
   console.log(__webpack_public_path__)
-  root = root || ReactDOM.createRoot(container ? container.querySelector('#root') : document.querySelector('#root'));
+  root = root || ReactDOM.createRoot(document.querySelector('#root'));
   root.render(
     <React.StrictMode>
       <App />
     </React.StrictMode>
   );
-  props.registerApi({
-    // 这个对象会给到父插件
-  })
+
 }
 
-export async function unmount(props) {
-  // const { container } = props;
+export async function unmount() {
   root.unmount()
 }
 
-if (!window.__POWERED_BY_FREELOG__) {
-  bootstrap().then(mount);
-}
+
+if (window.__POWERED_BY_WUJIE__) {
+  window.__WUJIE_MOUNT = () => {
+    mount();
+  };
+  window.__WUJIE_UNMOUNT = () => {
+    unmount();
+  };
+} 
