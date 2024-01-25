@@ -54,7 +54,8 @@ export function unmount() {
   router = null;
   pinia = null;
 }
-
+// @ts-ignore
+console.log(window.parent.freelogApp, 9999)
 if (window.__POWERED_BY_WUJIE__) {
   window.__WUJIE_MOUNT = () => {
     mount();
