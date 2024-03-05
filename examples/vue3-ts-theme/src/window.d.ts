@@ -5,8 +5,9 @@ interface Window {
     userInfo: any;
     baseURL: string;
     freelogAuth: any;
-    __POWERED_BY_WUJIE__: any;
-    __WUJIE_UNMOUNT: any;
-    __WUJIE_MOUNT:any;
+    __MICRO_APP_ENVIRONMENT__: any;
+    unmount: any;
+    mount:any;
+    __MICRO_APP_BASE_ROUTE__:any;
     ENV: string;
 }

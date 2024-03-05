@@ -8,25 +8,16 @@ import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import "ant-design-vue/dist/antd.css";
 import Antd from "ant-design-vue";
-import { message } from "ant-design-vue";
 import "@/assets/css/index.scss";
-import { freelogApp } from "freelog-runtime";
-
 let pinia: any = null;
-
 window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
 // createApp(App).use(store).use(router).mount("#app")
 let router: any = null;
 let instance: any = null;
-
-/**
- *
- * 渲染方法
- */
-function render(props: any = {}) {
-  const { container } = props;
+// 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
+window.mount = () => {
   router = createRouter({
-    history: createWebHistory(window.__POWERED_BY_WUJIE__ ? "/" : "/"),
+    history: createWebHistory(window.__MICRO_APP_BASE_ROUTE__ ? "/" : "/"),
     routes,
   });
   instance = createApp(App);
@@ -34,35 +25,22 @@ function render(props: any = {}) {
   instance.use(router);
   instance.use(pinia);
   instance.use(Antd);
-  instance.mount(container ? container.querySelector("#app") : "#app");
-}
+  instance.mount("#app");
 
-/**
- * 加载阶段
- */
-export function mount() {
-  render();
-}
+  console.log("微应用child-vue3渲染了 -- UMD模式");
+};
 
-/**
- * 卸载阶段：为了防止内存溢出，必须卸载vue实例 以及将 router与pinina置为null
- */
-export function unmount() {
+// 👇 将卸载操作放入 unmount 函数
+window.unmount = () => {
   instance.unmount();
   instance._container.innerHTML = "";
   instance = null;
   router = null;
   pinia = null;
-}
-// @ts-ignore
-console.log(window.parent.freelogApp, 9999)
-if (window.__POWERED_BY_WUJIE__) {
-  window.__WUJIE_MOUNT = () => {
-    mount();
-  };
-  window.__WUJIE_UNMOUNT = () => {
-    unmount();
-  };
-} else {
-  render();
+  console.log("微应用child-vue3卸载了 -- UMD模式");
+};
+
+// 如果不在微前端环境，则直接执行mount渲染
+if (!window.__MICRO_APP_ENVIRONMENT__) {
+  window.mount();
 }
