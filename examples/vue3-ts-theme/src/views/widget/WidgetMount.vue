@@ -111,7 +111,7 @@ const mountExhibitWidget = async () => {
 };
 // 离开记得卸载插件喔
 onBeforeUnmount( () => {
-  freelogApp.destroyWidget(exhibitWidget.widgetId)
+  // freelogApp.destroyWidget(exhibitWidget.widgetId)
 });
 mountExhibitWidget();
 mountSubWidget();
