@@ -59,7 +59,7 @@ const show = async (data: any) => {
 };
 // 离开记得卸载插件喔
 onBeforeUnmount( () => {
-  exhibitWidget?.unmount();
+  // exhibitWidget?.unmount();
 });
 const mountExhibitWidget = async (url: string, name: string) => {
   const res = await freelogApp.getExhibitListByPaging({
