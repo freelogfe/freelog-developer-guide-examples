@@ -34,15 +34,15 @@ function render(props: any = {}) {
   instance.mount(container ? container.querySelector("#app") : "#app");
   // instance.config.globalProperties.$message = message;
 
-  if (props?.registerApi) {
-    // 暴露api给父插件或主题
-    props.registerApi({
-      startGame: (url: string, name: string) => {
-        const store = useGameUrlStore();
-        store.setUrl(url, name);
-      },
-    });
-  }
+  // 暴露api给父插件或主题
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  freelogApp.registerApi({
+    startGame: (url: string, name: string) => {
+      const store = useGameUrlStore();
+      store.setUrl(url, name);
+    },
+  });
 }
 
 export async function mount() {

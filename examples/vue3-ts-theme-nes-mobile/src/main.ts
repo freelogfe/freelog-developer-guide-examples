@@ -7,7 +7,7 @@ import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useGameUrlStore } from "./stores/game";
-import "./assets/css/index.scss"
+import "./assets/css/index.scss";
 import { freelogApp } from "freelog-runtime";
 
 // import "./font_8d5l8fzk5b87iudi.js"
@@ -30,16 +30,16 @@ function render(props: any = {}) {
 
   instance.mount(container ? container.querySelector("#app") : "#app");
   // instance.config.globalProperties.$message = message;
-
-  if (props?.registerApi) {
-    // 暴露api给父插件或主题
-    props.registerApi({
-      startGame: (url:string, name: string) => {
-        const store = useGameUrlStore();
-        store.setUrl(url, name);
-      },
-    });
-  }
+  
+  // 暴露api给父插件或主题
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  freelogApp.registerApi({
+    startGame: (url: string, name: string) => {
+      const store = useGameUrlStore();
+      store.setUrl(url, name);
+    },
+  });
 }
 
 if (!window.__POWERED_BY_FREELOG__) {

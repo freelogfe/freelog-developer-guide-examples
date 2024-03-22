@@ -7,9 +7,8 @@ import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useCounterStore } from "./stores/counter";
-import "./assets/css/index.scss"
+import "./assets/css/index.scss";
 import { freelogApp } from "freelog-runtime";
-
 
 let pinia: any = null;
 
@@ -28,27 +27,23 @@ function render(props: any = {}) {
   instance.use(router);
   instance.use(pinia);
   instance.mount(container ? container.querySelector("#app") : "#app");
-  if (props.registerApi) {
-    // 暴露api给父插件或主题
-    props.registerApi({
-      changeMe: () => {
-        const store = useCounterStore();
-        store.increment();
-      },
-    });
-  }
+  // 暴露api给父插件或主题
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  freelogApp.registerApi({
+    changeMe: () => {
+      const store = useCounterStore();
+      store.increment();
+    },
+  });
 }
-
- 
 
 export async function bootstrap() {
   console.log("%c ", "color: green;", "vue3.0 app bootstraped");
 }
 
- 
-
 export async function mount() {
-  render(); 
+  render();
 }
 
 export async function unmount() {
