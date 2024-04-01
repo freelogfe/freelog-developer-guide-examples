@@ -8,7 +8,7 @@ import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useCounterStore } from "./stores/counter";
 import "./assets/css/index.scss";
-import { freelogApp,initFreelogApp } from "freelog-runtime";
+import { freelogApp, initFreelogApp } from "freelog-runtime";
 
 let pinia: any = null;
 
@@ -16,16 +16,18 @@ let pinia: any = null;
 let router: any = null;
 let instance: any = null;
 
-function render( ) {
+function render() {
   router = createRouter({
-    history: createWebHistory(window.__MICRO_APP_ENVIRONMENT__ ? "/widget" : "/"),
+    history: createWebHistory(
+      window.__MICRO_APP_ENVIRONMENT__ ? "/widget" : "/"
+    ),
     routes,
   });
   instance = createApp(App);
   pinia = createPinia();
   instance.use(router);
   instance.use(pinia);
-  instance.mount(container ? container.querySelector("#app") : "#app");
+  instance.mount(document.querySelector("#app"));
   // 暴露api给父插件或主题
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -37,9 +39,6 @@ function render( ) {
   });
 }
 
-export async function bootstrap() {
-  console.log("%c ", "color: green;", "vue3.0 app bootstraped");
-}
 function mount() {
   render();
 }
