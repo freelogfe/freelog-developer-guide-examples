@@ -5,6 +5,6 @@ interface Window {
     userInfo: any;
     baseURL: string;
     freelogAuth: any;
-    __POWERED_BY_FREELOG__: any;
+    __MICRO_APP_ENVIRONMENT__: any;
     ENV: string;
 }

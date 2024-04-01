@@ -111,7 +111,7 @@ const mountExhibitWidget = async () => {
 // 离开记得卸载插件喔
 onBeforeUnmount(async () => {
   await exhibitWidget.unmount();
-  await exhibitWidget.selfWidget();
+  await selfWidget.unmount();
 });
 mountExhibitWidget();
 mountSubWidget();

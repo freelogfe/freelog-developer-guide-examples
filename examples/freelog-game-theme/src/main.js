@@ -24,13 +24,11 @@ Vue.use(VueRouter)
 
 let instance = null;
 
-
-
 function render(props = {}) {
   const { container } = props;
 
   // router = new VueRouter({
-  //     base: window.__POWERED_BY_FREELOG__ ? '/vue' : '/',
+  //     base: window.__MICRO_APP_ENVIRONMENT__ ? '/vue' : '/',
   //     mode: 'history',
   //     routes,
   // });
@@ -40,24 +38,23 @@ function render(props = {}) {
   }).$mount(container ? container.querySelector('#app') : '#app');
 }
 
-
-
-
-
-export async function mount() {
+function mount() {
   render();
 }
 
-export async function unmount() {
+function unmount() {
   instance.$destroy();
   instance.$el.innerHTML = '';
   instance = null;
 }
-if (window.__POWERED_BY_WUJIE__) {
-  window.__WUJIE_MOUNT = () => {
-    mount();
-  };
-  window.__WUJIE_UNMOUNT = () => {
-    unmount();
-  };
-} 
+
+
+// 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
+window.mount = () => {
+  mount();
+}
+
+// 👇 将卸载操作放入 unmount 函数，就是上面步骤2中的卸载函数
+window.unmount = () => {
+  unmount();
+}

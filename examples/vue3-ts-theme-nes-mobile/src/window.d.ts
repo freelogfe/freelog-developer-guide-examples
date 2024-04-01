@@ -1,11 +1,7 @@
 interface Window {
-    freelogApp: any;
-    isMobile: any;
-    isTest: boolean;
-    userInfo: any;
-    baseURL: string;
-    freelogAuth: any;
-    __POWERED_BY_FREELOG__: any;
-    ENV: string;
-    FREELOG_RESOURCENAME: string;
-}
+    mount: any;
+    unmount: any;
+    __MICRO_APP_ENVIRONMENT__: string;
+    __MICRO_APP_PUBLIC_PATH__: string;
+  }
+  

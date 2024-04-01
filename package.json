@@ -8,5 +8,8 @@
   },
   "keywords": [],
   "author": "snnaenu",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "freelog-runtime": "^3.5.2"
+  }
 }

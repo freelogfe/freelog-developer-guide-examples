@@ -10,10 +10,10 @@ import "ant-design-vue/dist/antd.css";
 import Antd from "ant-design-vue";
 import { message } from "ant-design-vue";
 import "@/assets/css/index.scss";
-import { freelogApp } from "freelog-runtime";
+import { initFreelogApp } from "freelog-runtime";
 let pinia: any = null;
 
-window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
+// window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
 // createApp(App).use(store).use(router).mount("#app")
 let router: any = null;
 let instance: any = null;
@@ -22,10 +22,9 @@ let instance: any = null;
  *
  * 渲染方法
  */
-function render(props: any = {}) {
-  const { container } = props;
+function render() {
   router = createRouter({
-    history: createWebHistory(window.__POWERED_BY_FREELOG__ ? "/" : "/"),
+    history: createWebHistory(window.__MICRO_APP_ENVIRONMENT__ ? "/" : "/"),
     routes,
   });
   instance = createApp(App);
@@ -33,36 +32,20 @@ function render(props: any = {}) {
   instance.use(router);
   instance.use(pinia);
   instance.use(Antd);
-  instance.mount(container ? container.querySelector("#app") : "#app");
-}
-
-if (!window.__POWERED_BY_FREELOG__) {
-  render();
-}
-
-/**
- * 启动阶段：可以在这里准备一些加载时需要的数据
- */
-export async function bootstrap() {
-  // console.log("%c ", "color: green;", "vue3.0 app bootstraped");
+  instance.mount(document.querySelector("#app"));
 }
 
 /**
  * 加载阶段
  */
-export async function mount(props: any) {
-  storeTest(props);
-  render(props);
-  instance.config.globalProperties.$onGlobalStateChange =
-    props.onGlobalStateChange;
-  instance.config.globalProperties.$setGlobalState = props.setGlobalState;
-  instance.config.globalProperties.$message = message;
+function mount() {
+  render();
 }
 
 /**
  * 卸载阶段：为了防止内存溢出，必须卸载vue实例 以及将 router与pinina置为null
  */
-export async function unmount() {
+function unmount() {
   instance.unmount();
   instance._container.innerHTML = "";
   instance = null;
@@ -70,42 +53,13 @@ export async function unmount() {
   pinia = null;
 }
 
-/**
- *
- * 全局通信测试
- */
-function storeTest(props: any) {
-  /**
-   * 测试一下主题插件的全局通信
-   */
-  // 初始化可以跟插件通信的全局数据,仅主题可以用，但主题可以通过config传递给插件使用
-  (freelogApp as any).initGlobalState({
-    ignore: props.name,
-    user: {
-      name: props.name,
-    },
-  });
-  if (props.onGlobalStateChange) {
-    props.onGlobalStateChange(
-      (value: any, prev: any) =>
-        // console.log(`[插件 - ${props.name}]:`, value, prev),
-      true
-    );
-  }
-  setTimeout(() => {
-    props.setGlobalState({
-      ignore: props.name + "111",
-      user: {
-        name: props.name + "111",
-      },
-    });
-  }, 2500);
-  if (props.setGlobalState) {
-    props.setGlobalState({
-      ignore: props.name,
-      user: {
-        name: props.name,
-      },
-    });
-  }
-}
+// 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
+window.mount = () => {
+  initFreelogApp();
+  mount();
+};
+
+// 👇 将卸载操作放入 unmount 函数，就是上面步骤2中的卸载函数
+window.unmount = () => {
+  unmount();
+};

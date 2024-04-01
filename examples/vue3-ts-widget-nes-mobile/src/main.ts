@@ -11,10 +11,10 @@ import "./assets/css/index.scss";
 import "./nes.css";
 // import "./bootstrap-min.css"
 import "./play-mobile.css";
-import { freelogApp } from "freelog-runtime";
+import { freelogApp, initFreelogApp } from "freelog-runtime";
 
 // import "./font_4224740_t78uykib6qs"
-window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
+// window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
 
 let pinia: any = null;
 
@@ -22,10 +22,11 @@ let pinia: any = null;
 let router: any = null;
 let instance: any = null;
 
-function render(props: any = {}) {
-  const { container } = props;
+function render() {
   router = createRouter({
-    history: createWebHistory(window.__POWERED_BY_WUJIE__ ? "/widget" : "/"),
+    history: createWebHistory(
+      window.__MICRO_APP_ENVIRONMENT__ ? "/widget" : "/"
+    ),
     routes,
   });
   instance = createApp(App);
@@ -33,7 +34,7 @@ function render(props: any = {}) {
   instance.use(router);
   instance.use(pinia);
 
-  instance.mount(container ? container.querySelector("#app") : "#app");
+  instance.mount(document.querySelector("#app"));
   // instance.config.globalProperties.$message = message;
 
   // 暴露api给父插件或主题
@@ -47,24 +48,23 @@ function render(props: any = {}) {
   });
 }
 
-export async function mount() {
+function mount() {
   render();
 }
-
-export async function unmount() {
+function unmount() {
   instance.unmount();
   instance._container.innerHTML = "";
   instance = null;
   router = null;
   pinia = null;
 }
-if (window.__POWERED_BY_WUJIE__) {
-  window.__WUJIE_MOUNT = () => {
-    mount();
-  };
-  window.__WUJIE_UNMOUNT = () => {
-    unmount();
-  };
-} else {
-  render();
-}
+// 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
+window.mount = () => {
+  initFreelogApp();
+  mount();
+};
+
+// 👇 将卸载操作放入 unmount 函数，就是上面步骤2中的卸载函数
+window.unmount = () => {
+  unmount();
+};

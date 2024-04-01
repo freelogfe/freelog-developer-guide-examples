@@ -8,7 +8,7 @@ import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useGameUrlStore } from "./stores/game";
 import "./assets/css/index.scss";
-import { freelogApp } from "freelog-runtime";
+import { freelogApp, initFreelogApp } from "freelog-runtime";
 
 // import "./font_8d5l8fzk5b87iudi.js"
 let pinia: any = null;
@@ -17,10 +17,11 @@ let pinia: any = null;
 let router: any = null;
 let instance: any = null;
 
-function render(props: any = {}) {
-  const { container } = props;
+function render() {
   router = createRouter({
-    history: createWebHistory(window.__POWERED_BY_FREELOG__ ? "/widget" : "/"),
+    history: createWebHistory(
+      window.__MICRO_APP_ENVIRONMENT__ ? "/widget" : "/"
+    ),
     routes,
   });
   instance = createApp(App);
@@ -28,9 +29,9 @@ function render(props: any = {}) {
   instance.use(router);
   instance.use(pinia);
 
-  instance.mount(container ? container.querySelector("#app") : "#app");
+  instance.mount(document.querySelector("#app"));
   // instance.config.globalProperties.$message = message;
-  
+
   // 暴露api给父插件或主题
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -42,52 +43,24 @@ function render(props: any = {}) {
   });
 }
 
-if (!window.__POWERED_BY_FREELOG__) {
+function mount() {
   render();
 }
 
-export async function bootstrap() {
-  console.log("%c ", "color: green;", "vue3.0 app bootstraped");
-}
-
-function storeTest(props: any) {
-  if (props.onGlobalStateChange) {
-    props.onGlobalStateChange(
-      (value: any, prev: any) =>
-        console.log(`[插件 - ${props.name}]:`, value, prev),
-      true
-    );
-  }
-  setTimeout(() => {
-    props.setGlobalState({
-      ignore: props.name + "111",
-      user: {
-        name: props.name + "111",
-      },
-    });
-  }, 2500);
-  if (props.setGlobalState) {
-    props.setGlobalState({
-      ignore: props.name,
-      user: {
-        name: props.name,
-      },
-    });
-  }
-}
-
-export async function mount(props: any) {
-  storeTest(props);
-  render(props);
-  instance.config.globalProperties.$onGlobalStateChange =
-    props.onGlobalStateChange;
-  instance.config.globalProperties.$setGlobalState = props.setGlobalState;
-}
-
-export async function unmount() {
+function unmount() {
   instance.unmount();
   instance._container.innerHTML = "";
   instance = null;
   router = null;
   pinia = null;
 }
+// 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
+window.mount = () => {
+  initFreelogApp();
+  mount();
+};
+
+// 👇 将卸载操作放入 unmount 函数，就是上面步骤2中的卸载函数
+window.unmount = () => {
+  unmount();
+};

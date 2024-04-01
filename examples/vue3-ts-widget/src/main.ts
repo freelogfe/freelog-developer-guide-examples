@@ -8,7 +8,7 @@ import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useCounterStore } from "./stores/counter";
 import "./assets/css/index.scss";
-import { freelogApp } from "freelog-runtime";
+import { freelogApp,initFreelogApp } from "freelog-runtime";
 
 let pinia: any = null;
 
@@ -16,10 +16,9 @@ let pinia: any = null;
 let router: any = null;
 let instance: any = null;
 
-function render(props: any = {}) {
-  const { container } = props;
+function render( ) {
   router = createRouter({
-    history: createWebHistory(window.__POWERED_BY_WUJIE__ ? "/widget" : "/"),
+    history: createWebHistory(window.__MICRO_APP_ENVIRONMENT__ ? "/widget" : "/"),
     routes,
   });
   instance = createApp(App);
@@ -41,12 +40,11 @@ function render(props: any = {}) {
 export async function bootstrap() {
   console.log("%c ", "color: green;", "vue3.0 app bootstraped");
 }
-
-export async function mount() {
+function mount() {
   render();
 }
 
-export async function unmount() {
+function unmount() {
   instance.unmount();
   instance._container.innerHTML = "";
   instance = null;
@@ -54,13 +52,13 @@ export async function unmount() {
   pinia = null;
 }
 
-if (window.__POWERED_BY_WUJIE__) {
-  window.__WUJIE_MOUNT = () => {
-    mount();
-  };
-  window.__WUJIE_UNMOUNT = () => {
-    unmount();
-  };
-} else {
-  render();
-}
+// 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
+window.mount = () => {
+  initFreelogApp();
+  mount();
+};
+
+// 👇 将卸载操作放入 unmount 函数，就是上面步骤2中的卸载函数
+window.unmount = () => {
+  unmount();
+};
