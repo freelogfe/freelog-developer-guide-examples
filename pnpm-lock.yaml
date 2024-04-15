@@ -5,8 +5,8 @@ importers:
   .:
     dependencies:
       freelog-runtime:
-        specifier: ^3.5.2
-        version: 3.5.2
+        specifier: ^3.5.3
+        version: 3.5.3
 
   examples/freelog-game-theme:
     dependencies:
@@ -16,9 +16,6 @@ importers:
       element-ui:
         specifier: ^2.15.1
         version: 2.15.1(vue@2.6.11)
-      freelog-runtime:
-        specifier: 1.0.14
-        version: 1.0.14
       marked:
         specifier: ^2.0.1
         version: 2.0.1
@@ -134,9 +131,6 @@ importers:
       file-loader:
         specifier: ^6.2.0
         version: 6.2.0(webpack@5.64.4)
-      freelog-runtime:
-        specifier: 1.0.14
-        version: 1.0.14
       fs-extra:
         specifier: ^10.0.0
         version: 10.0.0
@@ -317,9 +311,6 @@ importers:
       file-loader:
         specifier: ^6.2.0
         version: 6.2.0(webpack@5.64.4)
-      freelog-runtime:
-        specifier: 1.0.14
-        version: 1.0.14
       fs-extra:
         specifier: ^10.0.0
         version: 10.0.0
@@ -428,9 +419,6 @@ importers:
       element-plus:
         specifier: ^2.3.7
         version: 2.3.7(vue@3.3.4)
-      freelog-runtime:
-        specifier: 1.0.14
-        version: 1.0.14
       pinia:
         specifier: ^2.0.33
         version: 2.0.33(typescript@4.5.5)(vue@3.3.4)
@@ -577,9 +565,6 @@ importers:
       eslint-plugin-vue:
         specifier: ^9.15.1
         version: 9.15.1(eslint@7.32.0)
-      freelog-runtime:
-        specifier: 1.0.17
-        version: 1.0.17
       prettier:
         specifier: ^2.4.1
         version: 2.4.1
@@ -677,9 +662,6 @@ importers:
       eslint-plugin-vue:
         specifier: ^9.15.1
         version: 9.15.1(eslint@7.32.0)
-      freelog-runtime:
-        specifier: 1.0.18
-        version: 1.0.18
       postcss-px-to-viewport:
         specifier: ^1.1.1
         version: 1.1.1
@@ -786,9 +768,6 @@ importers:
       eslint-plugin-vue:
         specifier: ^9.15.1
         version: 9.15.1(eslint@7.32.0)
-      freelog-runtime:
-        specifier: 1.0.18
-        version: 1.0.18
       prettier:
         specifier: ^2.4.1
         version: 2.4.1
@@ -871,9 +850,6 @@ importers:
       eslint-plugin-vue:
         specifier: ^9.15.1
         version: 9.15.1(eslint@7.32.0)
-      freelog-runtime:
-        specifier: 1.0.18
-        version: 1.0.18
       prettier:
         specifier: ^2.4.1
         version: 2.4.1
@@ -974,9 +950,6 @@ importers:
       eslint-plugin-vue:
         specifier: ^9.15.1
         version: 9.15.1(eslint@7.32.0)
-      freelog-runtime:
-        specifier: 1.0.18
-        version: 1.0.18
       postcss-px-to-viewport:
         specifier: ^1.1.1
         version: 1.1.1
@@ -1080,9 +1053,6 @@ importers:
       eslint-plugin-vue:
         specifier: ^9.15.1
         version: 9.15.1(eslint@7.32.0)
-      freelog-runtime:
-        specifier: 1.0.18
-        version: 1.0.18
       prettier:
         specifier: ^2.4.1
         version: 2.4.1
@@ -11103,23 +11073,8 @@ packages:
       '@taiyuuki/utils': 0.4.7
     dev: false
 
-  /freelog-runtime@1.0.14:
-    resolution: {integrity: sha512-lrixkd/2q8Jf+px103zTd8Wujl9Jo2L+2c4a2Ff6N1TIIzzJbc/+wNU+m4U+uVxbRlJU0rQdRnZFfKo7AfapZg==}
-    engines: {node: '>=10'}
-    dev: false
-
-  /freelog-runtime@1.0.17:
-    resolution: {integrity: sha512-i+fygjzREUdfsLgFB0tc6nn2siawbPOmIyy3tAmO4ZNydZMB98L08hIFyHiyRkd7M6FdcthsKAKuOEG5tgxdWQ==}
-    engines: {node: '>=10'}
-    dev: true
-
-  /freelog-runtime@1.0.18:
-    resolution: {integrity: sha512-NuYOAhhBmy0UF5Jj8IyLh7+W9CgQQMuoDSGzFJ9iLJiEM/pH/kvG/6ezKukwIsG0BB1uB6tNpzJ7I9+4XnPpwA==}
-    engines: {node: '>=10'}
-    dev: true
-
-  /freelog-runtime@3.5.2:
-    resolution: {integrity: sha512-2QKLBCRz8pccQznxlaGiwvafGTk67qR5ZT/mnwBZ608QCyYpXIO9s+RUda/9YLm0R9Trs66GemjCTdJ9Zi9rOQ==}
+  /freelog-runtime@3.5.3:
+    resolution: {integrity: sha512-Mh5NhW+1usb6igp0logKh+5qbUc8rUVjwmNXV+sbM66e+HDXBWseJegmAIJNIdaVb8xiqfziRabzSFeLioVFNw==}
     engines: {node: '>=10'}
     dev: false
 

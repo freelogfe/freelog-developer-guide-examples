@@ -9,7 +9,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import "ant-design-vue/dist/antd.css";
 import Antd from "ant-design-vue";
 import "@/assets/css/index.scss";
-import { initFreelogApp } from "freelog-runtime";
+import { initFreelogApp, freelogApp } from "freelog-runtime";
 let pinia: any = null;
 // window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
 // createApp(App).use(store).use(router).mount("#app")
@@ -44,6 +44,11 @@ const unmount = () => {
 // 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
 window.mount = () => {
   initFreelogApp();
+  freelogApp.mapShareUrl({
+    detail: (exhibitId) => {
+      return `/widget-dep`;
+    },
+  });
   mount();
 };
 

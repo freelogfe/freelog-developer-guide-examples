@@ -29,15 +29,25 @@ interface DataItem {
 }
 const data = ref([] as DataItem[]);
 const imgUrl = ref("");
+// freelogApp
+//   .getExhibitListByPaging({
+//     skip: 0,
+//     limit: 20,
+//     // articleResourceTypes: "图片",
+//   })
+//   .then((res: any) => {
+//     data.value = res.data.data.dataList;
+//   });
 freelogApp
-  .getExhibitListByPaging({
-    skip: 0,
-    limit: 20,
+  .getExhibitListById({
+    exhibitIds:
+      "64b4ecbe8d9a4b002fa94de8,64a53205cebcab002f8245bd,64a50b79cebcab002f822b6d,64a50156cebcab002f8229e9",
     // articleResourceTypes: "图片",
   })
   .then((res: any) => {
-    data.value = res.data.data.dataList;
+    data.value = res.data.data;
   });
+freelogApp.getExhibitInfo("64b4ecbe8d9a4b002fa94de8");
 const show = async (data: any) => {
   if (data.articleInfo.resourceType.includes("照片")) {
     imgUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {

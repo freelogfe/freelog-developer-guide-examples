@@ -31,13 +31,13 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp } from "freelog-runtime";
+import { freelogApp, widgetApi } from "freelog-runtime";
 import { reactive, ref } from "vue";
 import DepTree from "./_components/DepTree.vue";
 const treeData = ref([] as any[]);
-console.log(freelogApp.getSubDep)
+
 freelogApp.getSubDep().then((res: any) => {
-  console.log(res)
+  console.log(res);
   if (res.subDep) {
     let str: Array<string> = [];
     res.subDep.forEach((sub: any) => {

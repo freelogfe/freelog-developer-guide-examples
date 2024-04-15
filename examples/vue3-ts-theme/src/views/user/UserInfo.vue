@@ -31,6 +31,7 @@ const userData = ref({} as any);
 let rawData: any = {};
 // 根据自定义的key获取 存储的用户数据，主题、不同的插件与插件 保存数据都是隔离的
 freelogApp.getUserData("testData").then((data: any) => {
+  console.log(data,555)
   rawData = data;
   userData.value = data || {};
 });
