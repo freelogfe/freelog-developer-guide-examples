@@ -10,14 +10,13 @@ function resolve(dir) {
   return path.join(__dirname, dir);
 }
 
-const port = 8001;
+const port = 8007;
 module.exports = defineConfig(async () => {
   const https = await webpackPlugin.default({
     force: true,
     source: 'coding',
     hosts: ['localhost', '127.0.0.1']
   })
-  console.log(https)
   return {
     plugins: [
       AutoImport({

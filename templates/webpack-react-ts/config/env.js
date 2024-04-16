@@ -16,7 +16,7 @@ if (!NODE_ENV) {
 process.env.HTTPS = 'true' 
 // process.env.SSL_CRT_FILE = 'certs/dev.pem' 
 // process.env.SSL_KEY_FILE = 'certs/dev.key' 
-process.env.PORT = '7100' // 端口自行定
+process.env.PORT = '8005' // 端口自行定
 if (NODE_ENV === 'development') {
   process.env.WDS_SOCKET_HOST = 'localhost'
   // process.env.WDS_SOCKET_PATH = 'localhost:' + process.env.PORT // webpack5设置为空 ''

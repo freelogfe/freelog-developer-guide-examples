@@ -14,7 +14,6 @@ module.exports = defineConfig(async () => {
     source: 'coding',
     hosts: ['localhost', '127.0.0.1']
   })
-  console.log(https)
   return {
     transpileDependencies: true,
     outputDir: 'dist',
