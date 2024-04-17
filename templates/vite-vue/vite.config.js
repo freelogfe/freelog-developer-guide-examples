@@ -5,9 +5,12 @@ import { resolve } from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [basicSsl(),vue()],
+  plugins: [basicSsl(), vue()],
   server: {
     port: 8002,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
   },
   resolve: {
     // 配置路径别名

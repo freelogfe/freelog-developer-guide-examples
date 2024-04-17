@@ -11,15 +11,16 @@ import { initFreelogApp } from "freelog-runtime";
 let pinia = null;
 let router = null;
 let instance = null;
-
+let history = null;
 /**
  * 
  * 渲染方法
  */
 function render(props = {}) {
     const { container } = props;
+    history = createWebHistory(window.__MICRO_APP_ENVIRONMENT__ ? '/theme' : '/')
     router = createRouter({
-        history: createWebHistory(window.__MICRO_APP_ENVIRONMENT__ ? '/theme' : '/'),
+        history,
         routes,
     });
     pinia = createPinia()
@@ -42,10 +43,11 @@ function mount() {
  */
 function unmount() {
     instance.unmount();
-    instance._container.innerHTML = '';
+    history.destroy();
     instance = null;
     router = null;
     pinia = null;
+    history = null;
 }
 // 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
 window.mount = () => {

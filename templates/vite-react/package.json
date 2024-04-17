@@ -12,8 +12,13 @@
   "dependencies": {
     "@types/node": "^20.12.7",
     "@vitejs/plugin-basic-ssl": "^1.1.0",
+    "freelog-runtime": "^3.5.3",
+    "localforage": "^1.10.0",
+    "match-sorter": "^6.3.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
+    "sort-by": "^1.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

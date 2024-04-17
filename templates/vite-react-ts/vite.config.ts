@@ -8,6 +8,9 @@ export default defineConfig({
   plugins: [basicSsl(), react()],
   server: {
     port: 8001,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
   },
   resolve: {
     // 配置路径别名
