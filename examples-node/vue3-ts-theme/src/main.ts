@@ -15,7 +15,7 @@ let pinia: any = null;
 // createApp(App).use(store).use(router).mount("#app")
 let router: any = null;
 let instance: any = null;
-// 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
+
 const mount = () => {
   router = createRouter({
     history: createWebHistory(window.__MICRO_APP_BASE_ROUTE__ ? "/" : "/"),
@@ -41,7 +41,7 @@ const unmount = () => {
   console.log("微应用child-vue3卸载了 -- UMD模式");
 };
 
-// 👇 将渲染操作放入 mount 函数，子应用初始化时会自动执行
+
 window.mount = () => {
   initFreelogApp();
   freelogApp.mapShareUrl({
@@ -52,7 +52,6 @@ window.mount = () => {
   mount();
 };
 
-// 👇 将卸载操作放入 unmount 函数，就是上面步骤2中的卸载函数
 window.unmount = () => {
   unmount();
 };
