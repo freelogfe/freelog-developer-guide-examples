@@ -44,8 +44,8 @@ const unmount = () => {
 window.mount = () => {
   initFreelogApp();
   freelogApp.mapShareUrl({
-    detail: (exhibitId) => {
-      return `/widget-dep/${exhibitId}`;
+    content: (exhibitId: string) => {
+      return `/user-share/${exhibitId}`;
     },
   });
   mount();

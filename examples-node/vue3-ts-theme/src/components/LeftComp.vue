@@ -31,6 +31,7 @@
       <template #title>用户相关</template>
       <a-menu-item key="user-login">登录处理</a-menu-item>
       <a-menu-item key="user-info">用户数据</a-menu-item>
+      <a-menu-item key="user-share">展品分享</a-menu-item>
     </a-sub-menu>
   </a-menu>
 </template>
@@ -52,7 +53,6 @@ export default defineComponent({
     const router = useRouter();
     const route = useRoute();
     const handleClick: MenuProps["onClick"] = (e) => {
-      console.log(e.key,3542342343)
       router.push("/" + e.key);
     };
     const titleClick = (e: Event) => {
@@ -62,7 +62,9 @@ export default defineComponent({
       () => route.path,
       (val: any) => {
         if (!val) return;
-        val = val.replace("/", "").split("?")[0];
+        console.log(val)
+        val = val.replace("/", "").split("?")[0].split("/")[0];
+        console.log(val)
         selectedKeys.value = [val];
         openKeys.value = [val.split("-")[0], ...openKeys.value];
       },

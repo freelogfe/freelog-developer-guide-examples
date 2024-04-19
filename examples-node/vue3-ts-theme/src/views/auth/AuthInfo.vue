@@ -50,7 +50,7 @@ freelogApp
     const data = res.data.data.dataList.filter(
       (item: any) => item.exhibitName == "收费图片"
     );
-    const exhibitId = data[0];
+    const exhibitId = data[0].exhibitId;
     // 查询是否拥有授权
     freelogApp.getExhibitAuthStatus(exhibitId).then((auth: any) => {
       authStatus.value = JSON.stringify(auth.data.data);

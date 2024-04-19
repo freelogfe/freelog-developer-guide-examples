@@ -33,6 +33,7 @@ interface DataItem {
 }
 const data = ref([] as DataItem[]);
 const imgUrl = ref("");
+console.log(freelogApp.resultType);
 // 获取展品列表
 freelogApp
   .getExhibitListByPaging({
@@ -68,9 +69,12 @@ const show = async (data: any) => {
   } else {
     // 没有授权
     freelogApp
-      .addAuth(data.exhibitId, {
-        immediate: true,
-      })
+      .addAuth(
+        data.exhibitId
+        // ,{
+        //   immediate: true,
+        // }
+      )
       .then(async (result: any) => {
         if (result.status === freelogApp.resultType.SUCCESS) {
           imgUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {
@@ -78,11 +82,12 @@ const show = async (data: any) => {
           });
         }
       });
+    freelogApp.callAuth();
   }
 };
 </script>
 <style>
 .not-auth {
-  background-color: lightblue;
+  /* background-color: lightblue; */
 }
 </style>

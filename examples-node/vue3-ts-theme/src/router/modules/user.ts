@@ -11,6 +11,16 @@ const routes: Array<RouteRecordRaw> = [
     name: "userInfo",
     component: () => import("@/views/user/UserInfo.vue"),
   },
+  {
+    path: "/user-share/:id",
+    name: "userShare2",
+    component: () => import("@/views/user/ShareExhibit.vue"),
+  },
+  {
+    path: "/user-share",
+    name: "userShare",
+    component: () => import("@/views/user/ShareExhibit.vue"),
+  },
 ];
 
 // const router = createRouter({

@@ -29,9 +29,11 @@ import { ref } from "vue";
 import { freelogApp } from "freelog-runtime";
 const userData = ref({} as any);
 let rawData: any = {};
+// 用于开发模式时，非节点内部主题或插件（外部未签约的资源）开发时设置用户数据保存的 key，等签约后线上用户数据与开发时一致
+freelogApp.setUserDataKeyForDev("snnaenu/插件开发演示代码主题");
 // 根据自定义的key获取 存储的用户数据，主题、不同的插件与插件 保存数据都是隔离的
 freelogApp.getUserData("testData").then((data: any) => {
-  console.log(data,555)
+  console.log(data, 555);
   rawData = data;
   userData.value = data || {};
 });
