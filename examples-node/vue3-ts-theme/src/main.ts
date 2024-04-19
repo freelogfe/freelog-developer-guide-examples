@@ -28,7 +28,7 @@ const mount = () => {
   instance.use(Antd);
   instance.mount("#app");
 
-  console.log("微应用child-vue3渲染了 -- UMD模式");
+  console.log("child-vue3渲染了 -- UMD模式");
 };
 
 // 👇 将卸载操作放入 unmount 函数
@@ -38,15 +38,14 @@ const unmount = () => {
   instance = null;
   router = null;
   pinia = null;
-  console.log("微应用child-vue3卸载了 -- UMD模式");
+  console.log("child-vue3卸载了 -- UMD模式");
 };
-
 
 window.mount = () => {
   initFreelogApp();
   freelogApp.mapShareUrl({
     detail: (exhibitId) => {
-      return `/widget-dep`;
+      return `/widget-dep/${exhibitId}`;
     },
   });
   mount();

@@ -11,10 +11,10 @@
     <a-sub-menu key="widget" @titleClick="titleClick">
       <template #title>插件相关</template>
       <a-menu-item key="widget-dep">获取自身依赖</a-menu-item>
-      <a-menu-item key="widget-config">主题插件自身数据</a-menu-item>
+      <a-menu-item key="widget-config">常规与自身数据</a-menu-item>
       <a-menu-item key="widget-mount">加载插件与通信</a-menu-item>
       <a-menu-item key="widget-viewport">移动端viewport适配</a-menu-item>
-      <a-menu-item key="widget-static">静态资源路径获取</a-menu-item>
+      <!-- <a-menu-item key="widget-static">静态资源路径获取</a-menu-item> -->
     </a-sub-menu>
     <a-sub-menu key="exhibit" @titleClick="titleClick">
       <template #title>展品获取</template>
@@ -36,12 +36,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
-import {
-  MailOutlined,
-  QqOutlined,
-  AppstoreOutlined,
-  SettingOutlined,
-} from "@ant-design/icons-vue";
+
 import type { MenuProps } from "ant-design-vue";
 import { useRoute, useRouter } from "vue-router";
 export default defineComponent({

@@ -21,11 +21,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "widgetControl",
     component: () => import("@/views/widget/WidgetControl.vue"),
   },
-  {
-    path: "/widget-static",
-    name: "widgetStatic",
-    component: () => import("@/views/widget/WidgetStatic.vue"),
-  },
+
   {
     path: "/widget-viewport",
     name: "widgetViewport",

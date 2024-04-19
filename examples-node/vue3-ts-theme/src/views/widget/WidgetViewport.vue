@@ -17,7 +17,7 @@ const setView = () => {
   freelogApp.setViewport({
     width: "device-width", //"device-width", // immutable
     height: "device-height", // not supported in browser
-    "initial-scale": 3.0, // 0.0-10.0   available for theme
+    "initial-scale": 2.0, // 0.0-10.0   available for theme
     "maximum-scale": 5.0, // 0.0-10.0   available for theme
     "minimum-scale": 1.0, // 0.0-10.0   available for theme
     "user-scalable": "no", // available for theme
@@ -33,7 +33,7 @@ const setView = () => {
     "user-scalable": "no", // available for theme
     "viewport-fit": "auto", // not supported in browser
   });
-  },5000)
+  },50000)
 };
 </script>
 <style scoped></style>

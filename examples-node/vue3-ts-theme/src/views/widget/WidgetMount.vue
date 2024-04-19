@@ -64,7 +64,7 @@ const mountSubWidget = async () => {
     if (sub.name === "snnaenu/插件开发演示代码插件") {
       selfWidget = await freelogApp.mountWidget({
         widget: sub, // 必传，子插件数据
-        container: document.getElementById("freelog-self"), // 必传，自定义一个让插件挂载的div容器
+        container: document.getElementById("freelog-self") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         topExhibitData: subData, // 必传，最外层展品数据（子孙插件都需要用）
         config: {
           name: "我是主题依赖的插件",
@@ -80,11 +80,11 @@ const mountSubWidget = async () => {
   });
 };
 const mountExhibitWidget = async () => {
-  const res = await freelogApp.getExhibitListByPaging({
+  const res:any = await freelogApp.getExhibitListByPaging({
     articleResourceTypes: "插件",
     isLoadVersionProperty: 1,
   });
-  const widgets = res.data.data.dataList;
+  const widgets = res.data.data?.dataList;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   console.log(window.microApp);
@@ -95,7 +95,7 @@ const mountExhibitWidget = async () => {
       // widget.exhibitId = widget.exhibitId + '111'
       exhibitWidget = await freelogApp.mountWidget({
         widget: widget, // 必传，子插件数据
-        container: document.getElementById("freelog-exhibit"), // 必传，自定义一个让插件挂载的div容器
+        container: document.getElementById("freelog-exhibit") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         topExhibitData: null, // 必传，最外层展品数据（子孙插件都需要用）
         config: {
           name: "我是展品类型的插件",
