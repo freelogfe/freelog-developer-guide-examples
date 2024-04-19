@@ -123,8 +123,8 @@ importers:
         specifier: ^2.3.7
         version: 2.3.7(vue@3.4.21)
       freelog-runtime:
-        specifier: ^3.5.5
-        version: link:node_modules/freelog-runtime
+        specifier: ^3.6.0
+        version: 3.6.0
       pinia:
         specifier: ^2.0.33
         version: 2.0.33(typescript@4.5.5)(vue@3.4.21)
@@ -214,8 +214,8 @@ importers:
         specifier: ^3.8.3
         version: 3.8.3
       freelog-runtime:
-        specifier: ^3.5.4
-        version: 3.5.5
+        specifier: ^3.6.0
+        version: 3.6.0
       pinia:
         specifier: ^2.0.33
         version: 2.0.33(typescript@4.5.5)(vue@3.4.21)
@@ -8434,6 +8434,7 @@ packages:
       es-errors: 1.3.0
       es-object-atoms: 1.0.0
       es-shim-unscopables: 1.0.2
+    dev: true
 
   /array.prototype.findlastindex@1.2.3:
     resolution: {integrity: sha512-LzLoiOMAxvy+Gd3BAq3B7VeIgPdo+Q8hthvKtXybMvRV0jrXfJM/t8mw7nNlpEcVlVUnCnM2KSX4XU5HmpodOA==}
@@ -8482,6 +8483,7 @@ packages:
       define-properties: 1.2.1
       es-abstract: 1.22.3
       es-shim-unscopables: 1.0.2
+    dev: true
 
   /array.prototype.tosorted@1.1.2:
     resolution: {integrity: sha512-HuQCHOlk1Weat5jzStICBCd83NxiIMwqDg/dHEsoefabn/hJRj5pVdWcPUSpRrwhwxZOsQassMpgN/xRYFBMIg==}
@@ -8501,6 +8503,7 @@ packages:
       es-abstract: 1.22.3
       es-errors: 1.3.0
       es-shim-unscopables: 1.0.2
+    dev: true
 
   /arraybuffer.prototype.slice@1.0.2:
     resolution: {integrity: sha512-yMBKppFur/fbHu9/6USUe03bZ4knMYiwFBcyiaXB8Go0qNehwX6inYPzK9U0NeQvGxKthcmHcaR8P5MStSRBAw==}
@@ -11226,7 +11229,7 @@ packages:
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0)(eslint@8.57.0)
       eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0)(eslint@8.57.0)(jest@27.5.1)(typescript@4.9.5)
       eslint-plugin-jsx-a11y: 6.8.0(eslint@8.57.0)
-      eslint-plugin-react: 7.34.1(eslint@8.57.0)
+      eslint-plugin-react: 7.33.2(eslint@8.57.0)
       eslint-plugin-react-hooks: 4.6.0(eslint@8.57.0)
       eslint-plugin-testing-library: 5.11.1(eslint@8.57.0)(typescript@4.9.5)
       typescript: 4.9.5
@@ -11515,6 +11518,7 @@ packages:
       resolve: 2.0.0-next.5
       semver: 6.3.1
       string.prototype.matchall: 4.0.10
+    dev: true
 
   /eslint-plugin-testing-library@5.11.1(eslint@8.57.0)(typescript@4.9.5):
     resolution: {integrity: sha512-5eX9e1Kc2PqVRed3taaLnAAqPZGEX75C+M/rXzUAI3wIg/ZxzUm1OVAwfe/O+vE+6YXOLetSe9g5GKD2ecXipw==}
@@ -12266,8 +12270,8 @@ packages:
       - snappy
       - supports-color
 
-  /freelog-runtime@3.5.5:
-    resolution: {integrity: sha512-5t3uzMS7ZwVKUn3GhryTO0+GA+nab6WNk9R6U2fJPElHpp2p0S2yoCIwdfec9eCza1g14JW3TLXAwsoD7azXsQ==}
+  /freelog-runtime@3.6.0:
+    resolution: {integrity: sha512-VvA+FokE1AmFA8Avfm4b+Ve/u8FrL5RBZmWKDKBAMfFTnPgbHr81teuAn9JjLOek/G3+6V8XEpYneUqkKfifog==}
     dependencies:
       axios: 0.21.4(debug@4.3.4)
       egg-freelog-base: 3.1.47
@@ -12922,7 +12926,7 @@ packages:
     dependencies:
       get-intrinsic: 1.2.4
       hasown: 2.0.2
-      side-channel: 1.0.4
+      side-channel: 1.0.6
 
   /internal-slot@1.0.7:
     resolution: {integrity: sha512-NGnrKwXzSms2qUUih/ILZ5JBqNTSa1+ZmP6flaIp6KmSElgE9qdndzS3cqjrDovwFdmwsGsLdeFgB6suw+1e9g==}

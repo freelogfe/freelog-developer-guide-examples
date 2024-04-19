@@ -43,7 +43,6 @@ let exhibitWidget: any = null;
 const add = () => {
   // 获取插件暴露的api
   selfWidget.getApi().changeMe();
-  console.log(selfWidget);
 };
 const add2 = () => {
   // 获取插件暴露的api
@@ -66,6 +65,14 @@ const mountSubWidget = async () => {
         widget: sub, // 必传，子插件数据
         container: document.getElementById("freelog-self") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         topExhibitData: subData, // 必传，最外层展品数据（子孙插件都需要用）
+        renderWidgetOptions: {
+          data: { type: "类型" },
+          lifeCycles: {
+            mounted: (e: CustomEvent) => {
+              console.log(e,"mounted")
+            },
+          },
+        },
         config: {
           name: "我是主题依赖的插件",
         }, // 传递给子插件配置数据，会合并到作品上的配置数据
@@ -76,18 +83,20 @@ const mountSubWidget = async () => {
       // selfWidget.mountPromise.then(() => {
       //  // do something
       // });
+      selfWidget.setData({ name: "jack" });
+      selfWidget.addDataListener((data: any) => {
+        console.log(data, 3333);
+      });
     }
   });
 };
 const mountExhibitWidget = async () => {
-  const res:any = await freelogApp.getExhibitListByPaging({
+  const res: any = await freelogApp.getExhibitListByPaging({
     articleResourceTypes: "插件",
     isLoadVersionProperty: 1,
   });
   const widgets = res.data.data?.dataList;
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  console.log(window.microApp);
+
   widgets.forEach(async (widget: any, index: number) => {
     console.log(widget, "snnaenu/插件开发演示代码插件");
 
@@ -97,6 +106,9 @@ const mountExhibitWidget = async () => {
         widget: widget, // 必传，子插件数据
         container: document.getElementById("freelog-exhibit") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         topExhibitData: null, // 必传，最外层展品数据（子孙插件都需要用）
+        renderWidgetOptions: {
+          data: { type: "类型" },
+        },
         config: {
           name: "我是展品类型的插件",
         }, // 传递给子插件配置数据，会合并到作品上的配置数据
