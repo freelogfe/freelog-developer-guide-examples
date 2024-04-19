@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/node": "^20.12.7",
     "@vitejs/plugin-basic-ssl": "^1.1.0",
-    "freelog-runtime": "^3.5.4",
+    "freelog-runtime": "^3.6.2",
     "freelog-type": "^3.6.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

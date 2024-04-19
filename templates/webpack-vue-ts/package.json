@@ -31,7 +31,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^9.15.1",
-    "freelog-runtime": "^3.5.4",
+    "freelog-runtime": "^3.6.2",
     "prettier": "^2.4.1",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",

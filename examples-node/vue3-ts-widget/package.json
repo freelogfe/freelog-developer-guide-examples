@@ -10,7 +10,7 @@
   "dependencies": {
     "@types/webpack-env": "^1.18.4",
     "core-js": "^3.8.3",
-    "freelog-runtime": "^3.6.0",
+    "freelog-runtime": "^3.6.2",
     "pinia": "^2.0.33",
     "register-service-worker": "^1.7.2",
     "vue": "^3.3.4",
