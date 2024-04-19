@@ -4,7 +4,7 @@
       <template #renderItem="{ item }">
         <a-list-item>
           <a-card :title="item.exhibitName" @click="showTree(item)">
-            <div class="h-80 over-h">
+            <div class="h-80 over-h cur-pointer">
               <img class="h-100x" :src="item.coverImages[0]" alt="" />
             </div>
           </a-card>

@@ -1,35 +1,43 @@
 <template>
-  <div class="p-40 w-100x h-100x y-auto">
-    <div class="">
-      <a-list :grid="{ gutter: 16, column: 4 }" :data-source="data">
-        <template #renderItem="{ item }">
-          <a-list-item>
-            <a-card :title="item.exhibitName" @click="show(item)">
-              <div class="h-80 over-h">
-                <img class="h-100x" :src="item.coverImages[0]" alt="" />
-              </div>
-            </a-card>
-          </a-list-item>
-        </template>
-      </a-list>
-    </div>
-    <div class="w-100x flex-column-center h-400 over-h mt-40">
-      <span v-if="!imgUrl" class="f-title-3">点击上面图片可在这展示</span>
-      <img :src="imgUrl" alt="" v-else class="h-100x" />
+  <div class="w-100x h-100x p-40 flex-column y-auto">
+    <div class="f-regular fw-medium flex-column mb-40 bb-1 pb-20">
+      <div class="text-align-left f-title-1 mb-10">效果展示：</div>
+      <div class="text-align-left pl-40 mb-20">
+        <span class="f-title-3 mr-10">授权信息: </span>
+        <div class="f-title-4 mt-10">
+          {{ authStatus }}
+        </div>
+      </div>
+      <div class="text-align-left pl-40 mb-20">
+        <span class="f-title-3 mr-10">展品是否可用: </span>
+        <div class="f-title-4 mt-10">
+          {{ exhibitAvailable }}
+        </div>
+      </div>
+      <div class="text-align-left pl-40 mb-20">
+        <span class="f-title-3 mr-10">展品签约次数: </span>
+        <div class="f-title-4 mt-10">
+          {{ exhibitSignCount }}
+        </div>
+      </div>
+      <div class="text-align-left pl-40 mb-20">
+        <span class="f-title-3 mr-10">统计展品签约量: </span>
+        <div class="f-title-4 mt-10">
+          {{ signStatistics }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { fr } from "element-plus/es/locale";
 import { freelogApp } from "freelog-runtime";
-import { ref } from "vue";
-interface DataItem {
-  exhibitName: string;
-  exhibitTitle: string;
-}
-const data = ref([] as DataItem[]);
-const imgUrl = ref("");
-// 获取展品列表
+import { reactive, ref } from "vue";
+const authStatus = ref("");
+const exhibitAvailable = ref("");
+const exhibitSignCount = ref("");
+const signStatistics = ref("");
 freelogApp
   .getExhibitListByPaging({
     skip: 0,
@@ -39,42 +47,25 @@ freelogApp
   .then((res: any) => {
     let arr = [] as string[];
 
-    res.data.data.dataList.forEach((element: any) => {
-      arr.push(element.exhibitId);
-    });
+    const data = res.data.data.dataList.filter(
+      (item: any) => item.exhibitName == "收费图片"
+    );
+    const exhibitId = data[0];
     // 查询是否拥有授权
-    freelogApp.getExhibitAuthStatus(arr.join(",")).then((auth: any) => {
-      data.value = res.data.data.dataList.map((item: any) => {
-        auth.data.data.some((au: any) => {
-          if (au.exhibitId === item.exhibitId) {
-            item.auth = au;
-            return true;
-          }
-          return false;
-        });
-        return item;
-      });
+    freelogApp.getExhibitAuthStatus(exhibitId).then((auth: any) => {
+      authStatus.value = JSON.stringify(auth.data.data);
+    });
+    // 查询是否可供用户签约（也就是节点是否获取到了上层资源的完整授权）
+    freelogApp.getExhibitAvailable(exhibitId).then((auth: any) => {
+      exhibitAvailable.value = JSON.stringify(auth.data.data);
+    });
+    // 查询签约数量
+    freelogApp.getExhibitSignCount(exhibitId).then((auth: any) => {
+      exhibitSignCount.value = JSON.stringify(auth.data.data);
+    });
+    // 统计展品签约量
+    freelogApp.getSignStatistics().then((auth: any) => {
+      signStatistics.value = JSON.stringify(auth.data.data);
     });
   });
-const show = async (data: any) => {
-  if (data.auth.isAuth) {
-    imgUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {
-      returnUrl: true,
-    });
-  } else {
-    console.log(data.exhibitId, 9999)
-    // 没有授权
-    freelogApp
-      .addAuth(data.exhibitId, {
-        immediate: true,
-      })
-      .then(async (result: any) => {
-        if (result.status === freelogApp.resultType.SUCCESS) {
-          imgUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {
-            returnUrl: true,
-          });
-        }
-      });
-  }
-};
 </script>

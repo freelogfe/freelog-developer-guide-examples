@@ -24,8 +24,8 @@
     </a-sub-menu>
     <a-sub-menu key="auth" @titleClick="titleClick">
       <template #title>授权处理</template>
-      <a-menu-item key="auth-info">授权判断与调用</a-menu-item>
-      <!-- <a-menu-item key="auth-process">授权流程</a-menu-item> -->
+      <a-menu-item key="auth-info">授权信息</a-menu-item>
+      <a-menu-item key="auth-process">授权流程</a-menu-item>
     </a-sub-menu>
     <a-sub-menu key="user" @titleClick="titleClick">
       <template #title>用户相关</template>
