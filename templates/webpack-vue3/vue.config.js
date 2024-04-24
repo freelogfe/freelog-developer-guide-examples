@@ -1,7 +1,4 @@
 const { defineConfig } = require('@vue/cli-service')
-const AutoImport = require('unplugin-auto-import/webpack')
-const Components = require('unplugin-vue-components/webpack')
-const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 const path = require('path');
 const { name } = require('./package');
 const webpackPlugin = require('webpack-mkcert')
@@ -18,14 +15,6 @@ module.exports = defineConfig(async () => {
     hosts: ['localhost', '127.0.0.1']
   })
   return {
-    plugins: [
-      AutoImport({
-        resolvers: [ElementPlusResolver()],
-      }),
-      Components({
-        resolvers: [ElementPlusResolver()],
-      }),
-    ],
     transpileDependencies: true,
     outputDir: 'dist',
     assetsDir: 'static',

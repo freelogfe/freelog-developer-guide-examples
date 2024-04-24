@@ -59,7 +59,6 @@ const reload = (obj: any) => {
 };
 const mountSubWidget = async () => {
   const subData = await freelogApp.getSubDep();
-  console.log(subData)
   subData.subDep.forEach(async (sub: any, index: number) => {
     if (sub.name === "snnaenu/插件开发演示代码插件") {
       selfWidget = await freelogApp.mountWidget({
@@ -70,7 +69,7 @@ const mountSubWidget = async () => {
           data: { type: "类型" },
           lifeCycles: {
             mounted: (e: CustomEvent) => {
-              console.log(e,"mounted")
+              console.log(e, "mounted");
             },
           },
         },
@@ -92,15 +91,13 @@ const mountSubWidget = async () => {
   });
 };
 const mountExhibitWidget = async () => {
-  const res: any = await freelogApp.getExhibitListByPaging({
+  const res = await freelogApp.getExhibitListByPaging({
     articleResourceTypes: "插件",
     isLoadVersionProperty: 1,
   });
   const widgets = res.data.data?.dataList;
 
   widgets.forEach(async (widget: any, index: number) => {
-    console.log(widget, "snnaenu/插件开发演示代码插件");
-
     if (widget.articleInfo.articleName == "snnaenu/插件开发演示代码插件") {
       // widget.exhibitId = widget.exhibitId + '111'
       exhibitWidget = await freelogApp.mountWidget({
