@@ -25,13 +25,15 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp } from "freelog-runtime";
+import {
+  freelogApp,
+  ExhibitInfo,
+  GetExhibitListByIdResult,
+  GetExhibitListByPagingResult,
+} from "freelog-runtime";
 import { ref } from "vue";
-interface DataItem {
-  exhibitName: string;
-  exhibitTitle: string;
-}
-const data = ref([] as DataItem[]);
+
+const data = ref([] as ExhibitInfo[]);
 const imgUrl = ref("");
 const exhibitInfo = ref("");
 freelogApp
@@ -39,31 +41,36 @@ freelogApp
     skip: 0,
     limit: 20,
     articleResourceTypes: "图片",
+    isLoadVersionProperty: 1,
   })
-  .then((res: any) => {
-    const exhibitIds = res.data.data.dataList.map((item: any) => {
+  .then((res: GetExhibitListByPagingResult) => {
+    const exhibitIds = res.data.data.dataList.map((item: ExhibitInfo) => {
       return item.exhibitId;
     });
     freelogApp
       .getExhibitListById({
         exhibitIds: exhibitIds.join(","),
       })
-      .then((res: any) => {
+      .then((res: GetExhibitListByIdResult) => {
         console.log(res.data.data);
         data.value = res.data.data.filter(
-          (item: any) => item.exhibitName != "收费图片"
+          (item: ExhibitInfo) => item.exhibitName != "收费图片"
         );
       });
   });
 
-const show = async (data: any) => {
+const show = async (data: ExhibitInfo) => {
   if (data.articleInfo.resourceType.includes("照片")) {
     imgUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {
       returnUrl: true,
     });
-    freelogApp.getExhibitInfo(data.exhibitId).then((res) => {
-      exhibitInfo.value = JSON.stringify(res.data.data);
-    });
+    freelogApp
+      .getExhibitInfo(data.exhibitId, {
+        isLoadVersionProperty: 1,
+      })
+      .then((res) => {
+        exhibitInfo.value = JSON.stringify(res.data.data);
+      });
   }
 };
 </script>

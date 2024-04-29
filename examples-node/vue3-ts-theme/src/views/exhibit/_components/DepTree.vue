@@ -20,7 +20,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [data: any]; // 具名元组语法
 }>();
-const onSelect = (key: any, info) => {
+const onSelect = (key: any, info: any) => {
   if (info.node.parent) {
     emit("select", info);
   }

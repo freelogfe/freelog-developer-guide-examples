@@ -16,11 +16,6 @@ const routes: Array<RouteRecordRaw> = [
     name: "widgetMount",
     component: () => import("@/views/widget/WidgetMount.vue"),
   },
-  {
-    path: "/widget-control",
-    name: "widgetControl",
-    component: () => import("@/views/widget/WidgetControl.vue"),
-  },
 
   {
     path: "/widget-viewport",

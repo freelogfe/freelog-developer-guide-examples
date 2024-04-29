@@ -25,7 +25,14 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp } from "freelog-runtime";
+import {
+  freelogApp,
+  GetExhibitDepInfoResult,
+  GetExhibitDepTreeResult,
+  GetExhibitListByPagingResult,
+  ExhibitInfo,
+  ExhibitDependencyTree,
+} from "freelog-runtime";
 import { ref } from "vue";
 import DepTree from "./_components/DepTree.vue";
 const imgUrl = ref("");
@@ -44,8 +51,8 @@ const show = async (node: any) => {
     .getExhibitDepInfo(node.node.exhibitId, {
       articleNids: node.node.parent.node.nid,
     })
-    .then((res) => {
-      exhibitInfo.value = JSON.stringify(res.data?.data);
+    .then((res: GetExhibitDepInfoResult) => {
+      exhibitInfo.value = JSON.stringify(res.data.data);
     });
 };
 const showTree = async (exhibit: any) => {
@@ -55,11 +62,11 @@ const showTree = async (exhibit: any) => {
       // isContainRootNode: false,
       maxDeep: 10,
     })
-    .then((res: any) => {
-      const obj = { ...res.data.data[0], exhibitId: exhibit.exhibitId };
+    .then((res: GetExhibitDepTreeResult) => {
+      const obj: any = { ...res.data.data[0], exhibitId: exhibit.exhibitId };
       obj.title = obj.resourceName;
       obj.key = obj.resourceId;
-      function deep(data: any, top: any) {
+      function deep(data: ExhibitDependencyTree[], top: any) {
         if (data?.length) {
           data.forEach((item: any) => {
             const next = {
@@ -84,10 +91,11 @@ freelogApp
     skip: 0,
     limit: 20,
     articleResourceTypes: "图片",
+    isLoadVersionProperty: 1,
   })
-  .then((res: any) => {
+  .then((res: GetExhibitListByPagingResult) => {
     data.value = res.data.data.dataList.filter(
-      (item: any) => item.exhibitName != "收费图片"
+      (item: ExhibitInfo) => item.exhibitName != "收费图片"
     );
   });
 </script>

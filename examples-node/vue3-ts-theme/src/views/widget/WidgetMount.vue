@@ -34,11 +34,17 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp } from "freelog-runtime";
+import {
+  freelogApp,
+  GetSubDepResult,
+  SubDepType,
+  WidgetController,
+  GetExhibitListByPagingResult,
+} from "freelog-runtime";
 import { onBeforeUnmount, ref } from "vue";
 const activeKey = ref("1");
-let selfWidget: any = null;
-let exhibitWidget: any = null;
+let selfWidget: WidgetController = {} as WidgetController;
+let exhibitWidget: WidgetController = {} as WidgetController;
 
 const add = () => {
   // 获取插件暴露的api
@@ -58,8 +64,8 @@ const reload = (obj: any) => {
   });
 };
 const mountSubWidget = async () => {
-  const subData = await freelogApp.getSubDep();
-  subData.subDep.forEach(async (sub: any, index: number) => {
+  const subData: GetSubDepResult = await freelogApp.getSubDep();
+  subData.subDep.forEach(async (sub: SubDepType, index: number) => {
     if (sub.name === "snnaenu/插件开发演示代码插件") {
       selfWidget = await freelogApp.mountWidget({
         widget: sub, // 必传，子插件数据
@@ -91,10 +97,11 @@ const mountSubWidget = async () => {
   });
 };
 const mountExhibitWidget = async () => {
-  const res = await freelogApp.getExhibitListByPaging({
-    articleResourceTypes: "插件",
-    isLoadVersionProperty: 1,
-  });
+  const res: GetExhibitListByPagingResult =
+    await freelogApp.getExhibitListByPaging({
+      articleResourceTypes: "插件",
+      isLoadVersionProperty: 1,
+    });
   const widgets = res.data.data?.dataList;
 
   widgets.forEach(async (widget: any, index: number) => {

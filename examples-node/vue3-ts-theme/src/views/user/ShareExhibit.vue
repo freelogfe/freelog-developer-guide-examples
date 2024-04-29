@@ -30,7 +30,12 @@
 
 <script lang="ts" setup>
 import { useRoute } from "vue-router";
-import { freelogApp } from "freelog-runtime";
+import {
+  freelogApp,
+  GetExhibitListByPagingResult,
+  ExhibitInfo,
+  GetExhibitListByIdResult,
+} from "freelog-runtime";
 import { ref } from "vue";
 import { message } from "ant-design-vue";
 
@@ -64,18 +69,17 @@ freelogApp
     limit: 20,
     articleResourceTypes: "图片",
   })
-  .then((res: any) => {
-    const exhibitIds = res.data.data.dataList.map((item: any) => {
+  .then((res: GetExhibitListByPagingResult) => {
+    const exhibitIds = res.data.data.dataList.map((item: ExhibitInfo) => {
       return item.exhibitId;
     });
     freelogApp
       .getExhibitListById({
         exhibitIds: exhibitIds.join(","),
       })
-      .then((res: any) => {
-        console.log(res.data.data);
+      .then((res: GetExhibitListByIdResult) => {
         data.value = res.data.data.filter(
-          (item: any) => item.exhibitName != "收费图片"
+          (item: ExhibitInfo) => item.exhibitName != "收费图片"
         );
       });
   });

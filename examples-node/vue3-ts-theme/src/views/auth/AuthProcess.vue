@@ -25,15 +25,18 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp } from "freelog-runtime";
+import {
+  freelogApp,
+  GetExhibitListByPagingResult,
+  GetExhibitAuthStatusResult,
+  ExhibitInfo,
+  AuthResult,
+  AddAuthResult,
+} from "freelog-runtime";
 import { ref } from "vue";
-interface DataItem {
-  exhibitName: string;
-  exhibitTitle: string;
-}
-const data = ref([] as DataItem[]);
+type DataType = ExhibitInfo & { auth: AuthResult };
+const data = ref([] as DataType[]);
 const imgUrl = ref("");
-console.log(freelogApp.resultType);
 // 获取展品列表
 freelogApp
   .getExhibitListByPaging({
@@ -41,28 +44,31 @@ freelogApp
     limit: 20,
     articleResourceTypes: "图片",
   })
-  .then((res: any) => {
+  .then((res: GetExhibitListByPagingResult) => {
     let arr = [] as string[];
 
-    res.data.data.dataList.forEach((element: any) => {
+    res.data.data.dataList.forEach((element: ExhibitInfo) => {
       arr.push(element.exhibitId);
     });
     // 查询是否拥有授权
-    freelogApp.getExhibitAuthStatus(arr.join(",")).then((auth: any) => {
-      data.value = res.data.data.dataList.map((item: any) => {
-        auth.data.data.some((au: any) => {
-          if (au.exhibitId === item.exhibitId) {
-            item.auth = au;
-            return true;
-          }
-          return false;
+    freelogApp
+      .getExhibitAuthStatus(arr.join(","))
+      .then((auth: GetExhibitAuthStatusResult) => {
+        data.value = res.data.data.dataList.map((item: ExhibitInfo) => {
+          let authData: AuthResult = {} as AuthResult;
+          auth.data.data.some((au: AuthResult) => {
+            if (au.exhibitId === item.exhibitId) {
+              authData = au;
+              return true;
+            }
+            return false;
+          });
+          return { auth: authData, ...item };
         });
-        return item;
       });
-    });
   });
-const show = async (data: any) => {
-  if (data.auth.isAuth) {
+const show = async (data: DataType) => {
+  if (data?.auth.isAuth) {
     imgUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {
       returnUrl: true,
     });
@@ -75,7 +81,7 @@ const show = async (data: any) => {
         //   immediate: true,
         // }
       )
-      .then(async (result: any) => {
+      .then(async (result: AddAuthResult) => {
         if (result.status === freelogApp.resultType.SUCCESS) {
           imgUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {
             returnUrl: true,

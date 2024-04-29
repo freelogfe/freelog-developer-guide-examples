@@ -16,7 +16,7 @@
     </div>
     <div class="f-regular fw-medium flex-column mb-40 bb-1 pb-20">
       <div class="text-align-left f-title-1 mb-10">效果展示：</div>
-      <DepTree :treeData="treeData" />
+      <dep-tree :treeData="treeData" />
     </div>
     <!-- <div class="f-regular fw-medium flex-column mb-40 bb-1 pb-20">
       <div class="text-align-left f-title-1 mb-10">设计缺陷或优化思考：</div>
@@ -31,30 +31,38 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp, widgetApi } from "freelog-runtime";
-import { reactive, ref } from "vue";
-import DepTree from "./_components/DepTree.vue";
-const treeData = ref([] as any[]);
+import {
+  freelogApp,
+  GetExhibitDepTreeResult,
+  ExhibitDependencyTree,
+  GetSubDepResult,
+  SubDepType,
+} from "freelog-runtime";
+import { ref } from "vue";
+import type { TreeProps } from "ant-design-vue";
 
-freelogApp.getSubDep().then((res: any) => {
-  console.log(res);
+import DepTree from "./_components/DepTree.vue";
+type TreeNode = TreeProps["treeData"];
+const treeData = ref<TreeNode>([]);
+
+freelogApp.getSubDep().then((res: GetSubDepResult) => {
   if (res.subDep) {
     let str: Array<string> = [];
-    res.subDep.forEach((sub: any) => {
+    res.subDep.forEach((sub: SubDepType) => {
       str.push(sub.nid);
     });
     freelogApp
       .getExhibitDepTree(freelogApp.getSelfExhibitId(), {
         isContainRootNode: true,
       })
-      .then((res: any) => {
+      .then((res: GetExhibitDepTreeResult) => {
         const self = res.data.data[0];
         const deps = res.data.data[0].dependencies;
         treeData.value = [
           {
             title: self.resourceName + "  (我是自身)",
             key: self.resourceId,
-            children: deps.map((item: any) => {
+            children: deps.map((item: ExhibitDependencyTree) => {
               return {
                 title: item.resourceName + "  (我是依赖)",
                 key: item.resourceId,

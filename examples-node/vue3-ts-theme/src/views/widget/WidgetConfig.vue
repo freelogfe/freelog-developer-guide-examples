@@ -37,9 +37,8 @@
 </template>
 
 <script lang="ts" setup>
-import { fr } from "element-plus/es/locale";
 import { freelogApp } from "freelog-runtime";
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 const selfArticleId = ref("");
 const getSelfWidgetRenderName = ref("");
 const selfExhibitId = ref("");

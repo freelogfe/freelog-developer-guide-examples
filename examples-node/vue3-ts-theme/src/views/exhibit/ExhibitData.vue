@@ -22,12 +22,17 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp } from "freelog-runtime";
+import {
+  freelogApp,
+  ExhibitInfo,
+  WidgetController,
+  GetExhibitListByPagingResult,
+} from "freelog-runtime";
 import { ref, onBeforeUnmount } from "vue";
 
-let exhibitWidget: any = null;
+let exhibitWidget: WidgetController = {} as WidgetController;
 
-const data = ref([] as any[]);
+const data = ref([] as ExhibitInfo[]);
 const gameUrl = ref("");
 const gameName = ref("");
 freelogApp
@@ -36,7 +41,7 @@ freelogApp
     limit: 20,
     articleResourceTypes: "nesrom,红白机",
   })
-  .then(async (res: any) => {
+  .then(async (res: GetExhibitListByPagingResult) => {
     data.value = res.data.data.dataList;
     gameName.value = data.value[0].exhibitName;
     gameUrl.value = await freelogApp.getExhibitFileStream(
@@ -47,27 +52,25 @@ freelogApp
     );
     mountExhibitWidget(gameUrl.value, gameName.value);
   });
-const show = async (data: any) => {
+const show = async (data: ExhibitInfo) => {
   gameName.value = data.exhibitName;
-  gameUrl.value = await freelogApp.getExhibitFileStream(
-    data.exhibitId,
-    {
-      returnUrl: true,
-    }
-  );
-  exhibitWidget.getApi().startGame(gameUrl.value,gameName.value);
+  gameUrl.value = await freelogApp.getExhibitFileStream(data.exhibitId, {
+    returnUrl: true,
+  });
+  exhibitWidget.getApi().startGame(gameUrl.value, gameName.value);
 };
 // 离开记得卸载插件喔
-onBeforeUnmount( () => {
-  // exhibitWidget?.unmount();
+onBeforeUnmount(() => {
+  exhibitWidget?.unmount();
 });
 const mountExhibitWidget = async (url: string, name: string) => {
-  const res = await freelogApp.getExhibitListByPaging({
-    articleResourceTypes: "插件",
-    isLoadVersionProperty: 1,
-  });
-  const widgets = res.data.data?.dataList;
-  widgets.forEach(async (widget: any, index: number) => {
+  const res: GetExhibitListByPagingResult =
+    await freelogApp.getExhibitListByPaging({
+      articleResourceTypes: "插件",
+      isLoadVersionProperty: 1,
+    });
+  const widgets = res.data.data.dataList;
+  widgets.forEach(async (widget: ExhibitInfo) => {
     if (widget.exhibitName === "nes-widget") {
       // widget.exhibitId = widget.exhibitId + '111'
       exhibitWidget = await freelogApp.mountWidget({
