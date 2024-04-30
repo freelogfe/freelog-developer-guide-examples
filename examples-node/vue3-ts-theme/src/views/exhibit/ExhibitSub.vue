@@ -63,7 +63,9 @@ const showTree = async (exhibit: any) => {
     })
     .then((res: GetExhibitInfoResult) => {
       let tree: any = {};
-      const obj: any = res.data.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const obj: any = res.data.data.versionInfo.dependencyTree;
       const deep: any = [];
       obj.forEach((item: any) => {
         const next = {
