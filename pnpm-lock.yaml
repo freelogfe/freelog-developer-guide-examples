@@ -123,8 +123,8 @@ importers:
         specifier: ^2.7.2
         version: 2.7.2(vue@3.4.25)
       freelog-runtime:
-        specifier: ^3.7.7
-        version: 3.7.7
+        specifier: ^3.8.0
+        version: 3.8.0
       pinia:
         specifier: ^2.1.7
         version: 2.1.7(typescript@4.5.5)(vue@3.4.25)
@@ -214,8 +214,8 @@ importers:
         specifier: ^3.37.0
         version: 3.37.0
       freelog-runtime:
-        specifier: ^3.7.8
-        version: 3.7.8
+        specifier: ^3.8.0
+        version: 3.8.0
       pinia:
         specifier: ^2.1.7
         version: 2.1.7(typescript@4.5.5)(vue@3.4.25)
@@ -288,7 +288,7 @@ importers:
         version: 4.5.5
       webpack-mkcert:
         specifier: ^1.0.3
-        version: 1.0.3(@types/node@20.4.1)(sass@1.32.10)
+        version: 1.0.3(@types/node@20.12.7)(sass@1.75.0)
 
   nes-game/vue3-ts-theme-nes-mobile:
     dependencies:
@@ -623,8 +623,8 @@ importers:
         specifier: ^3.8.3
         version: 3.8.3
       freelog-runtime:
-        specifier: ^3.7.7
-        version: 3.7.7
+        specifier: ^3.8.0
+        version: 3.8.0
       jsnes:
         specifier: ^1.2.1
         version: 1.2.1
@@ -1028,7 +1028,7 @@ importers:
         version: 4.1.1(webpack@5.91.0)
       webpack-mkcert:
         specifier: ^1.0.3
-        version: 1.0.3(@types/node@20.4.1)(sass@1.32.10)
+        version: 1.0.3(@types/node@20.12.7)(sass@1.75.0)
       workbox-webpack-plugin:
         specifier: ^6.6.0
         version: 6.6.0(webpack@5.91.0)
@@ -1215,7 +1215,7 @@ importers:
     devDependencies:
       webpack-mkcert:
         specifier: ^1.0.3
-        version: 1.0.3(@types/node@20.4.1)(sass@1.32.10)
+        version: 1.0.3(@types/node@20.12.7)(sass@1.75.0)
 
   templates/webpack-vue-ts:
     dependencies:
@@ -1300,7 +1300,7 @@ importers:
         version: 4.5.5
       webpack-mkcert:
         specifier: ^1.0.3
-        version: 1.0.3(@types/node@20.4.1)(sass@1.32.10)
+        version: 1.0.3(@types/node@20.12.7)(sass@1.75.0)
 
   templates/webpack-vue3:
     dependencies:
@@ -1373,7 +1373,7 @@ importers:
         version: 0.25.2(rollup@2.79.1)(vue@3.4.23)
       webpack-mkcert:
         specifier: ^1.0.3
-        version: 1.0.3(@types/node@20.4.1)(sass@1.32.10)
+        version: 1.0.3(@types/node@20.12.7)(sass@1.75.0)
 
 packages:
 
@@ -5801,6 +5801,7 @@ packages:
 
   /@types/node@20.4.1:
     resolution: {integrity: sha512-JIzsAvJeA/5iY6Y/OxZbv1lUcc8dNSE77lb2gnBH+/PJ3lFR1Ccvgwl5JWnHAkNHcRsT0TbpVOsiMKZ1F/yyJg==}
+    dev: true
 
   /@types/normalize-package-data@2.4.4:
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -12419,8 +12420,8 @@ packages:
       - debug
     dev: false
 
-  /freelog-runtime@3.7.8:
-    resolution: {integrity: sha512-GTy9P4lGuCNhr2goLp3w5rmrYarMT1AxbF6WdV3pmptvESrwYJu17jEpozqGI7cI0LmkAboUQo/AwNgrdOcZkw==}
+  /freelog-runtime@3.8.0:
+    resolution: {integrity: sha512-XC9Rr6NJSp4MjH4kVV4ADLQM0ugiWF5pmjgejAWqD/maK7a5tt3jPABWZt2zqc24Klj0OiBoMu7+ZOmA/irY7g==}
     dependencies:
       axios: 0.21.4(debug@4.3.4)
     transitivePeerDependencies:
@@ -17968,6 +17969,7 @@ packages:
     hasBin: true
     dependencies:
       chokidar: 3.6.0
+    dev: true
 
   /sass@1.75.0:
     resolution: {integrity: sha512-ShMYi3WkrDWxExyxSZPst4/okE9ts46xZmJDSawJQrnte7M1V9fScVB+uNXOVKRBt0PggHOwoZcn8mYX4trnBw==}
@@ -19638,7 +19640,6 @@ packages:
       sass: 1.75.0
     optionalDependencies:
       fsevents: 2.3.3
-    dev: true
 
   /vite@3.2.10(@types/node@20.4.1)(sass@1.32.10):
     resolution: {integrity: sha512-Dx3olBo/ODNiMVk/cA5Yft9Ws+snLOXrhLtrI3F4XLt4syz2Yg8fayZMWScPKoz12v5BUv7VEmQHnsfpY80fYw==}
@@ -19673,6 +19674,7 @@ packages:
       sass: 1.32.10
     optionalDependencies:
       fsevents: 2.3.3
+    dev: true
 
   /vite@5.2.9(@types/node@20.12.7):
     resolution: {integrity: sha512-uOQWfuZBlc6Y3W/DTuQ1Sr+oIXWvqljLvS881SVmAj00d5RdgShLcuXWxseWPd4HXwiYBFW/vXHfKFeqj9uQnw==}
@@ -20436,7 +20438,6 @@ packages:
       - sugarss
       - supports-color
       - terser
-    dev: true
 
   /webpack-mkcert@1.0.3(@types/node@20.4.1)(sass@1.32.10):
     resolution: {integrity: sha512-sg19QINtMcHhpv4ncZ3XN1Y/RqpyNFcrEx4WXY/ACz2oUntlzbbpM+RlldcKhleGJgjHJsijdvdZ7LHspy72Tw==}
@@ -20456,6 +20457,7 @@ packages:
       - sugarss
       - supports-color
       - terser
+    dev: true
 
   /webpack-sources@1.4.3:
     resolution: {integrity: sha512-lgTS3Xhv1lCOKo7SA5TjKXMjpSM4sBjNV5+q2bqesbSPs5FjGmU6jjtBSkX9b4qW87vDIsCIlUPOEhbZrMdjeQ==}

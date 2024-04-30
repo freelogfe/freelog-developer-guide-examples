@@ -31,46 +31,27 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  freelogApp,
-  GetExhibitDepTreeResult,
-  ExhibitDependencyTree,
-  GetSubDepResult,
-  SubDepType,
-} from "freelog-runtime";
+import { freelogApp, ExhibitAuthNodeInfo } from "freelog-runtime";
 import { ref } from "vue";
 import type { TreeProps } from "ant-design-vue";
 
 import DepTree from "./_components/DepTree.vue";
 type TreeNode = TreeProps["treeData"];
 const treeData = ref<TreeNode>([]);
-
-freelogApp.getSubDep().then((res: GetSubDepResult) => {
-  if (res.subDep) {
-    let str: Array<string> = [];
-    res.subDep.forEach((sub: SubDepType) => {
-      str.push(sub.nid);
-    });
-    freelogApp
-      .getExhibitDepTree(freelogApp.getSelfExhibitId(), {
-        isContainRootNode: true,
-      })
-      .then((res: GetExhibitDepTreeResult) => {
-        const self = res.data.data[0];
-        const deps = res.data.data[0].dependencies;
-        treeData.value = [
-          {
-            title: self.resourceName + "  (我是自身)",
-            key: self.resourceId,
-            children: deps.map((item: ExhibitDependencyTree) => {
-              return {
-                title: item.resourceName + "  (我是依赖)",
-                key: item.resourceId,
-              };
-            }),
-          },
-        ];
-      });
-  }
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+freelogApp.getSelfDependencyTree().then((data: ExhibitAuthNodeInfo[]) => {
+  treeData.value = [
+    {
+      title: "  (我是自身)",
+      key: "1",
+      children: data.map((item: ExhibitAuthNodeInfo) => {
+        return {
+          title: item.articleName + "  (我是依赖)",
+          key: item.articleId,
+        };
+      }),
+    },
+  ];
 });
 </script>

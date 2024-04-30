@@ -8,7 +8,7 @@ import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import { useCounterStore } from "./stores/counter";
 import "./assets/css/index.scss";
-import { freelogApp, initFreelogApp } from "freelog-runtime";
+import { freelogApp, initFreelogApp, widgetApi } from "freelog-runtime";
 
 let pinia: any = null;
 
@@ -31,7 +31,8 @@ function render() {
   // 暴露api给父插件或主题
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  freelogApp.registerApi({
+  const data = widgetApi.getData()
+  data.registerApi({
     changeMe: () => {
       const store = useCounterStore();
       store.increment();
@@ -50,7 +51,6 @@ function unmount() {
   router = null;
   pinia = null;
 }
-
 
 window.mount = () => {
   initFreelogApp();

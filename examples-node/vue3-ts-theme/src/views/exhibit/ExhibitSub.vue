@@ -28,9 +28,9 @@
 import {
   freelogApp,
   GetExhibitDepInfoResult,
-  GetExhibitDepTreeResult,
   GetExhibitListByPagingResult,
   ExhibitInfo,
+  GetExhibitInfoResult,
   ExhibitDependencyTree,
 } from "freelog-runtime";
 import { ref } from "vue";
@@ -58,31 +58,48 @@ const show = async (node: any) => {
 const showTree = async (exhibit: any) => {
   // exhibit.data.data.dataList.forEach((exhibit: any) => {
   freelogApp
-    .getExhibitDepTree(exhibit.exhibitId, {
-      // isContainRootNode: false,
-      maxDeep: 10,
+    .getExhibitInfo(exhibit.exhibitId, {
+      isLoadVersionProperty: 1,
     })
-    .then((res: GetExhibitDepTreeResult) => {
-      const obj: any = { ...res.data.data[0], exhibitId: exhibit.exhibitId };
-      obj.title = obj.resourceName;
-      obj.key = obj.resourceId;
-      function deep(data: ExhibitDependencyTree[], top: any) {
-        if (data?.length) {
-          data.forEach((item: any) => {
-            const next = {
-              ...item,
-              title: item.resourceName,
-              key: item.resourceId,
-              exhibitId: exhibit.exhibitId,
-            };
-            top.children = top.children || [];
-            top.children.push(next);
-            deep(next.dependencies, next);
-          });
+    .then((res: GetExhibitInfoResult) => {
+      let tree: any = {};
+      const obj: any = res.data.data;
+      const deep: any = [];
+      obj.forEach((item: any) => {
+        const next = {
+          ...item,
+          title: item.articleName,
+          key: item.articleId,
+          children: [],
+          parentNid: item.parentNid,
+          nid: item.nid,
+        };
+        if (item.deep === 0) {
+          tree = next;
+        } else {
+          deep[item.deep] = deep[item.deep] || [];
+          deep[item.deep].push(next);
         }
-      }
-      deep(res.data.data[0].dependencies, obj);
-      treeData.value = [obj];
+      });
+      /**
+       * 一层循环，后续循环下一层
+       *
+       */
+      deep.forEach((element: any, index: number) => {
+        if (index === 1) {
+          tree.children = [...element];
+        }
+        element.forEach((item: any) => {
+          if (deep[index + 1]) {
+            deep[index + 1].forEach((next: any) => {
+              if (next.parentId === item.nid) {
+                item.children = [...item.children, next];
+              }
+            });
+          }
+        });
+      });
+      treeData.value = [tree];
     });
   // });
 };

@@ -36,23 +36,25 @@
 <script lang="ts" setup>
 import {
   freelogApp,
-  GetSubDepResult,
-  SubDepType,
+  ExhibitAuthNodeInfo,
   WidgetController,
+  ExhibitInfo,
   GetExhibitListByPagingResult,
 } from "freelog-runtime";
 import { onBeforeUnmount, ref } from "vue";
 const activeKey = ref("1");
 let selfWidget: WidgetController = {} as WidgetController;
 let exhibitWidget: WidgetController = {} as WidgetController;
+const selfWidgetApi = ref({} as any);
+const exhibitWidgetApi = ref({} as any);
 
 const add = () => {
   // 获取插件暴露的api
-  selfWidget.getApi().changeMe();
+  selfWidgetApi.value.changeMe();
 };
 const add2 = () => {
   // 获取插件暴露的api
-  exhibitWidget.getApi().changeMe();
+  exhibitWidgetApi.value.changeMe();
 };
 const reload = (obj: any) => {
   obj.reload().then((result: string) => {
@@ -64,31 +66,36 @@ const reload = (obj: any) => {
   });
 };
 const mountSubWidget = async () => {
-  const subData: GetSubDepResult = await freelogApp.getSubDep();
-  subData.subDep.forEach(async (sub: SubDepType, index: number) => {
-    if (sub.name === "snnaenu/插件开发演示代码插件") {
-      selfWidget = await freelogApp.mountWidget({
-        widget: sub, // 必传，子插件数据
+  const subData: ExhibitAuthNodeInfo[] =
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    await freelogApp.getSelfDependencyTree();
+  subData.forEach(async (sub: ExhibitAuthNodeInfo) => {
+    if (sub.articleName === "snnaenu/插件开发演示代码插件") {
+      selfWidget = await freelogApp.mountArticleWidget({
+        articleId: sub.articleId,
+        parentNid: sub.parentNid,
+        nid: sub.nid,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        topExhibitId: freelogApp.getTopExhibitId(),
         container: document.getElementById("freelog-self") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
-        topExhibitData: subData, // 必传，最外层展品数据（子孙插件都需要用）
         renderWidgetOptions: {
-          data: { type: "类型" },
+          data: {
+            type: "类型",
+            registerApi: (api: any) => {
+              selfWidgetApi.value = api;
+            },
+          },
           lifeCycles: {
             mounted: (e: CustomEvent) => {
               console.log(e, "mounted");
             },
           },
         },
-        config: {
-          name: "我是主题依赖的插件",
-        }, // 传递给子插件配置数据，会合并到作品上的配置数据
         seq: 0, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
         widget_entry: "https://localhost:8102", // 本地url，dev模式下，可以使用本地url调试子插件
       });
-      // 使用此函数可以保证在插件加载完成后 再执行
-      // selfWidget.mountPromise.then(() => {
-      //  // do something
-      // });
       selfWidget.setData({ name: "jack" });
       selfWidget.addDataListener((data: any) => {
         console.log(data, 3333);
@@ -104,19 +111,20 @@ const mountExhibitWidget = async () => {
     });
   const widgets = res.data.data?.dataList;
 
-  widgets.forEach(async (widget: any, index: number) => {
+  widgets.forEach(async (widget: ExhibitInfo, index: number) => {
     if (widget.articleInfo.articleName == "snnaenu/插件开发演示代码插件") {
       // widget.exhibitId = widget.exhibitId + '111'
-      exhibitWidget = await freelogApp.mountWidget({
-        widget: widget, // 必传，子插件数据
+      exhibitWidget = await freelogApp.mountExhibitWidget({
+        exhibitId: widget.exhibitId,
         container: document.getElementById("freelog-exhibit") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
-        topExhibitData: null, // 必传，最外层展品数据（子孙插件都需要用）
         renderWidgetOptions: {
-          data: { type: "类型" },
+          data: {
+            type: "类型",
+            registerApi: (api: any) => {
+              exhibitWidgetApi.value = api;
+            },
+          },
         },
-        config: {
-          name: "我是展品类型的插件",
-        }, // 传递给子插件配置数据，会合并到作品上的配置数据
         seq: 1, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
         widget_entry: "https://localhost:8102", // 本地url，dev模式下，可以使用本地url调试子插件
       });

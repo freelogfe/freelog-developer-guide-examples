@@ -17,20 +17,8 @@
         <span class="f-title-4">{{ JSON.stringify(freelogApp.devData) }}</span>
       </div>
       <div class="text-align-left pl-40 mb-20">
-        <span class="f-title-3 mr-10">获取自身作品id: </span>
-        <span class="f-title-4">{{ selfArticleId }}</span>
-      </div>
-      <div class="text-align-left pl-40 mb-20">
         <span class="f-title-3 mr-10">获取自身插件渲染id: </span>
         <span class="f-title-4">{{ getSelfWidgetRenderName }}</span>
-      </div>
-      <div class="text-align-left pl-40 mb-20">
-        <span class="f-title-3 mr-10">获取自身展品id: </span>
-        <span class="f-title-4">{{ selfExhibitId }}</span>
-      </div>
-      <div class="text-align-left pl-40 mb-10">
-        <span class="f-title-3 mr-10">获取自身配置: </span>
-        <span class="f-title-4">{{ selfConfig }}</span>
       </div>
     </div>
   </div>
@@ -39,12 +27,6 @@
 <script lang="ts" setup>
 import { freelogApp } from "freelog-runtime";
 import { ref } from "vue";
-const selfArticleId = ref("");
 const getSelfWidgetRenderName = ref("");
-const selfExhibitId = ref("");
-const selfConfig = ref("");
-selfArticleId.value = freelogApp.getSelfArticleId();
 getSelfWidgetRenderName.value = freelogApp.getSelfWidgetRenderName();
-selfExhibitId.value = freelogApp.getSelfExhibitId();
-selfConfig.value = JSON.stringify(freelogApp.getSelfConfig());
 </script>
