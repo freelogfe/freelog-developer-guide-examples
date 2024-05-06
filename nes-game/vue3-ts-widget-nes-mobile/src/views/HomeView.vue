@@ -210,7 +210,7 @@
 // import { Controller } from "jsnes";
 import { NesVue } from "freelog-nes-vue";
 import { ref, watch } from "vue";
-import { freelogApp } from "freelog-runtime";
+import {  widgetApi } from "freelog-runtime";
 import { useGameUrlStore } from "@/stores/game";
 import screenfull from 'screenfull'
 import { showToast } from 'vant';
@@ -270,7 +270,7 @@ function closeVoice() {
 }
 function back() {
   nes.value.pause();
-  freelogApp.getSelfConfig()?.showList();
+  widgetApi.getData().showList();
 }
 function requestFullScreen() {
   // if (fullScreen.value) {

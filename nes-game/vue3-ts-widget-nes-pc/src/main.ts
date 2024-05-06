@@ -10,7 +10,7 @@ import { useGameUrlStore } from "./stores/game";
 import Antd from "ant-design-vue";
 import "ant-design-vue/dist/antd.css";
 import "./assets/css/index.scss";
-import { freelogApp, initFreelogApp } from "freelog-runtime";
+import { widgetApi, initFreelogApp } from "freelog-runtime";
 
 // window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
 
@@ -38,7 +38,10 @@ function render() {
   // 暴露api给父插件或主题
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  freelogApp.registerApi({
+  console.log(widgetApi)
+  const data = widgetApi.getData()
+  console.log(widgetApi)
+  data.registerApi({
     startGame: (url: string, name: string) => {
       const store = useGameUrlStore();
       store.setUrl(url, name);

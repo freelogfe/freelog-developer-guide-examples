@@ -11,7 +11,7 @@ import "./assets/css/index.scss";
 import "./nes.css";
 // import "./bootstrap-min.css"
 import "./play-mobile.css";
-import { freelogApp, initFreelogApp } from "freelog-runtime";
+import { freelogApp, initFreelogApp, widgetApi } from "freelog-runtime";
 
 // import "./font_4224740_t78uykib6qs"
 // window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
@@ -40,7 +40,8 @@ function render() {
   // 暴露api给父插件或主题
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  freelogApp.registerApi({
+  const data = widgetApi.getData()
+  data.registerApi({
     startGame: (url: string, name: string) => {
       const store = useGameUrlStore();
       store.setUrl(url, name);

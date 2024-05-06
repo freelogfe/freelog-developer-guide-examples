@@ -31,7 +31,6 @@ import {
   GetExhibitListByPagingResult,
   ExhibitInfo,
   GetExhibitInfoResult,
-  ExhibitDependencyTree,
 } from "freelog-runtime";
 import { ref } from "vue";
 import DepTree from "./_components/DepTree.vue";
@@ -41,12 +40,14 @@ const treeData = ref([] as any[]);
 const exhibitInfo = ref("");
 const data = ref([] as any[]);
 const show = async (node: any) => {
+  
   // 顶级的展品id，当前资源的父资源的nid，当前资源的资源id
   imgUrl.value = await freelogApp.getExhibitDepFileStream(node.node.exhibitId, {
-    parentNid: node.node.parent.node.nid,
-    subArticleId: node.node.resourceId,
+    parentNid: node.node.parentNid,
+    subArticleId: node.node.articleId,
     returnUrl: true,
   });
+  console.log(node, imgUrl.value )
   freelogApp
     .getExhibitDepInfo(node.node.exhibitId, {
       articleNids: node.node.parent.node.nid,
@@ -67,6 +68,7 @@ const showTree = async (exhibit: any) => {
       // @ts-ignore
       const obj: any = res.data.data.versionInfo.dependencyTree;
       const deep: any = [];
+    
       obj.forEach((item: any) => {
         const next = {
           ...item,
@@ -74,13 +76,14 @@ const showTree = async (exhibit: any) => {
           key: item.articleId,
           children: [],
           parentNid: item.parentNid,
+          exhibitId:exhibit.exhibitId, 
           nid: item.nid,
         };
-        if (item.deep === 0) {
+        if (item.deep === 1) {
           tree = next;
         } else {
-          deep[item.deep] = deep[item.deep] || [];
-          deep[item.deep].push(next);
+          deep[item.deep - 2] = deep[item.deep] || [];
+          deep[item.deep - 2].push(next);
         }
       });
       /**
@@ -94,13 +97,14 @@ const showTree = async (exhibit: any) => {
         element.forEach((item: any) => {
           if (deep[index + 1]) {
             deep[index + 1].forEach((next: any) => {
-              if (next.parentId === item.nid) {
+              if (next.parentNid === item.nid) {
                 item.children = [...item.children, next];
               }
             });
           }
         });
-      });
+      }); 
+      console.log(tree, deep);
       treeData.value = [tree];
     });
   // });

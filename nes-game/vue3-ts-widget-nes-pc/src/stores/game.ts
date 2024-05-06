@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
-import { freelogApp } from "freelog-runtime";
-const defaultGameUrl = freelogApp?.getSelfConfig().defaultGameUrl || {}
-const defaultGameName = freelogApp?.getSelfConfig().defaultGameName || {}
+import { widgetApi } from "freelog-runtime";
+ 
 
 
 export const useGameUrlStore = defineStore('game', {
-  state: () => ({ url: defaultGameUrl,gameName: defaultGameName }),
+  state: () => ({ url: widgetApi.getData().defaultGameUrl,gameName: widgetApi.getData().defaultGameName }),
  
   actions: {
     setUrl(url: string, name: string) {

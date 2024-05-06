@@ -66,23 +66,18 @@ const reload = (obj: any) => {
   });
 };
 const mountSubWidget = async () => {
-  const subData: ExhibitAuthNodeInfo[] =
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    await freelogApp.getSelfDependencyTree();
+  const subData: ExhibitAuthNodeInfo[] =   await freelogApp.getSelfDependencyTree();
   subData.forEach(async (sub: ExhibitAuthNodeInfo) => {
     if (sub.articleName === "snnaenu/插件开发演示代码插件") {
       selfWidget = await freelogApp.mountArticleWidget({
         articleId: sub.articleId,
         parentNid: sub.parentNid,
-        nid: sub.nid,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        nid: sub.nid, 
         topExhibitId: freelogApp.getTopExhibitId(),
         container: document.getElementById("freelog-self") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         renderWidgetOptions: {
           data: {
-            type: "类型",
+            name: "自身依赖插件",
             registerApi: (api: any) => {
               selfWidgetApi.value = api;
             },
@@ -95,11 +90,7 @@ const mountSubWidget = async () => {
         },
         seq: 0, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
         widget_entry: "https://localhost:8102", // 本地url，dev模式下，可以使用本地url调试子插件
-      });
-      selfWidget.setData({ name: "jack" });
-      selfWidget.addDataListener((data: any) => {
-        console.log(data, 3333);
-      });
+      }); 
     }
   });
 };
@@ -119,7 +110,7 @@ const mountExhibitWidget = async () => {
         container: document.getElementById("freelog-exhibit") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         renderWidgetOptions: {
           data: {
-            type: "类型",
+            name: "展品插件",
             registerApi: (api: any) => {
               exhibitWidgetApi.value = api;
             },

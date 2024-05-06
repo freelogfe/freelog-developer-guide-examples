@@ -29,8 +29,7 @@ function render() {
   instance.use(pinia);
   instance.mount(document.querySelector("#app"));
   // 暴露api给父插件或主题
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+ 
   const data = widgetApi.getData()
   data.registerApi({
     changeMe: () => {

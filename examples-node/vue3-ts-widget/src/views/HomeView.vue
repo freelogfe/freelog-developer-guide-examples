@@ -11,11 +11,10 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { freelogApp } from "freelog-runtime";
-import { widgetApi } from "freelog-runtime";
+import { freelogApp,widgetApi } from "freelog-runtime";
 
 import { useCounterStore } from "../stores/counter";
-const name = freelogApp.getSelfConfig().name;
+const name = widgetApi.getData().name;
 const store = useCounterStore();
 widgetApi.dispatch({ type: "子插件发送给父插件的数据" });
 widgetApi.addDataListener((data: any) => {
