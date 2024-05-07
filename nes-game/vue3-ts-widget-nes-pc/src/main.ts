@@ -36,11 +36,8 @@ function render() {
   // instance.config.globalProperties.$message = message;
 
   // 暴露api给父插件或主题
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  console.log(widgetApi)
+
   const data = widgetApi.getData()
-  console.log(widgetApi)
   data.registerApi({
     startGame: (url: string, name: string) => {
       const store = useGameUrlStore();

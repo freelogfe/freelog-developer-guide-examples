@@ -51,6 +51,7 @@ freelogApp
         returnUrl: true,
       }
     );
+    console.log(gameUrl.value, gameName.value);
     mountExhibitWidget(gameUrl.value, gameName.value);
   });
 const show = async (data: ExhibitInfo) => {

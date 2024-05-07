@@ -71,7 +71,7 @@ const mountArticleWidget = async (url: string, name: string) => {
           },
         },
         seq: 0, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
-        // widget_entry: "https://localhost:8102", // 本地url，dev模式下，可以使用本地url调试子插件
+        widget_entry: "https://localhost:8203", // 本地url，dev模式下，可以使用本地url调试子插件
       });
     }
   });
