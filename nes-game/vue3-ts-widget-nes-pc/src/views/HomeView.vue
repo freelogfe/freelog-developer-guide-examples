@@ -37,7 +37,7 @@
       :url="urlValue"
     />
     <!-- url="https://taiyuuki.github.io/nes-vue/Super Mario Bros (JU).nes" -->
-   <NesVue2/>
+   <!-- <NesVue2/> -->
     <SetKey
       v-if="setKeyVisible"
       :visible="setKeyVisible"
@@ -53,7 +53,7 @@
 // import { Controller } from "jsnes";
 import SetKey from "./SetKey.vue";
 import { NesVue } from "freelog-nes-vue";
-import NesVue2 from "./NesVue.vue"
+// import NesVue2 from "./NesVue.vue"
 import { ref, watch } from "vue";
 import { freelogApp } from "freelog-runtime";
 import { useGameUrlStore } from "@/stores/game";
