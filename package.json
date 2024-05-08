@@ -1,0 +1,5 @@
+{
+	"dependencies": {
+		"freelog-runtime": "^3.8.2"
+	}
+}

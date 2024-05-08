@@ -12,7 +12,6 @@
   "dependencies": {
     "@types/node": "^20.12.7",
     "@vitejs/plugin-basic-ssl": "^1.1.0",
-    "freelog-runtime": "^3.6.2",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
     "react": "^18.2.0",

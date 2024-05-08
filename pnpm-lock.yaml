@@ -2,6 +2,12 @@ lockfileVersion: '6.0'
 
 importers:
 
+  .:
+    dependencies:
+      freelog-runtime:
+        specifier: ^3.8.2
+        version: 3.8.2
+
   examples-node/theme:
     dependencies:
       '@ant-design/icons':
@@ -10291,6 +10297,14 @@ packages:
     engines: {node: '>=4'}
     dev: false
 
+  /axios@0.21.4:
+    resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
+    dependencies:
+      follow-redirects: 1.15.6
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /axios@0.21.4(debug@4.3.4):
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
     dependencies:
@@ -13922,6 +13936,16 @@ packages:
         optional: true
     dev: false
 
+  /follow-redirects@1.15.6:
+    resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
+    dev: false
+
   /follow-redirects@1.15.6(debug@4.3.4):
     resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
     engines: {node: '>=4.0'}
@@ -14124,6 +14148,14 @@ packages:
     resolution: {integrity: sha512-arQHX8XpqZywxr4lXUxAH6hDEHzvdR0en9forTCDzP4MYJkl3Ik/jUNOAkYgIsH243ymIuNDxo3XdWGg7e9Mxw==}
     dependencies:
       axios: 0.21.4(debug@4.3.4)
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /freelog-runtime@3.8.2:
+    resolution: {integrity: sha512-l+0Xujzx+f/TgJr2ZpomGdVXkZDKIri1JOXhJGNY+xQVsTCgSzBZJGeRWMm8dda9vLV51u9dT+izj0kJKLub4A==}
+    dependencies:
+      axios: 0.21.4
     transitivePeerDependencies:
       - debug
     dev: false

@@ -13,7 +13,6 @@
     "ant-design-vue": "^3.2.20",
     "core-js": "^3.37.0",
     "freelog-nes-vue": "^1.6.10",
-    "freelog-runtime": "^3.8.2",
     "jsnes": "^1.2.1",
     "nes-vue": "^1.8.2",
     "pinia": "^2.1.7",

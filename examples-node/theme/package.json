@@ -19,7 +19,6 @@
     "@milkdown/theme-nord": "^7.3.6",
     "@milkdown/transformer": "^7.3.6",
     "antd": "^5.16.2",
-    "freelog-runtime": "^3.6.2",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
     "react": "^18.2.0",
