@@ -56,16 +56,17 @@ const onUserChange = () => {
   openOnUserChange.value = true;
   // 监听其余页面切换用户
   freelogApp.onUserChange(() => {
-    Modal.warning({
-      title: "将立刻刷新",
-      icon: createVNode(ExclamationCircleOutlined),
-      content: "已在其余页签退出或登录其余账号！",
-      okText: "确认",
-      onOk() {
-        // 主题才有资格整个网页reload，也可以由主题放权给插件
-        freelogApp.reload();
-      },
-    });
+    console.log(32232323)
+    // Modal.warning({
+    //   title: "将立刻刷新",
+    //   icon: createVNode(ExclamationCircleOutlined),
+    //   content: "已在其余页签退出或登录其余账号！",
+    //   okText: "确认",
+    //   onOk() {
+    //     // 主题才有资格整个网页reload，也可以由主题放权给插件
+    //     freelogApp.reload();
+    //   },
+    // });
   });
 };
 </script>

@@ -68,6 +68,9 @@ const nes = ref<any>(null);
 const urlStore = useGameUrlStore();
 const urlValue = ref<string>(urlStore.url);
 const gameName = ref<string>(urlStore.gameName);
+
+const selfWidgetId = freelogApp.getSelfWidgetRenderName();
+console.log("snnaenu/分享插件", selfWidgetId)
 watch(
   () => urlStore.url,
   (value: string) => {
