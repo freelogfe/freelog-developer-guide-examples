@@ -17,7 +17,7 @@
     "register-service-worker": "^1.7.2",
     "screenfull": "^6.0.2",
     "vant": "^4.6.6",
-    "vue": "^3.3.4",
+    "vue": "^3.4.31",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.3"
   },

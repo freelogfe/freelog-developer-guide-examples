@@ -49,7 +49,7 @@ onUnmounted(async () => {
 const mountArticleWidget = async (url: string, name: string) => {
   const subData = await freelogApp.getSelfDependencyTree();
   subData.forEach(async (sub: ExhibitAuthNodeInfo) => {
-    if (sub.articleName === "snnaenu/插件开发演示代码插件") {
+    if (sub.articleName === "snnaenu/nes-widget") {
       selfWidget = await freelogApp.mountArticleWidget({
         articleId: sub.articleId,
         parentNid: sub.parentNid,

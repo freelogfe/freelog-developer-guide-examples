@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { freelogApp } from "freelog-runtime";
-const defaultGameUrl = freelogApp?.getSelfConfig().defaultGameUrl || "https://192.168.2.122:8002/Contra" //"https://taiyuuki.github.io/nes-vue/Super Mario Bros (JU).nes"
-const defaultGameName = freelogApp?.getSelfConfig().defaultGameName || "无游戏"
+const defaultGameUrl = "https://192.168.2.122:8002/Contra" //"https://taiyuuki.github.io/nes-vue/Super Mario Bros (JU).nes"
+const defaultGameName = "无游戏"
 
 
 export const useGameUrlStore = defineStore('game', {
