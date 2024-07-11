@@ -208,7 +208,7 @@
 
 <script lang="ts" setup>
 // import { Controller } from "jsnes";
-import { NesVue } from "freelog-nes-vue";
+import { NesVue } from "nes-vue";
 import { ref, watch } from "vue";
 import {  widgetApi } from "freelog-runtime";
 import { useGameUrlStore } from "@/stores/game";

@@ -12,14 +12,14 @@
     "core-js": "^3.8.3",
     "freelog-nes-vue": "^1.6.10",
     "jsnes": "^1.2.1",
-    "nes-vue": "^1.6.10",
-    "pinia": "^2.0.33",
+    "nes-vue": "^1.8.2",
+    "pinia": "^2.1.7",
     "register-service-worker": "^1.7.2",
     "screenfull": "^6.0.2",
     "vant": "^4.6.6",
-    "vue": "^3.4.31",
-    "vue-class-component": "^8.0.0-0",
-    "vue-router": "^4.0.3"
+    "vue": "^3.4.0",
+    "vue-class-component": "8.0.0-rc.1",
+    "vue-router": "^4.3.2"
   },
   "devDependencies": {
     "@types/node": "^20.4.1",
