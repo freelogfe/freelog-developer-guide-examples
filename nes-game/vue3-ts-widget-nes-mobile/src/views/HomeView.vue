@@ -3,33 +3,6 @@
     class="home w-100x h-100x flex-row nes-container justify-center"
     id="nes-container"
   >
-    <!-- <div class="flex-column-center w-100x">
-      <div class="flex-row pt-40 space-between w-800 mb-10">
-        <div class="flex-row">
-          <van-slider
-            v-model="voiceValue"
-            @change="sliderChange"
-            :disabled="voiceDisabled"
-          />
-
-          <a-slider
-            :autofocus="false"
-            class="w-160 mr-10"
-            v-model:value="voiceValue"
-            ref="slider"
-            @afterChange="sliderChange"
-            :disabled="voiceDisabled"
-          />
-          <a-button type="primary" class="mr-20" @click="closeVoice">{{
-            voiceDisabled ? "打开声音" : "关闭声音"
-          }}</a-button>
-        </div>
-        <div class="f-title-3 mr-60">{{ gameName }}</div>
-        <div class="flex-row">
-          <a-button type="primary" @click="requestFullScreen">全屏</a-button>
-        </div>
-      </div>
-    </div> -->
     <div id="psp" class="flex-column h-100x align-center p-absolute lt-0 w-192">
       <div
         id="joystick_btn_menu"
@@ -208,12 +181,12 @@
 
 <script lang="ts" setup>
 // import { Controller } from "jsnes";
-import { NesVue } from "nes-vue";
+import { NesVue } from "freelog-nes-vue";
 import { ref, watch } from "vue";
 import {  widgetApi } from "freelog-runtime";
 import { useGameUrlStore } from "@/stores/game";
 import screenfull from 'screenfull'
-import { showToast } from 'vant';
+import {showToast} from "vant"
 
 const voiceValue = ref<number>(100);
 const width = ref<number | string>("107vmin");
@@ -230,10 +203,11 @@ const gameName = ref<string>(urlStore.gameName);
 watch(
   () => urlStore.url,
   (value: string) => {
+    console.log(value, 342334234)
     urlValue.value = value;
     gameName.value = urlStore.gameName;
-    /* ... */
-  }
+  },
+  { immediate: true }
 );
 const restart = () => {
   nes.value.reset();
@@ -262,9 +236,7 @@ const p2 = {
 };
 const p1Keys = ref({ ...p1 });
 const p2Keys = ref({ ...p2 });
-const sliderChange = () => {
-  slider?.value?.blur();
-};
+ 
 function closeVoice() {
   voiceDisabled.value = !voiceDisabled.value;
 }

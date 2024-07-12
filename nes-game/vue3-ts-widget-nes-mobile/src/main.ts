@@ -23,30 +23,31 @@ let router: any = null;
 let instance: any = null;
 
 function render() {
+  instance = createApp(App);
+  pinia = createPinia();
+  instance.use(pinia);
   router = createRouter({
     history: createWebHistory(
       window.__MICRO_APP_ENVIRONMENT__ ? "/widget" : "/"
     ),
     routes,
   });
-  instance = createApp(App);
-  pinia = createPinia();
   instance.use(router);
-  instance.use(pinia);
 
   instance.mount(document.querySelector("#app"));
   // instance.config.globalProperties.$message = message;
-
-  // 暴露api给父插件或主题
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const data = widgetApi.getData()
-  data.registerApi({
-    startGame: (url: string, name: string) => {
-      const store = useGameUrlStore();
-      store.setUrl(url, name);
-    },
-  });
+  if (window.__MICRO_APP_ENVIRONMENT__) {
+    // 暴露api给父插件或主题
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const data = widgetApi.getData();
+    data.registerApi({
+      startGame: (url: string, name: string) => {
+        const store = useGameUrlStore();
+        store.setUrl(url, name);
+      },
+    });
+  }
 }
 
 function mount() {
@@ -62,9 +63,13 @@ function unmount() {
 
 window.mount = () => {
   initFreelogApp();
+
   mount();
 };
 
 window.unmount = () => {
   unmount();
 };
+if (!window.__MICRO_APP_ENVIRONMENT__) {
+  render();
+}
