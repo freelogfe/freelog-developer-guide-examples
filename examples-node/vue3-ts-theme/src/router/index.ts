@@ -20,6 +20,10 @@ const routes: Array<RouteRecordRaw> = [
   ...userRoutes,
   ...authRoutes,
   ...exhibitRoutes,
+  {
+    path: "/:pathMatch(.*)", // 捕获所有未知路径
+    redirect: "/widget-dep", // 重定向到首页
+  },
 ];
 
 // const router = createRouter({

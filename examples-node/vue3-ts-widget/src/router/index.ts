@@ -14,7 +14,11 @@ const routes: Array<RouteRecordRaw> = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+  },
+  {
+    path: "/:pathMatch(.*)", // 捕获所有未知路径
+    redirect: "/", // 重定向到首页
+  },
 ]
 
 // const router = createRouter({
