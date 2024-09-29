@@ -28,8 +28,7 @@ const select = (id: string) => {
   selectId.value = id;
   router.push({ path: '/' + id});
 };
-selectId.value = location.href.replace("/", "")
- 
+selectId.value = route.params.id as string;
 freelogApp
   .getExhibitListByPaging({
     skip: 0,
