@@ -1,0 +1,46 @@
+{
+  "version": "1.3.2",
+  "workId": "6768d232d83d52002f6b0f59",
+  "name": "vue3-theme",
+  "baseUpcastResources": [],
+  "dependencies": [],
+  "resolveResources": [],
+  "inputAttrs": [],
+  "customPropertyDescriptors": [
+    {
+      "type": "readonlyText",
+      "key": "aab",
+      "name": "补充属性",
+      "remark": "补充属性",
+      "defaultValue": "aaaa"
+    },
+    {
+      "type": "readonlyText",
+      "key": "bbc",
+      "name": "补充属性2",
+      "remark": "bb",
+      "defaultValue": "bb"
+    },
+    {
+      "type": "editableText",
+      "key": "options_123",
+      "name": "可选配置-文本",
+      "remark": "文本",
+      "defaultValue": "文本"
+    },
+    {
+      "type": "select",
+      "key": "options_233",
+      "name": "可选配置-下拉列表",
+      "remark": "下拉列表",
+      "defaultValue": "1",
+      "candidateItems": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ]
+    }
+  ],
+  "description": "eter453t"
+}
