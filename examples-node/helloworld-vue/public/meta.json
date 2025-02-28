@@ -1,0 +1,14 @@
+﻿{
+    "nameSpace": "freelogLibrary.snnaenu.localModule",
+    "js": {
+        "entry": "vue-helloworld.umd.js",
+        "other": []
+    },
+    "css": {
+        "entry": "helloworld-vue.css",
+        "other": []
+    },
+    "other": [
+        "meta.json"
+    ]
+}

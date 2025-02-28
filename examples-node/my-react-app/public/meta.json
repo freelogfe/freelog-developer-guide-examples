@@ -1,0 +1,15 @@
+﻿{
+    "nameSpace": "freelogLibrary.snnaenu.localModule",
+    "js": {
+      "entry": "react-helloworld.umd.js",
+      "other": []
+    },
+    "css": {
+      "entry": "my-react-app.css",
+      "other": []
+    },
+    "other": [
+      "vite.svg",
+      "meta.json"
+    ]
+  }
