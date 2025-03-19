@@ -14,28 +14,43 @@ let pinia: any = null;
 // window.FREELOG_RESOURCENAME = "snnaenu/插件开发演示代码主题";
 // createApp(App).use(store).use(router).mount("#app")
 let router: any = null;
-let instance: any = null;
+let app: any = null;
+import * as Vue from "vue";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+window.Vue = Vue;
 
-const mount = () => {
+const mount = async () => {
   router = createRouter({
     history: createWebHistory(window.__MICRO_APP_BASE_ROUTE__ ? "/" : "/"),
     routes,
   });
-  instance = createApp(App);
+  app = createApp(App);
   pinia = createPinia();
-  instance.use(router);
-  instance.use(pinia);
-  instance.use(Antd);
-  instance.mount("#app");
-
-  console.log("child-vue3渲染了 -- UMD模式");
+  app.use(router);
+  app.use(pinia);
+  app.use(Antd);
+  app.mount("#app");
+  // 获取实例
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const instance = window.FreelogLibrary;
+  const getUrlsv = await instance.getLibraryEntryUrls("snnaenu/测试软件库");
+  const resb = await instance.loadLibraryJs(
+    getUrlsv.jsEntryUrl,
+    getUrlsv.metaJson
+  );
+  console.log("主题中 cumins/vue-component-002", getUrlsv.version, resb);
+  instance.loadLibraryCss(getUrlsv.cssEntryUrl);
+  app.component("MittleComp", resb.default);
+  app.mount("#app");
 };
 
 // 👇 将卸载操作放入 unmount 函数
 const unmount = () => {
-  instance.unmount();
-  instance._container.innerHTML = "";
-  instance = null;
+  app.unmount();
+  app._container.innerHTML = "";
+  app = null;
   router = null;
   pinia = null;
   console.log("child-vue3卸载了 -- UMD模式");

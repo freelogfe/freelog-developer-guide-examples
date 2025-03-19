@@ -22,6 +22,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "widgetViewport",
     component: () => import("@/views/widget/WidgetViewport.vue"),
   },
+  {
+    path: "/package",
+    name: "package",
+    component: () => import("@/views/widget/Package.vue"),
+  },
 ];
 
 // const router = createRouter({
