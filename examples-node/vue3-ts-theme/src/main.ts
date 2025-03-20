@@ -30,12 +30,11 @@ const mount = async () => {
   app.use(router);
   app.use(pinia);
   app.use(Antd);
-  app.mount("#app");
   // 获取实例
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const instance = window.FreelogLibrary;
-  const getUrlsv = await instance.getLibraryEntryUrls("snnaenu/测试软件库");
+  const getUrlsv = await instance.getLibraryEntryUrls("snnaenu/vue前端库示例");
   const resb = await instance.loadLibraryJs(
     getUrlsv.jsEntryUrl,
     getUrlsv.metaJson

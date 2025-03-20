@@ -1,0 +1,14 @@
+{
+    "nameSpace": "freelogLibrary.abcdddd.bbb",
+    "js": {
+        "entry": "index.freelog-library.umd.js",
+        "other": []
+    },
+    "css": {
+        "entry": "",
+        "other": []
+    },
+    "other": [
+        "meta.json"
+    ]
+}

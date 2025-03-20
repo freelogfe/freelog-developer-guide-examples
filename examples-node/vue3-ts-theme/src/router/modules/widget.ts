@@ -25,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/package",
     name: "package",
-    component: () => import("@/views/widget/Package.vue"),
+    component: () => import("@/views/widget/PackageComp.vue"),
   },
 ];
 

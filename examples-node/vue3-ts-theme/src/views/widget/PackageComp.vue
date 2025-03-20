@@ -1,59 +1,127 @@
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <template>
   <div class="w-100x h-100x p-40 flex-column">
-    <div class="f-regular fw-medium flex-column mb-40 pb-20 bb-1">
-      <div class="text-align-left f-title-1 mb-10">涉及api：</div>
-      <div class="text-align-left pl-40 mb-10">
-        <span class="f-title-3 mr-10">获取自身展品id: </span>
-        <span class="f-title-4">freelogApp.getSelfExhibitId()</span>
-      </div>
-      <div class="text-align-left pl-40 mb-10 flex-row">
-        <span class="f-title-3 mr-10">获取自身展品依赖: </span>
-        <span class="f-title-4"
-          >freelogApp.getExhibitDepTree(freelogApp.getSelfExhibitId(), {
-          isContainRootNode: true, })</span
-        >
-      </div>
-    </div>
-    <div class="f-regular fw-medium flex-column mb-40 bb-1 pb-20">
-      <div class="text-align-left f-title-1 mb-10">效果展示：</div>
-      <dep-tree :treeData="treeData" />
-    </div>
-    <!-- <div class="f-regular fw-medium flex-column mb-40 bb-1 pb-20">
-      <div class="text-align-left f-title-1 mb-10">设计缺陷或优化思考：</div>
-      <span class="f-title-4 pl-40 text-align-left"
-        >缺陷：插件需要判断自己是主题还是插件、判断自己是展品还是依赖的资源。当前支持判断，但没有明确，需要明确的方法支持
-      </span>
-      <span class="f-title-4 pl-40 text-align-left"
-        >优化：当前场景不应该需要插件去判断，自动识别，通过唯一的作品id去获取
-      </span>
-    </div> -->
-    <MittleComp msg="cumins/vue-component-002 => 1.0.0"></MittleComp>
-
+    <a-tabs v-model:activeKey="activeKey">
+      <a-tab-pane key="1" tab="前端库-组件库-vue">
+        <MittleComp msg="我是vue组件库的组件"></MittleComp>
+      </a-tab-pane>
+      <a-tab-pane key="2" tab="前端库-JS工具包" force-render>
+        <div class="flex-column">
+          <div class="flex-row mb-20">
+            <a-button type="primary mr-30" @click="add2"
+              >给展品依赖插件加1</a-button
+            >
+            <a-button type="primary mr-30" @click="reload(exhibitWidget)"
+              >重新加载</a-button
+            >
+          </div>
+          <div id="freelog-exhibit"></div>
+        </div>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { freelogApp, ExhibitAuthNodeInfo } from "freelog-runtime";
-import { ref } from "vue";
-import type { TreeProps } from "ant-design-vue";
+import {
+  freelogApp,
+  ExhibitAuthNodeInfo,
+  WidgetController,
+  ExhibitInfo,
+  GetExhibitListByPagingResult,
+} from "freelog-runtime";
+import { onBeforeUnmount, ref } from "vue";
+const activeKey = ref("1");
+let selfWidget: WidgetController = {} as WidgetController;
+let exhibitWidget: WidgetController = {} as WidgetController;
+const selfWidgetApi = ref({} as any);
+const exhibitWidgetApi = ref({} as any);
 
-import DepTree from "./_components/DepTree.vue";
-type TreeNode = TreeProps["treeData"];
-const treeData = ref<TreeNode>([]);
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-freelogApp.getSelfDependencyTree().then((data: ExhibitAuthNodeInfo[]) => {
-  treeData.value = [
-    {
-      title: "  (我是自身)",
-      key: "1",
-      children: data.map((item: ExhibitAuthNodeInfo) => {
-        return {
-          title: item.articleName + "  (我是依赖)",
-          key: item.articleId,
-        };
-      }),
-    },
-  ];
+const add = () => {
+  // 获取插件暴露的api
+  selfWidgetApi.value.changeMe();
+};
+const add2 = () => {
+  // 获取插件暴露的api
+  exhibitWidgetApi.value.changeMe();
+};
+const reload = (obj: any) => {
+  obj.reload().then((result: string) => {
+    if (result) {
+      console.log("重新渲染成功");
+    } else {
+      console.log("重新渲染失败");
+    }
+  });
+};
+const mountSubWidget = async () => {
+  const subData: ExhibitAuthNodeInfo[] =
+    await freelogApp.getSelfDependencyTree();
+  subData.forEach(async (sub: ExhibitAuthNodeInfo) => {
+    if (sub.articleName === "snnaenu/插件开发演示代码插件") {
+      selfWidget = await freelogApp.mountArticleWidget({
+        articleId: sub.articleId,
+        parentNid: sub.parentNid,
+        nid: sub.nid,
+        topExhibitId: freelogApp.getTopExhibitId(),
+        container: document.getElementById("freelog-self") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
+        renderWidgetOptions: {
+          data: {
+            name: "自身依赖插件",
+            registerApi: (api: any) => {
+              selfWidgetApi.value = api;
+            },
+          },
+          lifeCycles: {
+            mounted: (e: CustomEvent) => {
+              console.log(e, "mounted");
+            },
+          },
+        },
+        seq: 0, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
+        widget_entry: "https://localhost:8102", // 本地url，dev模式下，可以使用本地url调试子插件
+      });
+    }
+  });
+};
+const mountExhibitWidget = async () => {
+  const res: GetExhibitListByPagingResult =
+    await freelogApp.getExhibitListByPaging({
+      articleResourceTypes: "插件",
+      isLoadVersionProperty: 1,
+    });
+  const widgets = res.data.data?.dataList;
+
+  widgets.forEach(async (widget: ExhibitInfo, index: number) => {
+    if (widget.articleInfo.articleName == "snnaenu/插件开发演示代码插件") {
+      // widget.exhibitId = widget.exhibitId + '111'
+      exhibitWidget = await freelogApp.mountExhibitWidget({
+        exhibitId: widget.exhibitId,
+        container: document.getElementById("freelog-exhibit") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
+        property: widget.versionInfo?.exhibitProperty,
+        dependencyTree: widget.versionInfo?.dependencyTree,
+        renderWidgetOptions: {
+          data: {
+            name: "展品插件",
+            registerApi: (api: any) => {
+              exhibitWidgetApi.value = api;
+            },
+          },
+        },
+        seq: 1, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
+        widget_entry: "https://localhost:8102", // 本地url，dev模式下，可以使用本地url调试子插件
+      });
+      return true;
+    }
+    return false;
+  });
+};
+// 离开记得卸载插件喔
+onBeforeUnmount(async () => {
+  await exhibitWidget.unmount();
+  await selfWidget.unmount();
 });
+mountExhibitWidget();
+mountSubWidget();
 </script>

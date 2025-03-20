@@ -13,6 +13,7 @@
       <a-menu-item key="widget-dep">获取自身依赖</a-menu-item>
       <a-menu-item key="widget-config">常规与自身数据</a-menu-item>
       <a-menu-item key="widget-mount">加载插件与通信</a-menu-item>
+      <a-menu-item key="package">前端库</a-menu-item>
       <a-menu-item key="widget-viewport">移动端viewport适配</a-menu-item>
       <!-- <a-menu-item key="widget-static">静态资源路径获取</a-menu-item> -->
     </a-sub-menu>
