@@ -1,5 +1,4 @@
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
-<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <template>
   <div class="w-100x h-100x p-40 flex-column">
@@ -21,18 +20,24 @@
   </div>
 </template>
 
-<script lang="ts" setup> 
+<script lang="ts" setup>
 import { ref } from "vue";
 const activeKey = ref("1");
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+let sayHello: any = null;
+const init = async () => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-const instance = window.FreelogLibrary
+  const instance = window.FreelogLibrary;
 
-// 2. 调用实例方法getLibraryEntryUrls获取js和css的地址对象, 参数为你要使用的库的"资源标识"
-const getUrlsPa = await instance.getLibraryEntryUrls("snnaenu/js前端库示例")
+  // 2. 调用实例方法getLibraryEntryUrls获取js和css的地址对象, 参数为你要使用的库的"资源标识"
+  const getUrlsPa = await instance.getLibraryEntryUrls("snnaenu/js前端库示例");
 
-// 3. 调用实例方法loadLibraryJs加载js入口文件获取库, 第一个参数是js地址, 第二个参数是meta.json数据
-const resPa = await instance.loadLibraryJs(getUrlsPa.jsEntryUrl, getUrlsPa.metaJson)
-const sayHello = resPa.sayHello;
-
+  // 3. 调用实例方法loadLibraryJs加载js入口文件获取库, 第一个参数是js地址, 第二个参数是meta.json数据
+  const resPa = await instance.loadLibraryJs(
+    getUrlsPa.jsEntryUrl,
+    getUrlsPa.metaJson
+  );
+  sayHello = resPa.sayHello;
+};
+init();
 </script>
