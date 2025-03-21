@@ -39,7 +39,6 @@ const mount = async () => {
     getUrlsv.jsEntryUrl,
     getUrlsv.metaJson
   );
-  console.log("主题中 cumins/vue-component-002", getUrlsv.version, resb);
   instance.loadLibraryCss(getUrlsv.cssEntryUrl);
   app.component("MittleComp", resb.default);
   app.mount("#app");
