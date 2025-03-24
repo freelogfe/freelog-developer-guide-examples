@@ -5,12 +5,12 @@
 })(this, (function (exports) { 'use strict';
 
     function abc() {
-        console.log("abc! beta2");
+        console.log("工具函数引用的函数");
     }
 
     function sayHello() {
         abc();
-        console.log("Hello World! beta2");
+        return "Hello World! 我是工具函数返回值";
     }
 
     exports.sayHello = sayHello;

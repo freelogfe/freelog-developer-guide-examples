@@ -1,5 +1,5 @@
 function abc() {
-    console.log("abc! beta2");
+    console.log("工具函数引用的函数");
 }
 
 export { abc }

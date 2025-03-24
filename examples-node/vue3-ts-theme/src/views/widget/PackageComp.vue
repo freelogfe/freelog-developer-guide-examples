@@ -9,11 +9,11 @@
       <a-tab-pane key="2" tab="前端库-JS工具包" force-render>
         <div class="flex-column">
           <div class="flex-row mb-20">
-            <a-button type="primary mr-30" @click="sayHello"
-              >点我控制台输出信息</a-button
+            <a-button type="primary mr-30" @click="()=> msg = sayHello()"
+              >点我执行工具函数</a-button
             >
           </div>
-          <div id="freelog-exhibit"></div>
+          <div id="freelog-exhibit">{{ msg }}</div>
         </div>
       </a-tab-pane>
     </a-tabs>
@@ -23,6 +23,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 const activeKey = ref("1");
+const msg = ref("");
 let sayHello: any = null;
 const init = async () => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

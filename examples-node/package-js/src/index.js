@@ -1,7 +1,7 @@
 import { abc } from "./a.js"
 function sayHello() {
     abc();
-    console.log("Hello World! beta2");
+    return "Hello World! 我是工具函数返回值";
 }
 
 export { sayHello }
