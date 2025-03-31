@@ -46,8 +46,8 @@
 
 [源码地址](https://github.com/noiron/race-game-threejs?tab=readme-ov-file)
 
-## 《Astray》迷宫游戏
+## 魔方游戏
 
-[玩耍地址](https://wwwtyro.github.io/Astray/)
+[玩耍地址](https://threejs-tetris-react.rylan.cn/)
 
-[源码地址](https://github.com/noiron/race-game-threejs?tab=readme-ov-file)
+[源码地址](https://github.com/RylanBot/threejs-tetris-react?tab=readme-ov-file)
