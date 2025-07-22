@@ -30,7 +30,7 @@ const select = (id: string) => {
 };
 selectId.value = route.params.id as string;
 freelogApp
-  .getExhibitListByPaging({
+  .getExhibitListByPage({
     skip: 0,
     limit: 20,
     articleResourceTypes: "nesrom,红白机",

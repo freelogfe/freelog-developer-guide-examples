@@ -68,7 +68,7 @@ export default {
     freelogApp.onLogin(() => {
       window.location.reload();
     });
-    const res = await freelogApp.getExhibitListByPaging({
+    const res = await freelogApp.getExhibitListByPage({
       skip: 0,
       limit: 20,
       articleResourceTypes: 'nesrom'

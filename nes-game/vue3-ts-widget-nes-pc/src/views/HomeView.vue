@@ -15,7 +15,7 @@
             voiceDisabled ? "打开声音" : "关闭声音"
           }}</a-button>
         </div>
-        <div class="f-title-3 mr-60 ">{{ gameName }}</div>
+        <div class="f-title-3 mr-60">{{ gameName }}</div>
         <div class="flex-row">
           <a-button type="primary" class="mr-20" @click="setKeyVisible = true"
             >设置按键</a-button
@@ -37,7 +37,7 @@
       :url="urlValue"
     />
     <!-- url="https://taiyuuki.github.io/nes-vue/Super Mario Bros (JU).nes" -->
-   <!-- <NesVue2/> -->
+    <!-- <NesVue2/> -->
     <SetKey
       v-if="setKeyVisible"
       :visible="setKeyVisible"
@@ -70,12 +70,12 @@ const urlValue = ref<string>(urlStore.url);
 const gameName = ref<string>(urlStore.gameName);
 
 const selfWidgetId = freelogApp.getSelfWidgetRenderName();
-console.log("snnaenu/分享插件", selfWidgetId)
+console.log("snnaenu/分享插件", selfWidgetId);
 watch(
   () => urlStore.url,
   (value: string) => {
     urlValue.value = value;
-    gameName.value = urlStore.gameName
+    gameName.value = urlStore.gameName;
     /* ... */
   }
 );
@@ -106,7 +106,8 @@ const p2Keys = ref({ ...p2 });
 const sliderChange = () => {
   slider?.value?.blur();
 };
-freelogApp.getUserData("nesKeys").then((data: any) => {
+freelogApp.getUserData("nesKeys").then((res: any) => {
+  const data = res.data.data;
   if (data && data.p1Keys) {
     p1Keys.value = { ...data.p1Keys };
   }
@@ -115,7 +116,8 @@ freelogApp.getUserData("nesKeys").then((data: any) => {
   }
 });
 function setKeys() {
-  freelogApp.getUserData("nesKeys").then((data: any) => {
+  freelogApp.getUserData("nesKeys").then((res: any) => {
+    const data = res.data.data;
     if (data && data.p1Keys) {
       p1Keys.value = { ...data.p1Keys };
     }

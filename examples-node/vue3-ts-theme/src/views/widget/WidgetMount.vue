@@ -97,7 +97,7 @@ const mountSubWidget = async () => {
 };
 const mountExhibitWidget = async () => {
   const res: GetExhibitListByPagingResult =
-    await freelogApp.getExhibitListByPaging({
+    await freelogApp.getExhibitListByPage({
       articleResourceTypes: "插件",
       isLoadVersionProperty: 1,
     });

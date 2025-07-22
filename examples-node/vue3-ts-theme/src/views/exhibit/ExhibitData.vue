@@ -37,7 +37,7 @@ const data = ref([] as ExhibitInfo[]);
 const gameUrl = ref("");
 const gameName = ref("");
 freelogApp
-  .getExhibitListByPaging({
+  .getExhibitListByPage({
     skip: 0,
     limit: 20,
     articleResourceTypes: "nesrom,红白机",
@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 });
 const mountExhibitWidget = async (url: string, name: string) => {
   const res: GetExhibitListByPagingResult =
-    await freelogApp.getExhibitListByPaging({
+    await freelogApp.getExhibitListByPage({
       articleResourceTypes: "插件",
       isLoadVersionProperty: 1,
     });

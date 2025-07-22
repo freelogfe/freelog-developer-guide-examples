@@ -169,9 +169,9 @@ const pressChange = (e: KeyboardEvent, key: string) => {
 const userData = ref({} as any);
 let rawData: any = {};
 // 根据自定义的key获取 存储的用户数据，主题、不同的插件与插件 保存数据都是隔离的
-freelogApp.getUserData("nesKeys").then((data: any) => {
-  rawData = data || {};
-  userData.value = data || {};
+freelogApp.getUserData("nesKeys").then((res: any) => {
+  rawData = res.data.data || {};
+  userData.value = res.data.data || {};
 });
 
 const setData = async (key: string, value: any) => {

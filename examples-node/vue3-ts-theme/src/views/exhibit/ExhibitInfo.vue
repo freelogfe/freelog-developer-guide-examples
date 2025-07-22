@@ -36,8 +36,9 @@ import { ref } from "vue";
 const data = ref([] as ExhibitInfo[]);
 const imgUrl = ref("");
 const exhibitInfo = ref("");
+
 freelogApp
-  .getExhibitListByPaging({
+  .getExhibitListByPage({
     skip: 0,
     limit: 20,
     articleResourceTypes: "图片",
@@ -65,11 +66,54 @@ const show = async (data: ExhibitInfo) => {
       returnUrl: true,
     });
     freelogApp
-      .getExhibitInfo(data.exhibitId, {
+      .getExhibitById(data.exhibitId, {
         isLoadVersionProperty: 1,
       })
-      .then((res) => {
+      .then((res: any) => {
         exhibitInfo.value = JSON.stringify(res.data.data);
+      });
+    console.log(
+      freelogApp.getWechatShareURL(),
+      data.coverImages[0],
+      {
+        title: freelogApp.nodeInfo.nodeName + "分享标题", // 分享标题
+        desc: "分享描述", // 分享描述
+        imgUrl: data.coverImages[0], // 分享图标
+        success: () => {
+          console.log("分享成功");
+        },
+      },
+      {
+        title: freelogApp.nodeInfo.nodeName + "分享标题", // 分享标题
+        imgUrl: data.coverImages[0], // 分享图标
+        success: () => {
+          console.log("分享成功");
+        },
+      }
+    );
+    freelogApp
+      .updateWechatShare(
+        {
+          title: freelogApp.nodeInfo.nodeName + "分享标题", // 分享标题
+          desc: "分享描述", // 分享描述
+          imgUrl: "https://image.freelog.com/avatar/50050", // data.coverImages[0], // 分享图标
+          success: () => {
+            console.log("分享成功");
+          },
+        },
+        {
+          title: freelogApp.nodeInfo.nodeName + "分享标题", // 分享标题
+          imgUrl: "https://image.freelog.com/avatar/50050", // data.coverImages[0], // 分享图标
+          success: () => {
+            console.log("分享成功");
+          },
+        }
+      )
+      .then(() => {
+        console.log("调用成功");
+      })
+      .catch(() => {
+        console.log("分享调用失败");
       });
   }
 };

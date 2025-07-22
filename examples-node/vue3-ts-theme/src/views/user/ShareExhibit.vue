@@ -64,7 +64,7 @@ const copyUrl = () => {
   message.success("复制成功，快去分享吧！");
 };
 freelogApp
-  .getExhibitListByPaging({
+  .getExhibitListByPage({
     skip: 0,
     limit: 20,
     articleResourceTypes: "图片",
@@ -88,7 +88,7 @@ const show = async (exhibitId: string) => {
   imgUrl.value = await freelogApp.getExhibitFileStream(exhibitId, {
     returnUrl: true,
   });
-  freelogApp.getExhibitInfo(exhibitId).then((res) => {
+  freelogApp.getExhibitById(exhibitId).then((res) => {
     exhibitInfo.value = JSON.stringify(res.data.data);
   });
 };

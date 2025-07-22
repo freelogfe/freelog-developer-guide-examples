@@ -20,7 +20,7 @@ watch(
   () => props.id,
   (val: any) => {
     if (!val) return;
-    freelogApp.getExhibitInfo(val).then(async (res: any) => {
+    freelogApp.getExhibitById(val).then(async (res: any) => {
       if (res.data.errCode) {
         message.error(res.data.msg);
         return;

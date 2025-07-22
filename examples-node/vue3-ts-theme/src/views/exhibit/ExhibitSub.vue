@@ -59,7 +59,7 @@ const show = async (node: any) => {
 const showTree = async (exhibit: any) => {
   // exhibit.data.data.dataList.forEach((exhibit: any) => {
   freelogApp
-    .getExhibitInfo(exhibit.exhibitId, {
+    .getExhibitById(exhibit.exhibitId, {
       isLoadVersionProperty: 1,
     })
     .then((res: GetExhibitInfoResult) => {
@@ -110,7 +110,7 @@ const showTree = async (exhibit: any) => {
   // });
 };
 freelogApp
-  .getExhibitListByPaging({
+  .getExhibitListByPage({
     skip: 0,
     limit: 20,
     articleResourceTypes: "图片",

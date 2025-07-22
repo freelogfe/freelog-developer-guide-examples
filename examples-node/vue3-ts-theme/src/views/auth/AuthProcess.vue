@@ -39,7 +39,7 @@ const data = ref([] as DataType[]);
 const imgUrl = ref("");
 // 获取展品列表
 freelogApp
-  .getExhibitListByPaging({
+  .getExhibitListByPage({
     skip: 0,
     limit: 20,
     articleResourceTypes: "图片",
