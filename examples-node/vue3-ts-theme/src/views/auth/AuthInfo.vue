@@ -46,7 +46,7 @@ const exhibitAvailable = ref("");
 const exhibitSignCount = ref("");
 const signStatistics = ref("");
 freelogApp
-  .getExhibitListByPaging({
+  .getExhibitListByPage({
     skip: 0,
     limit: 20,
     articleResourceTypes: "图片",
