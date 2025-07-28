@@ -28,8 +28,8 @@
 import {
   freelogApp,
   ExhibitInfo,
-  GetExhibitListByIdResult,
-  GetExhibitListByPagingResult,
+  ResponseDataType,
+  PageResult,
 } from "freelog-runtime";
 import { ref } from "vue";
 
@@ -44,7 +44,7 @@ freelogApp
     articleResourceTypes: "图片",
     isLoadVersionProperty: 1,
   })
-  .then((res: GetExhibitListByPagingResult) => {
+  .then((res: ResponseDataType<PageResult<ExhibitInfo>>) => {
     const exhibitIds = res.data.data.dataList.map((item: ExhibitInfo) => {
       return item.exhibitId;
     });
@@ -52,7 +52,7 @@ freelogApp
       .getExhibitListById({
         exhibitIds: exhibitIds.join(","),
       })
-      .then((res: GetExhibitListByIdResult) => {
+      .then((res: ResponseDataType<ExhibitInfo[]>) => {
         console.log(res.data.data);
         data.value = res.data.data.filter(
           (item: ExhibitInfo) => item.exhibitName != "收费图片"

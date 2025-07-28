@@ -33,12 +33,12 @@
 <script lang="ts" setup>
 import {
   freelogApp,
-  GetExhibitListByPagingResult,
+  ResponseDataType,
+  PageResult,
   ExhibitInfo,
-  GetExhibitAuthStatusResult,
-  GetExhibitAvailableResult,
-  GetExhibitSignCountResult,
-  GetSignStatisticsResult,
+  AuthResult,
+  SignItem,
+  SignCount,
 } from "freelog-runtime";
 import { ref } from "vue";
 const authStatus = ref("");
@@ -51,7 +51,7 @@ freelogApp
     limit: 20,
     articleResourceTypes: "图片",
   })
-  .then((res: GetExhibitListByPagingResult) => {
+  .then((res: ResponseDataType<PageResult<ExhibitInfo>>) => {
     const data: ExhibitInfo[] = res.data.data.dataList.filter(
       (item: ExhibitInfo) => item.exhibitName == "收费图片"
     );
@@ -59,24 +59,26 @@ freelogApp
     // 查询是否拥有授权
     freelogApp
       .getExhibitAuthStatus(exhibitId)
-      .then((auth: GetExhibitAuthStatusResult) => {
+      .then((auth: ResponseDataType<AuthResult[]>) => {
         authStatus.value = JSON.stringify(auth.data.data);
       });
     // 查询是否可供用户签约（也就是节点是否获取到了上层资源的完整授权）
     freelogApp
       .getExhibitAvailable(exhibitId)
-      .then((auth: GetExhibitAvailableResult) => {
+      .then((auth: ResponseDataType<AuthResult[]>) => {
         exhibitAvailable.value = JSON.stringify(auth.data.data);
       });
     // 查询签约数量
     freelogApp
       .getExhibitSignCount(exhibitId)
-      .then((auth: GetExhibitSignCountResult) => {
+      .then((auth: ResponseDataType<SignItem[]>) => {
         exhibitSignCount.value = JSON.stringify(auth.data.data);
       });
     // 统计展品签约量
-    freelogApp.getSignStatistics().then((auth: GetSignStatisticsResult) => {
-      signStatistics.value = JSON.stringify(auth.data.data);
-    });
+    freelogApp
+      .getSignStatistics()
+      .then((auth: ResponseDataType<SignCount[]>) => {
+        signStatistics.value = JSON.stringify(auth.data.data);
+      });
   });
 </script>

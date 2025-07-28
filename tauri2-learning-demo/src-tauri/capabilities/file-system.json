@@ -1,0 +1,17 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "file-system",
+  "description": "文件系统操作权限",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "fs:default",
+    "fs:scope:allow:$DOCUMENT/*",
+    "fs:scope:allow:$DESKTOP/*",
+    "fs:scope:allow:$DOWNLOAD/*",
+    "fs:scope:allow:$PICTURE/*",
+    "fs:scope:allow:$MUSIC/*",
+    "fs:scope:allow:$VIDEO/*",
+    "dialog:default"
+  ]
+} 

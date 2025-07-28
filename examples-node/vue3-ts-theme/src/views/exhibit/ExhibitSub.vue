@@ -27,10 +27,10 @@
 <script lang="ts" setup>
 import {
   freelogApp,
-  GetExhibitDepInfoResult,
-  GetExhibitListByPagingResult,
+  ResponseDataType,
+  PageResult,
   ExhibitInfo,
-  GetExhibitInfoResult,
+  DependArticleInfo,
 } from "freelog-runtime";
 import { ref } from "vue";
 import DepTree from "./_components/DepTree.vue";
@@ -40,18 +40,17 @@ const treeData = ref([] as any[]);
 const exhibitInfo = ref("");
 const data = ref([] as any[]);
 const show = async (node: any) => {
-  
   // 顶级的展品id，当前资源的父资源的nid，当前资源的资源id
   imgUrl.value = await freelogApp.getExhibitDepFileStream(node.node.exhibitId, {
     nid: node.node.parentNid,
     returnUrl: true,
   });
-  console.log(node, imgUrl.value )
+  console.log(node, imgUrl.value);
   freelogApp
     .getExhibitDepInfo(node.node.exhibitId, {
       articleNids: node.node.parent.node.nid,
     })
-    .then((res: GetExhibitDepInfoResult) => {
+    .then((res: ResponseDataType<DependArticleInfo[]>) => {
       exhibitInfo.value = JSON.stringify(res.data.data);
     });
 };
@@ -61,13 +60,13 @@ const showTree = async (exhibit: any) => {
     .getExhibitById(exhibit.exhibitId, {
       isLoadVersionProperty: 1,
     })
-    .then((res: GetExhibitInfoResult) => {
+    .then((res: ResponseDataType<ExhibitInfo>) => {
       let tree: any = {};
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const obj: any = res.data.data.versionInfo.dependencyTree;
       const deep: any = [];
-    
+
       obj.forEach((item: any) => {
         const next = {
           ...item,
@@ -75,7 +74,7 @@ const showTree = async (exhibit: any) => {
           key: item.articleId,
           children: [],
           parentNid: item.parentNid,
-          exhibitId:exhibit.exhibitId, 
+          exhibitId: exhibit.exhibitId,
           nid: item.nid,
         };
         if (item.deep === 1) {
@@ -102,7 +101,7 @@ const showTree = async (exhibit: any) => {
             });
           }
         });
-      }); 
+      });
       console.log(tree, deep);
       treeData.value = [tree];
     });
@@ -115,7 +114,7 @@ freelogApp
     articleResourceTypes: "图片",
     isLoadVersionProperty: 1,
   })
-  .then((res: GetExhibitListByPagingResult) => {
+  .then((res: ResponseDataType<PageResult<ExhibitInfo>>) => {
     data.value = res.data.data.dataList.filter(
       (item: ExhibitInfo) => item.exhibitName != "收费图片"
     );

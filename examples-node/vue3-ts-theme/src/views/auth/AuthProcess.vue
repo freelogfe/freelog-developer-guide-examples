@@ -27,24 +27,26 @@
 <script lang="ts" setup>
 import {
   freelogApp,
-  GetExhibitListByPagingResult,
-  GetExhibitAuthStatusResult,
+  ResponseDataType,
+  PageResult,
   ExhibitInfo,
   AuthResult,
   AddAuthResult,
 } from "freelog-runtime";
+
 import { ref } from "vue";
 type DataType = ExhibitInfo & { auth: AuthResult };
 const data = ref([] as DataType[]);
 const imgUrl = ref("");
 // 获取展品列表
 freelogApp
-  .getExhibitListByPage({
+  .getExhibitListAuthByPage({
     skip: 0,
     limit: 20,
+    allInfo: 1,
     articleResourceTypes: "图片",
   })
-  .then((res: GetExhibitListByPagingResult) => {
+  .then((res: ResponseDataType<PageResult<ExhibitInfo>>) => {
     let arr = [] as string[];
 
     res.data.data.dataList.forEach((element: ExhibitInfo) => {
@@ -53,7 +55,7 @@ freelogApp
     // 查询是否拥有授权
     freelogApp
       .getExhibitAuthStatus(arr.join(","))
-      .then((auth: GetExhibitAuthStatusResult) => {
+      .then((auth: ResponseDataType<AuthResult[]>) => {
         data.value = res.data.data.dataList.map((item: ExhibitInfo) => {
           let authData: AuthResult = {} as AuthResult;
           auth.data.data.some((au: AuthResult) => {

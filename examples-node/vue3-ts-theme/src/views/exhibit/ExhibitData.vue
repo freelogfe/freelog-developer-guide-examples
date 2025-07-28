@@ -24,9 +24,10 @@
 <script lang="ts" setup>
 import {
   freelogApp,
-  ExhibitInfo,
   WidgetController,
-  GetExhibitListByPagingResult,
+  ResponseDataType,
+  PageResult,
+  ExhibitInfo
 } from "freelog-runtime";
 import { ref, onBeforeUnmount } from "vue";
 const exhibitWidgetApi = ref({} as any);
@@ -42,7 +43,7 @@ freelogApp
     limit: 20,
     articleResourceTypes: "nesrom,红白机",
   })
-  .then(async (res: GetExhibitListByPagingResult) => {
+  .then(async (res: ResponseDataType<PageResult<ExhibitInfo>>) => {
     data.value = res.data.data.dataList;
     gameName.value = data.value[0].exhibitName;
     gameUrl.value = await freelogApp.getExhibitFileStream(
@@ -66,7 +67,7 @@ onBeforeUnmount(() => {
   exhibitWidget?.unmount();
 });
 const mountExhibitWidget = async (url: string, name: string) => {
-  const res: GetExhibitListByPagingResult =
+  const res: ResponseDataType<PageResult<ExhibitInfo>> =
     await freelogApp.getExhibitListByPage({
       articleResourceTypes: "插件",
       isLoadVersionProperty: 1,
@@ -88,7 +89,7 @@ const mountExhibitWidget = async (url: string, name: string) => {
           },
         },
         seq: undefined, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
-        widget_entry: "https://localhost:8203", // 本地url，dev模式下，可以使用本地url调试子插件
+        // widget_entry: "https://localhost:8203", // 本地url，dev模式下，可以使用本地url调试子插件
       });
     }
   });

@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "system",
+  "description": "系统操作权限",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "shell:default",
+    "notification:default",
+    "global-shortcut:default",
+    "tray:default",
+    "menu:default"
+  ]
+} 
