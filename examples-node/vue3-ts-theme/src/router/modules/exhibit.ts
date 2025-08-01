@@ -7,14 +7,19 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/exhibit/ExhibitInfo.vue"),
   },
   {
-    path: "/exhibit-data",
-    name: "exhibitData",
-    component: () => import("@/views/exhibit/ExhibitData.vue"),
-  },
-  {
     path: "/exhibit-sub",
     name: "exhibitSub",
     component: () => import("@/views/exhibit/ExhibitSub.vue"),
+  },
+  {
+    path: "/collection",
+    name: "collection",
+    component: () => import("@/views/exhibit/CollectionList.vue"),
+  },
+  {
+    path: "/exhibit-data",
+    name: "exhibitData",
+    component: () => import("@/views/exhibit/ExhibitData.vue"),
   },
 ];
 

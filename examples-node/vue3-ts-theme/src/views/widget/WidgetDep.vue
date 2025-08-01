@@ -54,4 +54,7 @@ freelogApp.getSelfDependencyTree().then((data: ExhibitAuthNodeInfo[]) => {
     },
   ];
 });
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+console.log(freelogApp.getCurrentUrl("/abdc?a=1&b=2"))
 </script>

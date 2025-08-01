@@ -21,6 +21,7 @@
       <template #title>展品获取</template>
       <a-menu-item key="exhibit-info">展品列表</a-menu-item>
       <a-menu-item key="exhibit-sub">展品子依赖</a-menu-item>
+      <a-menu-item key="collection">集合</a-menu-item>
       <a-menu-item key="exhibit-data">玩个游戏</a-menu-item>
     </a-sub-menu>
     <a-sub-menu key="auth" @titleClick="titleClick">

@@ -41,14 +41,19 @@ freelogApp
   });
 const setData = async (key: string, value: number) => {
   userData.value[key] = value;
-  const data = {
-    visitCount: key == "visitCount"?  userData.value.visitCount + 1 : userData.value.visitCount,
-    adCount: key == "adCount"?  userData.value.adCount + 1 : userData.value.adCount,
+
+  const data: any = {
+    visitCount:
+      key == "visitCount"
+        ? userData.value.visitCount + 1
+        : userData.value.visitCount,
+    adCount:
+      key == "adCount" ? userData.value.adCount + 1 : userData.value.adCount,
   };
   const res = await freelogApp.setUserData("testData", data);
-  if (res.data.data.errCode == 0) {
-    userData.value[key] = 0;
-    userData.value["adCount"] = 0;
+  console.log(res, 666, userData.value[key], data[key]);
+  if (res.data.errCode == 0) {
+    userData.value[key] = data[key];
   } else {
     message.error(res.data.data.errMsg);
   }
