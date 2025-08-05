@@ -22,7 +22,7 @@
       <template v-for="(item, idx) in itemList" :key="idx">
         <div class="flex-row algin-center h-80">
           <div class="h-80 over-h w-80">
-            <img class="h-100x" :src="item.articleInfo.coverImages[0]" alt="" />
+            <img class="h-100x" :src="item.articleInfo?.coverImages[0]" alt="" />
           </div>
 
           <span class="mt-30 ml-12 text-ellipsis w-200">{{
@@ -41,6 +41,7 @@ import {
   ResponseDataType,
   ItemDepTree,
   SubItemInfo,
+  ItemAuthResult,
   CollectionInfo,
   PageResult,
 } from "freelog-runtime";
@@ -73,7 +74,7 @@ const show = async (data: ExhibitInfo) => {
     .getCollectionSubListByPage(data.exhibitId, {
       skip: 0,
       limit: 20,
-      isShowDetailInfo: 1,
+      isShowDetailInfo: 0,
       sortType: 1,
     })
     .then((res: ResponseDataType<PageResult<SubItemInfo>>) => {
@@ -83,7 +84,7 @@ const show = async (data: ExhibitInfo) => {
     .getCollectionsSubListByPage(data.exhibitId, {
       skip: 0,
       limit: 20,
-      isShowDetailInfo: 1,
+      isShowDetailInfo: 0,
       sortType: 1,
     })
     .then((res: ResponseDataType<PageResult<CollectionInfo>>) => {
@@ -105,49 +106,53 @@ const show = async (data: ExhibitInfo) => {
         freelogApp
           .getCollectionSubById(data.exhibitId, { itemId: item.itemId })
           .then((res: ResponseDataType<SubItemInfo>) => {
-            console.log("getCollectionSubById", res.data.data);
+            console.log("getCollectionSubById", res);
           });
         freelogApp
           .getCollectionSubListById(data.exhibitId, { itemIds: item.itemId })
           .then((res: ResponseDataType<SubItemInfo[]>) => {
-            console.log("getCollectionSubListById", res.data.data);
+            console.log("getCollectionSubListById", res);
           });
         freelogApp
           .getCollectionSubListAuthById(data.exhibitId, {
             itemIds: item.itemId,
           })
           .then((res: ResponseDataType<SubItemInfo[]>) => {
-            console.log("getCollectionSubListAuthById", res.data.data);
+            console.log("getCollectionSubListAuthById", res);
           });
         freelogApp
-          .getCollectionSubListAuthById(data.exhibitId, {
+          .getCollectionSubAuthStatus(data.exhibitId, {
             itemIds: item.itemId,
           })
-          .then((res: ResponseDataType<SubItemInfo[]>) => {
-            console.log("getCollectionSubListAuthById", res.data.data);
+          .then((res: ResponseDataType<ItemAuthResult[]>) => {
+            console.log("getCollectionSubAuthStatus", res);
           });
         freelogApp
           .getCollectionSubFileStream(data.exhibitId, {
             itemId: item.itemId,
           })
           .then((res: any) => {
-            console.log("getCollectionSubFileStream", res.data.data);
+            console.log("getCollectionSubFileStream", res);
           });
         freelogApp
           .getCollectionSubDepList(data.exhibitId, {
             itemId: item.itemId,
           })
           .then((res: ResponseDataType<ItemDepTree[]>) => {
-            console.log("getCollectionSubFileStream", res.data.data);
+            console.log("getCollectionSubDepList", res);
+            res.data.data.some((dep: ItemDepTree) => {
+              freelogApp
+                .getCollectionSubDepFileStream(data.exhibitId, {
+                  itemId: item.itemId,
+                  nid: dep.nid,
+                })
+                .then((res: any) => {
+                  console.log("getCollectionSubDepFileStream", res);
+                });
+              return true;
+            });
           });
-        freelogApp
-          .getCollectionSubDepFileStream(data.exhibitId, {
-            itemId: item.itemId,
-            nid: "222",
-          })
-          .then((res: any) => {
-            console.log("getCollectionSubFileStream", res.data.data);
-          });
+
         return true;
       });
     });
