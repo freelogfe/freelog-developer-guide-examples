@@ -31,21 +31,30 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp, ExhibitAuthNodeInfo } from "freelog-runtime";
+import { freelogApp, DependencyNodeInfo } from "freelog-runtime";
 import { ref } from "vue";
 import type { TreeProps } from "ant-design-vue";
 
-import DepTree from "./_components/DepTree.vue";
 type TreeNode = TreeProps["treeData"];
 const treeData = ref<TreeNode>([]);
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-freelogApp.getSelfDependencyTree().then((data: ExhibitAuthNodeInfo[]) => {
+console.log(freelogApp.getSelfProperty());
+console.log(freelogApp.getSelfPropertyForTheme());
+console.log(freelogApp.getSelfDepForTheme());
+Promise.all([
+  freelogApp.getSelfProperty(),
+  freelogApp.getSelfPropertyForTheme(),
+  freelogApp.getSelfDepForTheme(),
+]).then((res) => {
+  console.log(res);
+});
+freelogApp.getSelfDep().then((res) => {
+  // 获取自身展品依赖
+  const subData: DependencyNodeInfo[] = res.data.data;
   treeData.value = [
     {
       title: "  (我是自身)",
       key: "1",
-      children: data.map((item: ExhibitAuthNodeInfo) => {
+      children: subData.map((item: DependencyNodeInfo) => {
         return {
           title: item.articleName + "  (我是依赖)",
           key: item.articleId,
@@ -54,7 +63,4 @@ freelogApp.getSelfDependencyTree().then((data: ExhibitAuthNodeInfo[]) => {
     },
   ];
 });
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-console.log(freelogApp.getCurrentUrl("/abdc?a=1&b=2"))
 </script>

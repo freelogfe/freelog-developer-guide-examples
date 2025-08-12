@@ -12,10 +12,10 @@
         <span class="f-title-3 mr-10">获取当前 完整 url: </span>
         <span class="f-title-4">{{ freelogApp.getCurrentUrl() }}</span>
       </div>
-      <div class="text-align-left pl-40 mb-20">
+      <!-- <div class="text-align-left pl-40 mb-20">
         <span class="f-title-3 mr-10">获取devData: </span>
         <span class="f-title-4">{{ JSON.stringify(freelogApp.devData) }}</span>
-      </div>
+      </div> -->
       <div class="text-align-left pl-40 mb-20">
         <span class="f-title-3 mr-10">获取自身插件渲染id: </span>
         <span class="f-title-4">{{ getSelfWidgetRenderName }}</span>

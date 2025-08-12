@@ -36,10 +36,10 @@
 <script lang="ts" setup>
 import {
   freelogApp,
-  ExhibitAuthNodeInfo,
+  DependencyNodeInfo,
   WidgetController,
   ExhibitInfo,
-  GetExhibitListByPagingResult,
+  ResponseDataType,PageResult
 } from "freelog-runtime";
 import { onBeforeUnmount, ref } from "vue";
 const activeKey = ref("1");
@@ -66,9 +66,9 @@ const reload = (obj: any) => {
   });
 };
 const mountSubWidget = async () => {
-  const subData: ExhibitAuthNodeInfo[] =
-    await freelogApp.getSelfDependencyTree();
-  subData.forEach(async (sub: ExhibitAuthNodeInfo) => {
+  const res = await freelogApp.getSelfDep();
+  const subData = res.data.data;
+  subData.forEach(async (sub: DependencyNodeInfo) => {
     if (sub.articleName === "snnaenu/插件开发演示代码插件") {
       selfWidget = await freelogApp.mountArticleWidget({
         articleId: sub.articleId,
@@ -96,8 +96,10 @@ const mountSubWidget = async () => {
   });
 };
 const mountExhibitWidget = async () => {
-  const res: GetExhibitListByPagingResult =
+  const res: ResponseDataType<PageResult<ExhibitInfo>> =
     await freelogApp.getExhibitListByPage({
+      skip: 0,
+      limit:10,
       articleResourceTypes: "插件",
       isLoadVersionProperty: 1,
     });

@@ -36,7 +36,7 @@ import { ref } from "vue";
 const data = ref([] as ExhibitInfo[]);
 const imgUrl = ref("");
 const exhibitInfo = ref("");
-
+console.log(freelogApp.getSelfDep())
 freelogApp
   .getExhibitListByPage({
     skip: 0,
