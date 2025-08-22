@@ -39,7 +39,8 @@ import {
   DependencyNodeInfo,
   WidgetController,
   ExhibitInfo,
-  ResponseDataType,PageResult
+  ResponseDataType,
+  PageResult,
 } from "freelog-runtime";
 import { onBeforeUnmount, ref } from "vue";
 const activeKey = ref("1");
@@ -77,6 +78,7 @@ const mountSubWidget = async () => {
         topExhibitId: freelogApp.getTopExhibitId(),
         container: document.getElementById("freelog-self") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         renderWidgetOptions: {
+          "router-mode": "state", // 传递给子插件的路由模式
           data: {
             name: "自身依赖插件",
             registerApi: (api: any) => {
@@ -99,7 +101,7 @@ const mountExhibitWidget = async () => {
   const res: ResponseDataType<PageResult<ExhibitInfo>> =
     await freelogApp.getExhibitListByPage({
       skip: 0,
-      limit:10,
+      limit: 10,
       articleResourceTypes: "插件",
       isLoadVersionProperty: 1,
     });
@@ -114,6 +116,7 @@ const mountExhibitWidget = async () => {
         property: widget.versionInfo?.exhibitProperty,
         dependencyTree: widget.versionInfo?.dependencyTree,
         renderWidgetOptions: {
+          "router-mode": "state", // 传递给子插件的路由模式
           data: {
             name: "展品插件",
             registerApi: (api: any) => {

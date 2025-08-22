@@ -42,8 +42,7 @@ console.log(freelogApp.getSelfPropertyForTheme());
 console.log(freelogApp.getSelfDepForTheme());
 Promise.all([
   freelogApp.getSelfProperty(),
-  freelogApp.getSelfPropertyForTheme(),
-  freelogApp.getSelfDepForTheme(),
+  freelogApp.getSelfDep(),
 ]).then((res) => {
   console.log(res);
 });
