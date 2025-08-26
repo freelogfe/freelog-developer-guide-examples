@@ -11,6 +11,7 @@
     "@types/webpack-env": "^1.18.4",
     "core-js": "^3.8.3",
     "freelog-nes-vue": "^1.6.10",
+    "freelog-runtime": "^5.0.4",
     "jsnes": "^1.2.1",
     "nes-vue": "^1.6.10",
     "pinia": "^2.0.33",

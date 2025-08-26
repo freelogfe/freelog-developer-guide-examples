@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { freelogApp, ExhibitAuthNodeInfo } from "freelog-runtime";
+import { freelogApp, DependencyNodeInfo } from "freelog-runtime";
 import { ref, onUnmounted, watch } from "vue";
 import { message } from "ant-design-vue";
 const selfWidgetApi = ref({} as any);
@@ -49,7 +49,7 @@ onUnmounted(async () => {
 const mountArticleWidget = async (url: string, name: string) => {
   const res = await freelogApp.getSelfDep();
   const subData = res.data.data;
-  subData.forEach(async (sub: ExhibitAuthNodeInfo) => {
+  subData.forEach(async (sub: DependencyNodeInfo) => {
     if (sub.articleName === "snnaenu/nes-widget") {
       selfWidget = await freelogApp.mountArticleWidget({
         articleId: sub.articleId,

@@ -8,22 +8,22 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "screenfull": "^6.0.2",
     "@types/webpack-env": "^1.18.4",
     "core-js": "^3.8.3",
-    "pinia-plugin-persistedstate": "^2.4.0",
     "freelog-nes-vue": "^1.6.10",
+    "freelog-runtime": "^5.0.4",
     "jsnes": "^1.2.1",
     "nes-vue": "^1.8.2",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^2.4.0",
     "register-service-worker": "^1.7.2",
+    "screenfull": "^6.0.2",
     "vue": "3.4.25",
     "vue-class-component": "8.0.0-rc.1",
     "vue-router": "^4.3.2"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
-    "postcss-px-to-viewport": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vue/cli-plugin-babel": "~5.0.0",
@@ -38,6 +38,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^9.15.1",
+    "postcss-px-to-viewport": "^1.1.1",
     "prettier": "^2.4.1",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",
