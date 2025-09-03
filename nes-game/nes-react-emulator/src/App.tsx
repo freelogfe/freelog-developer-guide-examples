@@ -63,21 +63,7 @@ function App() {
     window.EJS_startOnLoaded = true;
     window.EJS_gameName = "Hun Game";
 
-    // 配置默认控制选项 - 启用连发功能
-    window.EJS_defaultControls = {
-      saveState: false,
-      loadState: false,
-      screenshot: false,
-      volume: false,
-      fullscreen: false,
-      gamepad: false,
-      cheat: false,
-      cacheManager: false,
-      exitEmulation: false,
-      // 启用连发功能
-      quickSave: true,
-      quickLoad: true
-    };
+  
 
     // 配置虚拟手柄设置 - 使用官方文档的配置格式
     window.EJS_VirtualGamepadSettings = [
