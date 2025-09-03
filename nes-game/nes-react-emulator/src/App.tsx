@@ -82,7 +82,7 @@ function App() {
         text: "Y",
         id: "y",
         location: "right",
-        left: 40,
+        left: 0,
         top: 0,
         bold: true,
         input_value: 9, // Y键 - 对应 BUTTON_3
@@ -92,7 +92,7 @@ function App() {
         text: "X",
         id: "x",
         location: "right",
-        left: 80,
+        left: 70,
         top: 0,
         bold: true,
         input_value: 1, // X键 - 对应 BUTTON_2
@@ -102,8 +102,8 @@ function App() {
         text: "B",
         id: "b",
         location: "right",
-        left: 40,
-        top: 40,
+        left: 0,
+        top: 60,
         bold: true,
         input_value: 8, // B键 - 对应 BUTTON_1
       },
@@ -112,8 +112,8 @@ function App() {
         text: "A",
         id: "a",
         location: "right",
-        left: 80,
-        top: 40,
+        left: 70,
+        top: 60,
         bold: true,
         input_value: 0, // A键 - 对应 BUTTON_4
       },
