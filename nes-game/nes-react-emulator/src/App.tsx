@@ -103,7 +103,7 @@ function App() {
         id: "b",
         location: "right",
         left: 0,
-        top: 60,
+        top: 70,
         bold: true,
         input_value: 8, // B键 - 对应 BUTTON_1
       },
@@ -113,7 +113,7 @@ function App() {
         id: "a",
         location: "right",
         left: 70,
-        top: 60,
+        top: 70,
         bold: true,
         input_value: 0, // A键 - 对应 BUTTON_4
       },
