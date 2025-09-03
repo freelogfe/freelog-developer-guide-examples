@@ -69,6 +69,8 @@ onBeforeUnmount(() => {
 const mountExhibitWidget = async (url: string, name: string) => {
   const res: ResponseDataType<PageResult<ExhibitInfo>> =
     await freelogApp.getExhibitListByPage({
+      skip: 0,
+      limit: 20,
       articleResourceTypes: "插件",
       isLoadVersionProperty: 1,
     });

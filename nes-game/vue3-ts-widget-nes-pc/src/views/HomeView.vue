@@ -24,8 +24,9 @@
         </div>
       </div>
     </div>
+    <NesVue2/>
 
-    <nes-vue
+    <!-- <nes-vue
       :width="width"
       :height="height"
       :gain="voiceDisabled ? 0 : voiceValue"
@@ -35,9 +36,8 @@
       :p2="p2Keys"
       v-if="urlValue"
       :url="urlValue"
-    />
+    /> -->
     <!-- url="https://taiyuuki.github.io/nes-vue/Super Mario Bros (JU).nes" -->
-    <!-- <NesVue2/> -->
     <SetKey
       v-if="setKeyVisible"
       :visible="setKeyVisible"
@@ -52,8 +52,8 @@
 <script lang="ts" setup>
 // import { Controller } from "jsnes";
 import SetKey from "./SetKey.vue";
-import { NesVue } from "freelog-nes-vue";
-// import NesVue2 from "./NesVue.vue"
+import { NesVue } from "nes-vue";
+import NesVue2 from "./NesVue.vue"
 import { ref, watch } from "vue";
 import { freelogApp } from "freelog-runtime";
 import { useGameUrlStore } from "@/stores/game";
@@ -76,7 +76,7 @@ watch(
   (value: string) => {
     urlValue.value = value;
     gameName.value = urlStore.gameName;
-    /* ... */
+    console.log("urlValue", urlValue.value);
   }
 );
 const p1 = {

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmulatorJS 测试</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .game-container {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            margin: 20px 0;
+            background: #000;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        select {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 EmulatorJS 原生测试</h1>
+        
+        <div class="controls">
+            <h3>选择游戏文件:</h3>
+            <input type="file" id="romFile" accept=".nes,.NES,.smc,.SMC,.gb,.GB,.gba,.GBA" />
+            
+            <h3>选择模拟器核心:</h3>
+            <select id="coreSelect">
+                <option value="nes">NES (任天堂红白机)</option>
+                <option value="snes">SNES (超级任天堂)</option>
+                <option value="gb">Game Boy</option>
+                <option value="gba">Game Boy Advance</option>
+                <option value="n64">Nintendo 64</option>
+                <option value="psx">PlayStation</option>
+                <option value="segaMS">Sega Genesis</option>
+            </select>
+            
+            <button onclick="loadGame()">加载游戏</button>
+            <button onclick="resetGame()">重置</button>
+        </div>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="game-container">
+            <div id="game"></div>
+        </div>
+        
+        <div>
+            <h3>使用说明:</h3>
+            <ul>
+                <li>选择ROM文件（支持.nes, .smc, .gb, .gba等格式）</li>
+                <li>选择对应的模拟器核心</li>
+                <li>点击"加载游戏"按钮</li>
+                <li>使用键盘控制游戏（方向键 + A/S/Z/X）</li>
+                <li>在移动设备上会自动显示虚拟游戏手柄</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentRom = null;
+        let isGameLoaded = false;
+
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function loadGame() {
+            const fileInput = document.getElementById('romFile');
+            const coreSelect = document.getElementById('coreSelect');
+            
+            if (!fileInput.files[0]) {
+                showStatus('请先选择ROM文件', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const core = coreSelect.value;
+            
+            // 清除之前的游戏
+            if (isGameLoaded) {
+                const gameDiv = document.getElementById('game');
+                gameDiv.innerHTML = '';
+                isGameLoaded = false;
+            }
+
+            // 创建新的游戏容器
+            const gameDiv = document.getElementById('game');
+            gameDiv.innerHTML = '<div id="emulator-game"></div>';
+
+            // 创建ROM URL
+            currentRom = URL.createObjectURL(file);
+            
+            showStatus(`正在加载 ${file.name}...`);
+
+            // 设置EmulatorJS配置
+            window.EJS_player = '#emulator-game';
+            window.EJS_core = core;
+            window.EJS_gameUrl = currentRom;
+            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data';
+            window.EJS_startOnLoaded = true;
+            window.EJS_gameName = file.name.replace(/\.[^/.]+$/, "");
+
+            // 事件回调
+            window.EJS_ready = () => {
+                console.log("模拟器准备就绪");
+                isGameLoaded = true;
+                showStatus(`游戏 ${file.name} 加载成功！`);
+            };
+
+            window.EJS_onGameStart = () => {
+                console.log("游戏已开始");
+                showStatus("游戏已开始运行");
+            };
+
+            window.EJS_onSaveState = () => {
+                console.log("状态已保存");
+                showStatus("游戏状态已保存");
+            };
+
+            window.EJS_onLoadState = () => {
+                console.log("状态已加载");
+                showStatus("游戏状态已加载");
+            };
+
+            // 动态加载EmulatorJS脚本
+            const script = document.createElement('script');
+            script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+            script.onload = () => {
+                console.log("EmulatorJS脚本加载完成");
+            };
+            script.onerror = () => {
+                console.error("EmulatorJS脚本加载失败");
+                showStatus("EmulatorJS脚本加载失败", 'error');
+            };
+            document.head.appendChild(script);
+        }
+
+        function resetGame() {
+            const gameDiv = document.getElementById('game');
+            gameDiv.innerHTML = '';
+            isGameLoaded = false;
+            
+            if (currentRom) {
+                URL.revokeObjectURL(currentRom);
+                currentRom = null;
+            }
+            
+            showStatus('游戏已重置');
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            showStatus('请选择ROM文件并点击"加载游戏"按钮');
+        });
+    </script>
+</body>
+</html>

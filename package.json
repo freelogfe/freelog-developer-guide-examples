@@ -1,4 +1,20 @@
 {
-	"dependencies": {
-	}
+  "name": "vue-emulator-example",
+  "version": "1.0.0",
+  "description": "Vue.js 模拟器集成示例",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.0",
+    "jsnes": "^1.2.1",
+    "nes-vue": "^1.8.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.0.0",
+    "vite": "^4.0.0"
+  }
 }
