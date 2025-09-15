@@ -3,3 +3,4 @@ packages:
   - "nes-game/*"
   - "examples-node/*"
   - "tauri2-learning-demo"
+  - "EmulatorJS" 
