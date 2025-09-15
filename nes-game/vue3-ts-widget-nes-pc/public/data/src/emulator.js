@@ -538,6 +538,8 @@ class EmulatorJS {
             return;
         }
         const gotCore = (data) => {
+            console.log(23333, data)
+
             this.defaultCoreOpts = {};
             this.checkCompression(new Uint8Array(data), this.localization("Decompress Game Core")).then((data) => {
                 let js, thread, wasm;
@@ -568,6 +570,7 @@ class EmulatorJS {
                     this.elements.bottomBar.saveSavFiles[0].style.display = "none";
                     this.elements.bottomBar.loadSavFiles[0].style.display = "none";
                 }
+                console.log(23333, window.EJS_Runtime)
 
                 this.initGameCore(js, wasm, thread);
             });
@@ -637,9 +640,41 @@ class EmulatorJS {
         });
     }
     initGameCore(js, wasm, thread) {
+        console.log(js, wasm, new Blob([js]), 23333)
+        // 替换 var EJS_Runtime 为 window.EJS_Runtime 以确保在微前端环境中能正确挂载
+        let modifiedJs = js;
+        if (js instanceof Uint8Array) {
+            // 将 Uint8Array 转换为字符串
+            const jsString = new TextDecoder().decode(js);
+            // 替换 var EJS_Runtime 为 window.EJS_Runtime (考虑可能有多个空格)
+            const modifiedJsString = jsString.replace(/var\s+EJS_Runtime\s*=/g, 'window.EJS_Runtime =');
+            // 将修改后的字符串转换回 Uint8Array
+            modifiedJs = new TextEncoder().encode(modifiedJsString);
+        } else if (typeof js === 'string') {
+            // 如果是字符串，则直接替换
+            modifiedJs = js.replace(/var\s+EJS_Runtime\s*=/g, 'window.EJS_Runtime =');
+        }
+        
         let script = this.createElement("script");
-        script.src = URL.createObjectURL(new Blob([js], { type: "application/javascript" }));
+        script.src = URL.createObjectURL(new Blob([modifiedJs], { type: "application/javascript" }));
+        console.log(23333, window.EJS_Runtime, script.src)
+        script.id = "game-core-script"
         script.addEventListener("load", () => {
+            console.log(23333, window, window.EJS_Runtime)
+            // 在微前端环境下尝试从不同位置获取 EJS_Runtime
+            if (typeof window.EJS_Runtime !== "function" && window.__MICRO_APP_WINDOW__) {
+                // 尝试从微前端的 window 代理对象获取
+                window.EJS_Runtime = window.__MICRO_APP_WINDOW__.EJS_Runtime;
+            }
+            
+            // 如果还是获取不到，尝试从 proxyWindow 获取
+            if (typeof window.EJS_Runtime !== "function" && window.__MICRO_APP_PROXY_WINDOW__) {
+                const proxyWindow = window.__MICRO_APP_PROXY_WINDOW__;
+                if (proxyWindow.__MICRO_APP_WINDOW__ && proxyWindow.__MICRO_APP_WINDOW__.EJS_Runtime) {
+                    window.EJS_Runtime = proxyWindow.__MICRO_APP_WINDOW__.EJS_Runtime;
+                }
+            }
+            
             this.initModule(wasm, thread);
         });
         document.body.appendChild(script);
@@ -931,6 +966,7 @@ class EmulatorJS {
         })();
     }
     initModule(wasmData, threadData) {
+        console.log(23333, window.EJS_Runtime)
         if (typeof window.EJS_Runtime !== "function") {
             console.warn("EJS_Runtime is not defined!");
             this.startGameError(this.localization("Error loading EmulatorJS runtime"));
@@ -3387,7 +3423,7 @@ class EmulatorJS {
         }
         if (this.settingsMenu.style.display !== "none" || this.isPopupOpen()) return;
         const special = [16, 17, 18, 19, 20, 21, 22, 23];
-        
+
         // NES特殊处理：将X键映射到A键，Y键映射到B键
         if ("nes" === this.getControlScheme()) {
             for (let i = 0; i < 4; i++) {
@@ -3397,7 +3433,7 @@ class EmulatorJS {
                         continue;
                     }
                     const controlValue = this.controls[i][j].value2;
-                    
+
                     // 检查是否是X键(9)或Y键(1)
                     let mappedButton = j;
                     if (j === 9) { // X键映射到A键(8)
@@ -3405,19 +3441,19 @@ class EmulatorJS {
                     } else if (j === 1) { // Y键映射到B键(0)
                         mappedButton = 0;
                     }
-                    
+
                     if (["buttonup", "buttondown"].includes(e.type) && (controlValue === e.label || controlValue === e.index)) {
                         // 处理NES的连发功能
                         if (j === 9 || j === 1) {
                             if (e.type === "buttondown") {
                                 // 触发一次按键按下
                                 this.gameManager.simulateInput(i, mappedButton, (special.includes(mappedButton) ? 0x7fff : 1));
-                                
+
                                 // 清除可能存在的旧定时器
                                 if (this.controls[i][j].nesRapidFireInterval) {
                                     clearInterval(this.controls[i][j].nesRapidFireInterval);
                                 }
-                                
+
                                 // 设置连发定时器
                                 this.controls[i][j].nesRapidFireInterval = setInterval(() => {
                                     this.gameManager.simulateInput(i, mappedButton, (special.includes(mappedButton) ? 0x7fff : 1));
@@ -3444,7 +3480,7 @@ class EmulatorJS {
             }
             return;
         }
-        
+
         for (let i = 0; i < 4; i++) {
             if (gamepadIndex !== i) continue;
             for (let j = 0; j < 30; j++) {
@@ -4373,13 +4409,13 @@ class EmulatorJS {
                     e.preventDefault();
                     if (e.type === "touchend" || e.type === "touchcancel") {
                         e.target.classList.remove("ejs_virtualGamepad_button_down");
-                        
+
                         // 清除连发定时器
                         if (e.target.nesRapidFireInterval) {
                             clearInterval(e.target.nesRapidFireInterval);
                             e.target.nesRapidFireInterval = null;
                         }
-                        
+
                         window.setTimeout(() => {
                             // NES特殊处理：将X键映射到A键，Y键映射到B键
                             let mappedValue = value;
@@ -4404,14 +4440,14 @@ class EmulatorJS {
                             }
                         }
                         this.gameManager.simulateInput(0, mappedValue, downValue);
-                        
+
                         // 如果是NES的X或Y键，启动连发功能
                         if ("nes" === this.getControlScheme() && (value == 9 || value == 1)) {
                             // 清除可能存在的旧定时器
                             if (e.target.nesRapidFireInterval) {
                                 clearInterval(e.target.nesRapidFireInterval);
                             }
-                            
+
                             // 设置连发定时器 (每100ms触发一次)
                             e.target.nesRapidFireInterval = setInterval(() => {
                                 this.gameManager.simulateInput(0, mappedValue, downValue);
