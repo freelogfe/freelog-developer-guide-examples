@@ -6710,121 +6710,6 @@ class EmulatorJS {
         return stream;
     }
 
-    /**
-     * Load a new ROM without destroying the emulator instance
-     * @param {string} romPath - Path to the ROM file
-     */
-    async loadROM(romPath) {
-        try {
-            // Reset game state
-            this.reset();
-            
-            // Load new ROM
-            const gameData = await this.downloadFile(romPath);
-            if (gameData === -1) {
-                throw new Error("Failed to download ROM file");
-            }
-            
-            // Update game manager with new ROM
-            if (this.gameManager) {
-                this.gameManager.loadROM(romPath);
-            }
-            
-            console.log("ROM loaded successfully:", romPath);
-        } catch (error) {
-            console.error("Error loading ROM:", error);
-            throw error;
-        }
-    }
-
-    /**
-     * Reset the emulator state
-     */
-    reset() {
-        // Reset internal state variables
-        this.started = false;
-        this.paused = true;
-        
-        // Clear any existing game data if needed
-        if (this.gameManager) {
-            // Perform any necessary cleanup in the game manager
-            if (this.gameManager.reset) {
-                this.gameManager.reset();
-            }
-        }
-        
-        console.log("Emulator state reset");
-    }
-
-    /**
-     * Destroy the emulator instance and clean up all resources
-     */
-    destroy() {
-        // Clean up any ongoing recordings
-        if (this.recorder && this.recorder.state === "recording") {
-            this.recorder.stop();
-        }
-
-        // Remove all event listeners that were added using the built-in method
-        if (this._eventListeners) {
-            for (let i = 0; i < this._eventListeners.length; i++) {
-                const listenerData = this._eventListeners[i];
-                this.removeEventListener(listenerData);
-            }
-        }
-
-        // Clean up game manager
-        if (this.gameManager && typeof this.gameManager.destroy === 'function') {
-            try {
-                this.gameManager.destroy();
-            } catch (e) {
-                console.warn('Error destroying game manager:', e);
-            }
-        }
-
-        // Remove canvas element
-        if (this.canvas && this.canvas.parentNode) {
-            this.canvas.parentNode.removeChild(this.canvas);
-        }
-
-        // Clear any running timers
-        if (this._timers) {
-            for (let i = 0; i < this._timers.length; i++) {
-                clearTimeout(this._timers[i]);
-            }
-        }
-
-        // Clear any intervals
-        if (this._intervals) {
-            for (let i = 0; i < this._intervals.length; i++) {
-                clearInterval(this._intervals[i]);
-            }
-        }
-
-        console.log('EmulatorJS instance destroyed');
-    }
-
-    /**
-     * Track event listeners for later cleanup
-     */
-    addTrackedEventListener(element, listener, callback) {
-        // Initialize the event listeners array if it doesn't exist
-        if (!this._eventListeners) {
-            this._eventListeners = [];
-        }
-        
-        // Add the event listener normally
-        const listeners = listener.split(" ");
-        for (let i = 0; i < listeners.length; i++) {
-            element.addEventListener(listeners[i], callback);
-            const data = { cb: callback, elem: element, listener: listeners[i] };
-            this._eventListeners.push(data);
-        }
-    }
-
-    /**
-     * Enhanced screen recording method
-     */
     screenRecord() {
         const captureFps = this.getSettingValue("screenRecordingFPS") || this.capture.video.fps;
         const captureFormat = this.getSettingValue("screenRecordFormat") || this.capture.video.format;
@@ -6907,11 +6792,7 @@ class EmulatorJS {
         });
         recorder.start();
 
-        // Store reference to recorder for cleanup
-        this.recorder = recorder;
-
         return recorder;
     }
 }
-
 window.EmulatorJS = EmulatorJS;

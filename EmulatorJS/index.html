@@ -9,59 +9,105 @@
                 height: 100%;
                 background-color: black;
                 color: white;
-            }
-
-            body {
                 margin: 0;
                 overflow: hidden;
+                font-family: Arial, sans-serif;
             }
 
-            body, #box, #top {
+            #container {
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-direction: column;
+                height: 100vh;
             }
 
-            #box {
-                color: #aaa;
-                height: 20em;
-                width: 30em;
-                max-width: 80%;
-                max-height: 80%;
-                background-color: #333;
-                border-radius: 0.4em;
-                border: 2px solid #555;
-                position: relative;
-                flex-direction: column;
-                transition-duration: 0.2s;
-                overflow: hidden;
-                font-family: monospace;
-                font-weight: bold;
-                font-size: 20px;
-                margin: 5px;
+            /* 左侧游戏列表 */
+            #game-list {
+                width: 250px;
+                background-color: #222;
+                padding: 20px;
+                overflow-y: auto;
+                border-right: 1px solid #444;
+            }
+
+            #game-list h2 {
+                margin-top: 0;
                 text-align: center;
-                padding: 10px;
+                color: #fff;
             }
 
-            #box:hover, #box[drag] {
-                border-color: #38f;
-                color: #ddd
-            }
-
-            #input {
+            .game-item {
+                padding: 12px;
+                margin: 8px 0;
+                background-color: #333;
+                border-radius: 4px;
                 cursor: pointer;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                opacity: 0;
+                transition: background-color 0.2s;
+                text-align: center;
+            }
+
+            .game-item:hover {
+                background-color: #444;
+            }
+
+            .game-item.active {
+                background-color: #007bff;
+            }
+
+            /* 右侧模拟器区域 */
+            #emulator-area {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #game-info {
+                padding: 12px 20px;
+                background-color: #333;
+                border-bottom: 1px solid #444;
+            }
+
+            #game-info h2 {
+                margin: 0;
+                color: #fff;
+            }
+
+            #emulator-container {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
             }
 
             #display {
                 width: 100%;
-                height: 100%
+                height: 100%;
+                max-width: 800px;
+                max-height: 600px;
+                background-color: #111;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            #game {
+                width: 100%;
+                height: 100%;
+            }
+
+            #initial-screen {
+                text-align: center;
+                color: #aaa;
+                padding: 20px;
+            }
+
+            #initial-screen .logo {
+                width: 100px;
+                height: 100px;
+                filter: drop-shadow(0 0 10px white);
+                margin-bottom: 20px;
+            }
+
+            #initial-screen p {
+                font-size: 18px;
             }
 
             select, button {
@@ -84,35 +130,74 @@
                 background-color: #666;
                 color: #ddd
             }
-
-            .logo {
-                width: 130px;
-                height: 130px;
-                filter: drop-shadow(0 0 10px white);
+            
+            .error-message {
+                color: #ff6b6b;
+                font-size: 16px;
+                padding: 10px;
+                text-align: center;
             }
-
-            #top {
-                margin: 5px;
+            
+            .loading-message {
+                color: #4CAF50;
+                font-size: 16px;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .game-item.loading {
+                background-color: #555;
+                cursor: not-allowed;
+                opacity: 0.7;
             }
         </style>
     </head>
 
     <body>
-        <div id="top">
-            <h1>EmulatorJS Demo</h1>
-            <img src="docs/Logo-light.png" alt="Logo" class="logo">
-            <br>
-        </div>
-        <div id="box">
-            <input type = file id = input>
-            Drag ROM file or click here
+        <div id="container">
+            <!-- 左侧游戏列表 -->
+            <div id="game-list">
+                <h2>游戏列表</h2>
+                <div class="game-item" data-rom="90坦克.nes" data-core="nes">
+                    90坦克
+                </div>
+                <div class="game-item" data-rom="93超级魂.nes" data-core="nes">
+                    93超级魂
+                </div>
+                <div class="game-item" data-rom="F-1赛车.nes" data-core="nes">
+                    F-1赛车
+                </div>
+            </div>
+
+            <!-- 右侧模拟器区域 -->
+            <div id="emulator-area">
+                <div id="game-info">
+                    <h2>请选择一个游戏</h2>
+                </div>
+                <div id="emulator-container">
+                    <div id="display">
+                        <div id="game">
+                            <div id="initial-screen">
+                                <img src="docs/Logo-light.png" alt="Logo" class="logo">
+                                <p>请选择左侧游戏列表中的游戏开始游玩</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- 加载 EmulatorManager -->
+        <script src="emulator-manager.js"></script>
         <script>
             let enableDebug = false;
             let enableThreads = false;
+            let currentGame = null;
+            let emulatorReady = false;
+            
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
+            
             if (parseInt(urlParams.get('debug')) === 1 || urlParams.get('debug') === "true") {
                 enableDebug = true;
                 console.log("Debug is enabled");
@@ -132,138 +217,136 @@
                 console.log("Threads are disabled");
             }
 
-            if (urlParams.get('rom')) {
-                console.log(`Loading ROM from URL: roms/${urlParams.get('rom')}`);
-                run(false, urlParams.get('rom'));
-            }
+            // 为游戏列表项添加点击事件
+            document.querySelectorAll('.game-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                    // 如果正在加载，避免重复点击
+                    if (item.classList.contains('loading')) {
+                        return;
+                    }
+                    
+                    // 更新激活状态
+                    document.querySelectorAll('.game-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // 获取游戏信息
+                    const rom = item.getAttribute('data-rom');
+                    const name = item.textContent.trim();
+                    const core = item.getAttribute('data-core');
+                    
+                    // 添加加载状态
+                    item.classList.add('loading');
+                    
+                    try {
+                        // 加载游戏
+                        await loadGame({
+                            rom: rom,
+                            name: name,
+                            core: core
+                        });
+                    } catch (error) {
+                        console.error("Failed to load game:", error);
+                        showError("Failed to load game: " + error.message);
+                    } finally {
+                        // 移除加载状态
+                        item.classList.remove('loading');
+                    }
+                });
+            });
 
-            async function run(upload, file) {
-                const url = upload ? input.files[0] : `roms/${file}`;
-                const parts = upload ? input.files[0].name.split(".") : file.split(".");
-
-                const core = await (async (ext) => {
-                    if (["fds", "nes", "unif", "unf"].includes(ext))
-                        return "nes"
-
-                    if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext))
-                        return "snes"
-
-                    if (["z64", "n64"].includes(ext))
-                        return "n64"
-
-                    if (["pce"].includes(ext))
-                        return "pce"
-
-                    if (["ngp", "ngc"].includes(ext))
-                        return "ngp"
-
-                    if (["ws", "wsc"].includes(ext))
-                        return "ws"
-
-                    if (["col", "cv"].includes(ext))
-                        return "coleco"
-
-                    if (["d64"].includes(ext))
-                        return "vice_x64sc"
-
-                    if (["nds", "gba", "gb", "z64", "n64"].includes(ext))
-                        return ext
-
-                    return await new Promise(resolve => {
-                        var coreValues = {
-                            "Nintendo 64": "n64",
-                            "Nintendo Game Boy": "gb",
-                            "Nintendo Game Boy Advance": "gba",
-                            "Nintendo DS": "nds",
-                            "Nintendo Entertainment System": "nes",
-                            "Super Nintendo Entertainment System": "snes",
-                            "PlayStation": "psx",
-                            "Virtual Boy": "vb",
-                            "Sega Mega Drive": "segaMD",
-                            "Sega Master System": "segaMS",
-                            "Sega CD": "segaCD",
-                            "Atari Lynx": "lynx",
-                            "Sega 32X": "sega32x",
-                            "Atari Jaguar": "jaguar",
-                            "Sega Game Gear": "segaGG",
-                            "Sega Saturn": "segaSaturn",
-                            "Atari 7800": "atari7800",
-                            "Atari 2600": "atari2600",
-                            "Arcade": "arcade",
-                            "NEC TurboGrafx-16/SuperGrafx/PC Engine": "pce",
-                            "NEC PC-FX": "pcfx",
-                            "SNK NeoGeo Pocket (Color)": "ngp",
-                            "Bandai WonderSwan (Color)": "ws",
-                            "ColecoVision": "coleco",
-                            "Commodore 64": "vice_x64sc",
-                            "Commodore 128": "vice_x128",
-                            "Commodore VIC20": "vice_xvic",
-                            "Commodore Plus/4": "vice_xplus4",
-                            "Commodore PET": "vice_xpet"
-                        }
-
-                        const cores = Object.keys(coreValues).sort().reduce(
-                            (obj, key) => { 
-                                obj[key] = coreValues[key]; 
-                                return obj;
-                            }, 
-                            {}
-                        );
-
-                        const button = document.createElement("button")
-                        const select = document.createElement("select")
-
-                        for (const type in cores) {
-                            const option = document.createElement("option")
-
-                            option.value = cores[type]
-                            option.textContent = type
-                            select.appendChild(option)
-                        }
-
-                        button.onclick = () => resolve(select[select.selectedIndex].value)
-                        button.textContent = "Load game"
-                        box.innerHTML = ""
-
-                        box.appendChild(select)
-                        box.appendChild(button)
-                    })
-                })(parts.pop())
-
-                const div = document.createElement("div")
-                const sub = document.createElement("div")
-                const script = document.createElement("script")
-
-                sub.id = "game"
-                div.id = "display"
-
-                const top = document.getElementById("top");
-                top.remove();
-                box.remove()
-                div.appendChild(sub)
-                document.body.appendChild(div)
-
-                window.EJS_player = "#game";
-                window.EJS_gameName = parts.shift();
-                window.EJS_biosUrl = "";
-                window.EJS_gameUrl = url;
-                window.EJS_core = core;
-                window.EJS_pathtodata = "data/";
-                window.EJS_startOnLoaded = true;
-                window.EJS_DEBUG_XX = enableDebug;
-                window.EJS_disableDatabases = true;
-                window.EJS_threads = enableThreads;
-
-                script.src = "data/loader.js";
-                document.body.appendChild(script);
+            // 加载游戏函数
+            async function loadGame(game) {
+                try {
+                    // 更新当前游戏信息
+                    currentGame = game;
+                    
+                    // 更新游戏信息显示
+                    document.querySelector('#game-info h2').textContent = game.name;
+                    
+                    // 显示加载状态
+                    const gameElement = document.getElementById('game');
+                    const initialScreen = document.getElementById('initial-screen');
+                    if (initialScreen) {
+                        initialScreen.remove();
+                    }
+                    gameElement.innerHTML = '<div class="loading-message">正在加载游戏...</div>';
+                    
+                    // 使用 EmulatorManager 运行游戏
+                    const emulator = await window.EmulatorManager.runGame({
+                        gameUrl: game.rom,
+                        gameName: game.name,
+                        core: game.core,
+                        debug: enableDebug,
+                        threads: enableThreads
+                    });
+                    
+                    // 成功加载后确保保留Emulator容器
+                    // 保持gameElement内的内容不变，因为EmulatorJS需要容器元素
+                    console.log("Game loaded successfully");
+                } catch (error) {
+                    console.error("Failed to load game:", error);
+                    showError("Failed to load game: " + error.message);
+                    throw error;
+                } finally {
+                    // 始终确保有一个干净的游戏容器
+                    // 这里不清理innerHTML，因为EmulatorJS需要保持容器
+                }
             }
             
-            input.onchange = async () => {
-                run(true);
+            // 在页面加载时确保初始屏幕存在
+            document.addEventListener('DOMContentLoaded', () => {
+                // 确保初始屏幕存在
+                const gameElement = document.getElementById('game');
+                const initialScreen = document.getElementById('initial-screen');
+                
+                if (gameElement && !initialScreen) {
+                    const initialScreenHTML = `
+                        <div id="initial-screen">
+                            <img src="docs/Logo-light.png" alt="Logo" class="logo">
+                            <p>请选择左侧游戏列表中的游戏开始游玩</p>
+                        </div>
+                    `;
+                    gameElement.innerHTML = initialScreenHTML;
+                }
+            });
+            
+            function showError(message) {
+                const display = document.getElementById("display");
+                if (display) {
+                    display.innerHTML = `<div class="error-message">${message}</div>`;
+                    
+                    // 添加重试按钮
+                    const retryButton = document.createElement("button");
+                    retryButton.textContent = "Try Again";
+                    retryButton.onclick = () => {
+                        if (currentGame) {
+                            // 重新添加初始屏幕
+                            const gameElement = document.getElementById('game');
+                            gameElement.innerHTML = `
+                                <div id="initial-screen">
+                                    <img src="docs/Logo-light.png" alt="Logo" class="logo">
+                                    <p>请选择左侧游戏列表中的游戏开始游玩</p>
+                                </div>
+                            `;
+                            // 重新激活当前选中项
+                            document.querySelectorAll('.game-item').forEach(item => {
+                                if (item.textContent.trim() === currentGame.name) {
+                                    item.classList.add('active');
+                                }
+                            });
+                        }
+                    };
+                    display.appendChild(retryButton);
+                }
             }
             
-            box.ondragover = () => box.setAttribute("drag", true);
-            box.ondragleave = () => box.removeAttribute("drag");
+            // 页面卸载时清理资源
+            window.addEventListener('beforeunload', () => {
+                if (window.EmulatorManager) {
+                    window.EmulatorManager.destroy();
+                }
+            });
+            
         </script>
     </body>
 </html>
