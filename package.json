@@ -9,12 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.4.0",
     "jsnes": "^1.2.1",
-    "nes-vue": "^1.8.2"
+    "nes-vue": "^1.8.2",
+    "vue": "^3.4.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
+    "father": "^4.6.5",
     "vite": "^4.0.0"
   }
 }

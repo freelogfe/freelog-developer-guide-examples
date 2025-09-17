@@ -6,6 +6,21 @@
     "homepage": "https://emulatorjs.org",
     "license": "GPL-3.0",
     "sideEffects": true,
+    "main": "dist/cjs/index.js",
+    "module": "dist/esm/index.js",
+    "types": "dist/esm/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/esm/index.js",
+            "require": "./dist/cjs/index.js",
+            "types": "./dist/esm/index.d.ts"
+        }
+    },
+    "files": [
+        "src",
+        "dist",
+        "data"
+    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/EmulatorJS/EmulatorJS.git"
@@ -15,9 +30,15 @@
     },
     "scripts": {
         "start": "http-server",
-        "minify": "node minify/minify.js",
-        "build": "node build.js",
-        "update": "node update.js"
+        "dev": "father dev",
+        "build": "father build",
+        "build:npm": "node scripts/build-npm.js",
+        "build:package": "node scripts/build-package.js",
+        "build:package:min": "node scripts/build-package.js minified",
+        "build:package:dev": "node scripts/build-package.js dev",
+        "build:esm": "node scripts/build-esm.js",
+        "build:bundle": "node scripts/bundle-esm.js",
+        "build:dist": "node scripts/build-dist.js"
     },
     "dependencies": {
         "@node-minify/clean-css": "^9.0.1",
@@ -30,7 +51,20 @@
         "node-fetch": "^3.3.2",
         "socket.io": "^4.8.1"
     },
+    "devDependencies": {
+        "father": "^4.6.5"
+    },
     "optionalDependencies": {
         "@emulatorjs/cores": "latest"
-    }
+    },
+    "keywords": [
+        "emulator",
+        "retro",
+        "games",
+        "nes",
+        "snes",
+        "gba",
+        "sega",
+        "rom"
+    ]
 }

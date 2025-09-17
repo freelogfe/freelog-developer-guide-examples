@@ -213,7 +213,7 @@ If you want to help with localization, please check out the [localization](data/
  </picture>
 </a>
 
-<!-- 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 --->
+<!-- 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 🎮 --->
 
 [License]: LICENSE
 [Issue]: https://github.com/ethanaobrien/emulatorjs/issues
