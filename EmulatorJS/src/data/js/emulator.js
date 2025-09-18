@@ -4735,6 +4735,9 @@ class EmulatorJS {
         this.virtualGamepad.style.display = "none";
     }
     handleResize() {
+        if(!this.game.parentElement){
+            return false;
+        }
         if (this.virtualGamepad) {
             if (this.virtualGamepad.style.display === "none") {
                 this.virtualGamepad.style.opacity = 0;
