@@ -15,9 +15,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted, onUnmounted, nextTick } from "vue";
-import { freelogApp } from "freelog-runtime";
-import { useGameUrlStore } from "@/stores/game";
+import { ref, watch, onMounted } from "vue";
+import { useGameUrlStore } from "./stores/game";
 import "freelog-emulatorjs/emulator.css";
 import { runGame } from "freelog-emulatorjs";
 
@@ -57,7 +56,7 @@ onMounted(() => {
 
 
 const loadEmulator = async () => {
-
+  if(!urlValue.value) return;
   runGame({
     gameUrl: urlValue.value,
     gameName: gameName.value,

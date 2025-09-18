@@ -608,26 +608,26 @@ class EmulatorJS {
                 }
             }
             const corePath = "cores/" + filename;
-            let res = await this.downloadFile(corePath, (progress) => {
+            // let res = await this.downloadFile(corePath, (progress) => {
+            // this.textElem.innerText = this.localization("Download Game Core") + progress;
+            // }, false, { responseType: "arraybuffer", method: "GET" });
+            // if (res === -1) {
+            console.log("File not found, attemping to fetch from emulatorjs cdn.");
+            console.error("**THIS METHOD IS A FAILSAFE, AND NOT OFFICIALLY SUPPORTED. USE AT YOUR OWN RISK**");
+            let version = this.ejs_version.endsWith("-beta") ? "nightly" : this.ejs_version;
+            let res = await this.downloadFile(`https://cdn.emulatorjs.org/${version}/data/${corePath}`, (progress) => {
                 this.textElem.innerText = this.localization("Download Game Core") + progress;
-            }, false, { responseType: "arraybuffer", method: "GET" });
+            }, true, { responseType: "arraybuffer", method: "GET" });
             if (res === -1) {
-                console.log("File not found, attemping to fetch from emulatorjs cdn.");
-                console.error("**THIS METHOD IS A FAILSAFE, AND NOT OFFICIALLY SUPPORTED. USE AT YOUR OWN RISK**");
-                let version = this.ejs_version.endsWith("-beta") ? "nightly" : this.ejs_version;
-                res = await this.downloadFile(`https://cdn.emulatorjs.org/${version}/data/${corePath}`, (progress) => {
-                    this.textElem.innerText = this.localization("Download Game Core") + progress;
-                }, true, { responseType: "arraybuffer", method: "GET" });
-                if (res === -1) {
-                    if (!this.supportsWebgl2) {
-                        this.startGameError(this.localization("Outdated graphics driver"));
-                    } else {
-                        this.startGameError(this.localization("Error downloading core") + " (" + filename + ")");
-                    }
-                    return;
+                if (!this.supportsWebgl2) {
+                    this.startGameError(this.localization("Outdated graphics driver"));
+                } else {
+                    this.startGameError(this.localization("Error downloading core") + " (" + filename + ")");
                 }
-                console.warn("File was not found locally, but was found on the emulatorjs cdn.\nIt is recommended to download the stable release from here: https://cdn.emulatorjs.org/releases/");
+                return;
             }
+            console.warn("File was not found locally, but was found on the emulatorjs cdn.\nIt is recommended to download the stable release from here: https://cdn.emulatorjs.org/releases/");
+            // }
             gotCore(res.data);
             this.storage.core.put(filename, {
                 version: rep.buildStart,
@@ -649,7 +649,7 @@ class EmulatorJS {
             // 如果是字符串，则直接替换
             modifiedJs = js.replace(/var\s+EJS_Runtime\s*=/g, 'window.EJS_Runtime =');
         }
-        
+
         let script = this.createElement("script");
         script.src = URL.createObjectURL(new Blob([modifiedJs], { type: "application/javascript" }));
         script.id = "game-core-script"
@@ -659,7 +659,7 @@ class EmulatorJS {
                 // 尝试从微前端的 window 代理对象获取
                 window.EJS_Runtime = window.__MICRO_APP_WINDOW__.EJS_Runtime;
             }
-            
+
             // 如果还是获取不到，尝试从 proxyWindow 获取
             if (typeof window.EJS_Runtime !== "function" && window.__MICRO_APP_PROXY_WINDOW__) {
                 const proxyWindow = window.__MICRO_APP_PROXY_WINDOW__;
@@ -667,7 +667,7 @@ class EmulatorJS {
                     window.EJS_Runtime = proxyWindow.__MICRO_APP_WINDOW__.EJS_Runtime;
                 }
             }
-            
+
             this.initModule(wasm, thread);
         });
         document.body.appendChild(script);
@@ -4735,7 +4735,7 @@ class EmulatorJS {
         this.virtualGamepad.style.display = "none";
     }
     handleResize() {
-        if(!this.game.parentElement){
+        if (!this.game.parentElement) {
             return false;
         }
         if (this.virtualGamepad) {
@@ -6721,18 +6721,18 @@ class EmulatorJS {
         try {
             // Reset game state
             this.reset();
-            
+
             // Load new ROM
             const gameData = await this.downloadFile(romPath);
             if (gameData === -1) {
                 throw new Error("Failed to download ROM file");
             }
-            
+
             // Update game manager with new ROM
             if (this.gameManager) {
                 this.gameManager.loadROM(romPath);
             }
-            
+
             console.log("ROM loaded successfully:", romPath);
         } catch (error) {
             console.error("Error loading ROM:", error);
@@ -6747,7 +6747,7 @@ class EmulatorJS {
         // Reset internal state variables
         this.started = false;
         this.paused = true;
-        
+
         // Clear any existing game data if needed
         if (this.gameManager) {
             // Perform any necessary cleanup in the game manager
@@ -6755,7 +6755,7 @@ class EmulatorJS {
                 this.gameManager.reset();
             }
         }
-        
+
         console.log("Emulator state reset");
     }
 
@@ -6815,7 +6815,7 @@ class EmulatorJS {
         if (!this._eventListeners) {
             this._eventListeners = [];
         }
-        
+
         // Add the event listener normally
         const listeners = listener.split(" ");
         for (let i = 0; i < listeners.length; i++) {

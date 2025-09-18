@@ -58,6 +58,7 @@ const mountArticleWidget = async (url: string, name: string) => {
         topExhibitId: freelogApp.getTopExhibitId(),
         container: document.getElementById("freelog-game") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         renderWidgetOptions: {
+          iframe:true,
           data: {
             defaultGameUrl: url,
             defaultGameName: name,

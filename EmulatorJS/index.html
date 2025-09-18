@@ -292,6 +292,7 @@
           // 使用 EmulatorManager 运行游戏
           const emulator = await runGame({
             gameUrl: game.rom,
+            container: "#game",
             gameName: game.name,
             core: game.core,
             pathtodata: "./src/data",
