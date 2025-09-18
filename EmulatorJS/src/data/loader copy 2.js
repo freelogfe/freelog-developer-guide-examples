@@ -10,19 +10,20 @@ import './js/compression.js';
 import './js/gamepad.js';
 import './js/shaders.js';
 import './js/storage.js';
+// import "./emulator.css"
 import './js/nipplejs.js';
 import './js/socket.io.min.js'
+// import "socket.io"
 
 /**
  * 加载 EmulatorJS 的主函数
  * @returns {Promise<void>}
  */
 export async function loadEmulator() {
-
     const folderPath = (path) => path.substring(0, path.length - path.split("/").pop().length);
     let scriptPath = (typeof window.EJS_pathtodata === "string") ? window.EJS_pathtodata : folderPath((new URL(document.currentScript.src)).pathname);
     if (!scriptPath.endsWith("/")) scriptPath += "/";
-
+    // 配置对象
     const config = {};
     config.gameUrl = window.EJS_gameUrl;
     config.dataPath = scriptPath;
@@ -67,7 +68,7 @@ export async function loadEmulator() {
     config.noAutoFocus = window.EJS_noAutoFocus;
     config.videoRotation = window.EJS_videoRotation;
     config.hideSettings = window.EJS_hideSettings;
-    config.shaders = Object.assign({}, window.EJS_SHADERS, window.EJS_shaders ? window.EJS_shaders : {});
+    config.shaders = Object.assign({}, EJS_SHADERS, window.EJS_shaders ? window.EJS_shaders : {});
 
     let systemLang;
     try {
