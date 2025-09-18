@@ -1,5 +1,5 @@
 {
-    "name": "@emulatorjs/emulatorjs",
+    "name": "freelog-emulatorjs",
     "version": "4.2.3",
     "type": "module",
     "description": "EmulatorJS is a frontend for RetroArch in the web browser.",
