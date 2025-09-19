@@ -21,7 +21,8 @@ export async function runGame(config) {
 
   try {
     // Load the emulator
-    await loadEmulator();
+    let controller = await loadEmulator();
+    return controller;
   } catch (error) {
     throw new Error(`Failed to load EmulatorJS: ${error.message}`);
   }

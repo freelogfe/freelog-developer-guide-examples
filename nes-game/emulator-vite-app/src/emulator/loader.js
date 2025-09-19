@@ -2,7 +2,7 @@
  * EmulatorJS Loader Module
  * This module provides functions to load the EmulatorJS emulator
  */
-import './js/emulator.js';
+import './emulator.js';
 
 
 /**
@@ -132,6 +132,10 @@ export async function loadEmulator() {
     }
     if (typeof window.EJS_onSaveSave === "function") {
         window.EJS_emulator.on("saveSave", window.EJS_onSaveSave);
+    }
+    return {
+        emulator: window.EJS_emulator,
+        config: window.EJS_config
     }
 }
 

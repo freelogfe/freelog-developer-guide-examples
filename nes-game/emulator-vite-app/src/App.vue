@@ -22,12 +22,11 @@ import { runGame } from "./emulator/index.js";
 
 // 扩展 Window 接口以支持 EmulatorJS 全局变量
 
-
 const urlStore = useGameUrlStore();
 const urlValue = ref<string>(urlStore.url);
 const gameName = ref<string>(urlStore.gameName);
 
-
+const emulator = ref<any>(null);
 
 // 监听urlStore变化
 watch(
@@ -37,6 +36,7 @@ watch(
     gameName.value = urlStore.gameName;
     console.log("urlValue", urlValue.value);
     if (value) {
+      emulator.value?.emulator?.destory();
       // 添加延迟确保之前的实例完全清理
       setTimeout(() => {
         loadEmulator();
@@ -53,11 +53,9 @@ onMounted(() => {
   // 监听全屏变化事件
 });
 
-
-
 const loadEmulator = async () => {
-  if(!urlValue.value) return;
-  runGame({
+  if (!urlValue.value) return;
+  emulator.value = await runGame({
     gameUrl: urlValue.value,
     gameName: gameName.value,
     core: "nes",
@@ -65,8 +63,6 @@ const loadEmulator = async () => {
     pathtodata: "./emulator/",
   });
 };
-
-
 </script>
 
 <style scoped>

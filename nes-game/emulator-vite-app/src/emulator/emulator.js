@@ -1,4 +1,9 @@
 class EmulatorJS {
+    destory() {
+        console.log(99999)
+        if (!this.started) return;
+        this.callEvent("exit");
+    }
     getCores() {
         let rv = {
             "atari5200": ["a5200"],

@@ -49,6 +49,22 @@ class EJS_GameManager {
             }
             this.toggleMainLoop(0);
             this.FS.unmount("/data/saves");
+            
+            // 处理音频上下文，防止切换游戏后还有上一个游戏的声音
+            try {
+                if (this.Module && this.Module.AL && this.Module.AL.currentCtx && this.Module.AL.currentCtx.audioCtx) {
+                    const audioContext = this.Module.AL.currentCtx.audioCtx;
+                    if (audioContext.state !== 'closed') {
+                        // 暂停音频上下文
+                        audioContext.suspend();
+                        // 或者直接关闭音频上下文
+                        // audioContext.close();
+                    }
+                }
+            } catch(e) {
+                console.warn("Failed to suspend audio context:", e);
+            }
+            
             setTimeout(() => {
                 try {
                     this.Module.abort();
