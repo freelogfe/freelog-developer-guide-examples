@@ -285,8 +285,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(vite@5.4.20(@types/node@24.5.2)(less@4.4.1)(lightningcss@1.22.1)(sass@1.77.7)(terser@5.36.0))
       freelog-emulatorjs:
-        specifier: ^4.2.7
-        version: 4.2.7
+        specifier: ^4.2.8
+        version: 4.2.8
       freelog-runtime:
         specifier: 4.1.9
         version: 4.1.9
@@ -8289,6 +8289,9 @@ packages:
 
   freelog-emulatorjs@4.2.7:
     resolution: {integrity: sha512-Z2vAXrvYbPwyUo4xHQ1+cVy7elz2m09fnNnmB7qTQmZeCITIwvtnez5kW7dl7zEpSLN21LcOywnEA3qufU5H9Q==}
+
+  freelog-emulatorjs@4.2.8:
+    resolution: {integrity: sha512-zq1sZu5t0uVq+tZqF8pQNAYtcluv/UFnqDqAPDVpC6lp9ELGOKtC5SU4Rdu+wmYwppjYebvztjh+HvhiRKA89A==}
 
   freelog-nes-vue@1.6.10:
     resolution: {integrity: sha512-e3dyfyBI2LPtxpvk9p3mBtGF9Rm4XOE2OE/T5aRDDr+0fYvPD+u2e20nkcRkwvGqLx4tT9H8gd/rRqFIg7O3HQ==}
@@ -25323,6 +25326,24 @@ snapshots:
   fraction.js@4.3.7: {}
 
   freelog-emulatorjs@4.2.7:
+    dependencies:
+      '@node-minify/clean-css': 9.0.1
+      '@node-minify/core': 9.0.2
+      '@node-minify/terser': 9.0.1
+      glob: 11.0.3
+      http-server: 14.1.1
+      nipplejs: 0.10.2
+      node-7z: 3.0.0
+      node-fetch: 3.3.2
+      socket.io: 4.8.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+    optionalDependencies:
+      bufferutil: 4.0.9
+      utf-8-validate: 6.0.5
+    transitivePeerDependencies:
+      - debug
+      - supports-color
+
+  freelog-emulatorjs@4.2.8:
     dependencies:
       '@node-minify/clean-css': 9.0.1
       '@node-minify/core': 9.0.2

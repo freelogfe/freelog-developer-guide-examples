@@ -18,7 +18,9 @@
     <a-button type="primary" @click="checkIsUserChange"
       >检查是否用户变化</a-button
     >
-    <div class="mt-20 mb-40">{{ isUserChange ? "用户变化请刷新页面" : "用户未变化" }}</div>
+    <div class="mt-20 mb-40">
+      {{ isUserChange ? "用户变化请刷新页面" : "用户未变化" }}
+    </div>
 
     <a-button type="primary" @click="onUserChange"
       >开启监听页面切换后用户变化</a-button
@@ -46,9 +48,16 @@ const login = () => {
 const checkIsUserChange = () => {
   isUserChange.value = freelogApp.isUserChange();
 };
-freelogApp.onLogin(() => {
-  console.log("login");
-});
+freelogApp.onLogin(
+  () => {
+    console.log("login");
+  },
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  () => {
+    console.log("用户关闭了登录窗口");
+  }
+);
 const loginOut = () => {
   freelogApp.callLoginOut();
 };
@@ -56,7 +65,7 @@ const onUserChange = () => {
   openOnUserChange.value = true;
   // 监听其余页面切换用户
   freelogApp.onUserChange(() => {
-    console.log(32232323)
+    console.log(32232323);
     // Modal.warning({
     //   title: "将立刻刷新",
     //   icon: createVNode(ExclamationCircleOutlined),
