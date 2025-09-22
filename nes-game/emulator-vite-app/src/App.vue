@@ -19,6 +19,7 @@ import { ref, watch, onMounted } from "vue";
 import { useGameUrlStore } from "./stores/game";
 import "./emulator/emulator.css";
 import { runGame } from "./emulator/index.js";
+import { freelogApp } from "freelog-runtime";
 
 // 扩展 Window 接口以支持 EmulatorJS 全局变量
 
@@ -52,7 +53,7 @@ onMounted(() => {
 
   // 监听全屏变化事件
 });
-
+console.log(freelogApp.getStaticPath("/emulator/"),9999)
 const loadEmulator = async () => {
   if (!urlValue.value) return;
   emulator.value = await runGame({
@@ -60,7 +61,10 @@ const loadEmulator = async () => {
     gameName: gameName.value,
     core: "nes",
     container: "#game",
-    pathtodata: "./emulator/",
+    pathtodata:
+      import.meta.env.NODE_ENV == "development"
+        ? "./emulator/"
+        : freelogApp.getStaticPath("/emulator/"),
   });
 };
 </script>
