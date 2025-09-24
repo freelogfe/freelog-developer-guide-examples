@@ -36,11 +36,11 @@ watch(
         mountArticleWidget(gameUrl.value, gameName.value);
         return;
       }
-      selfWidget.unmount().then(() => {
-        mountArticleWidget(gameUrl.value, gameName.value);
-      });
+      // selfWidget.unmount().then(() => {
+      //   mountArticleWidget(gameUrl.value, gameName.value);
+      // });
 
-      // selfWidgetApi.value.startGame(gameUrl.value, gameName.value);
+      selfWidgetApi.value.startGame(gameUrl.value, gameName.value);
     });
   },
   { immediate: true }
