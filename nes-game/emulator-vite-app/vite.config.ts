@@ -2,11 +2,12 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import { resolve } from "path";
+import mkcert from "vite-plugin-mkcert";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "./",
-  plugins: [basicSsl(), vue()],
+  plugins: [mkcert(), vue()],
   server: {
     port: 8203,
     headers: {
@@ -20,19 +21,19 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['freelog-emulatorjs'], // 让它走原生 ES 模块加载
+    exclude: ["freelog-emulatorjs"], // 让它走原生 ES 模块加载
   },
   build: {
     rollupOptions: {
       external: [],
       output: {
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.json')) {
-            return 'assets/localization/[name].[ext]';
+          if (assetInfo.name?.endsWith(".json")) {
+            return "assets/localization/[name].[ext]";
           }
-          return 'assets/[name].[ext]';
-        }
-      }
-    }
-  }
+          return "assets/[name].[ext]";
+        },
+      },
+    },
+  },
 });

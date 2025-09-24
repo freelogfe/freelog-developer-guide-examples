@@ -36,7 +36,11 @@ watch(
         mountArticleWidget(gameUrl.value, gameName.value);
         return;
       }
-      selfWidgetApi.value.startGame(gameUrl.value, gameName.value);
+      selfWidget.unmount().then(() => {
+        mountArticleWidget(gameUrl.value, gameName.value);
+      });
+
+      // selfWidgetApi.value.startGame(gameUrl.value, gameName.value);
     });
   },
   { immediate: true }
@@ -58,7 +62,7 @@ const mountArticleWidget = async (url: string, name: string) => {
         topExhibitId: freelogApp.getTopExhibitId(),
         container: document.getElementById("freelog-game") as HTMLElement, // 必传，自定义一个让插件挂载的div容器
         renderWidgetOptions: {
-          iframe:true,
+          iframe: true,
           data: {
             defaultGameUrl: url,
             defaultGameName: name,
@@ -73,7 +77,7 @@ const mountArticleWidget = async (url: string, name: string) => {
           },
         },
         seq: 0, // 如果要用多个同样的子插件需要传递序号，可以考虑与其余节点插件避免相同的序号, 注意用户数据是根据插件id+序号保存的。
-        widget_entry: "https://localhost:4173", // 本地url，dev模式下，可以使用本地url调试子插件
+        widget_entry: "https://localhost:8203", // 本地url，dev模式下，可以使用本地url调试子插件
       });
     }
   });
