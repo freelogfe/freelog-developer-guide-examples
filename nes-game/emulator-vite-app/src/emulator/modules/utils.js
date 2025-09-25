@@ -1,263 +1,208 @@
-// 工具模块 - 包含通用工具函数
+// 工具函数模块
 
-// 注意：这些函数需要绑定到EmulatorJS实例上才能正常工作
-// 它们原本是EmulatorJS类的方法，现在作为独立函数导出
-
-export function versionAsInt(version) {
-    // 将版本号转换为整数进行比较
-    const parts = version.split('.');
-    let result = 0;
-    for (let i = 0; i < parts.length; i++) {
-        result = result * 1000 + parseInt(parts[i]);
-    }
-    return result;
+/**
+ * 检查核心是否需要线程支持
+ * @param {string} core - 核心名称
+ * @returns {boolean} - 是否需要线程支持
+ */
+export function requiresThreads(core) {
+    const requiresThreads = ["ppsspp", "dosbox_pure"];
+    return requiresThreads.includes(core);
 }
 
-export function screenshot(callback) {
-    // 截图功能
-    if (!this.canvas) {
-        console.warn("Canvas not available for screenshot");
-        return;
-    }
-    
-    this.canvas.toBlob((blob) => {
-        callback(blob, "png");
-    }, "image/png");
+/**
+ * 检查核心是否需要WebGL2支持
+ * @param {string} core - 核心名称
+ * @returns {boolean} - 是否需要WebGL2支持
+ */
+export function requiresWebGL2(core) {
+    const requiresWebGL2 = ["ppsspp"];
+    return requiresWebGL2.includes(core);
 }
 
-export function screenRecord() {
-    // 屏幕录制功能
-    if (!this.capture || !this.capture.video) {
-        console.warn("Screen capture not available");
-        return null;
+/**
+ * 将版本号转换为整数，用于版本比较
+ * @param {string} ver - 版本号字符串
+ * @returns {number} - 版本号的整数表示
+ */
+export function versionAsInt(ver) {
+    if (ver.endsWith("-beta")) {
+        return 99999999;
     }
-
-    const captureFps = this.getSettingValue("screenRecordingFPS") || this.capture.video.fps;
-    const captureFormat = this.getSettingValue("screenRecordFormat") || this.capture.video.format;
-    const captureUpscale = this.getSettingValue("screenRecordUpscale") || this.capture.video.upscale;
-    const captureVideoBitrate = this.getSettingValue("screenRecordVideoBitrate") || this.capture.video.videoBitrate;
-    const captureAudioBitrate = this.getSettingValue("screenRecordAudioBitrate") || this.capture.video.audioBitrate;
-    const aspectRatio = this.gameManager.getVideoDimensions("aspect") || 1.333333;
-    const videoRotation = parseInt(this.getSettingValue("videoRotation") || 0);
-    const videoTurned = (videoRotation === 1 || videoRotation === 3);
-    
-    let width = 800;
-    let height = 600;
-    let frameAspect = this.canvas.width / this.canvas.height;
-    let canvasAspect = width / height;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    // 计算录制画布尺寸
-    if (frameAspect > canvasAspect) {
-        height = width / frameAspect;
-        offsetY = (600 - height) / 2;
-    } else {
-        width = height * frameAspect;
-        offsetX = (800 - width) / 2;
+    let rv = ver.split(".");
+    if (rv[rv.length - 1].length === 1) {
+        rv[rv.length - 1] = "0" + rv[rv.length - 1];
     }
+    return parseInt(rv.join(""));
+}
 
-    // 创建录制画布
-    const captureCanvas = this.createElement("canvas");
-    captureCanvas.width = 800 * captureUpscale;
-    captureCanvas.height = 600 * captureUpscale;
-    captureCanvas.style.display = "none";
-    this.elements.parent.appendChild(captureCanvas);
-
-    const ctx = captureCanvas.getContext("2d");
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, captureCanvas.width, captureCanvas.height);
-
-    // 缩放和绘制主画布内容
-    const scale = captureUpscale;
-    ctx.scale(scale, scale);
-    ctx.translate(offsetX, offsetY);
-
-    // 动画循环
-    let animation = true;
-    let chunks = [];
-    let lastFrameTime = 0;
-
-    const draw = (timestamp) => {
-        if (!animation) return;
-
-        // 控制帧率
-        if (timestamp - lastFrameTime >= (1000 / captureFps)) {
-            lastFrameTime = timestamp;
-            ctx.clearRect(0, 0, 800, 600);
-            ctx.drawImage(this.canvas, 0, 0, 800, 600);
+/**
+ * 将数据转换为适当的格式
+ * @param {*} data - 要转换的数据
+ * @param {boolean} rv - 是否只返回布尔值
+ * @returns {Promise<Uint8Array>|null} - 转换后的数据或null
+ */
+export function toData(data, rv) {
+    if (!(data instanceof ArrayBuffer) && !(data instanceof Uint8Array) && !(data instanceof Blob)) return null;
+    if (rv) return true;
+    return new Promise(async (resolve) => {
+        if (data instanceof ArrayBuffer) {
+            resolve(new Uint8Array(data));
+        } else if (data instanceof Uint8Array) {
+            resolve(data);
+        } else if (data instanceof Blob) {
+            resolve(new Uint8Array(await data.arrayBuffer()));
         }
-
-        requestAnimationFrame(draw);
-    };
-
-    requestAnimationFrame(draw);
-
-    // 创建媒体录制器
-    const stream = captureCanvas.captureStream(captureFps);
-    const options = {
-        mimeType: `video/${captureFormat};codecs=vp9`,
-        videoBitsPerSecond: captureVideoBitrate,
-        audioBitsPerSecond: captureAudioBitrate
-    };
-
-    const recorder = new MediaRecorder(stream, options);
-    
-    recorder.addEventListener("dataavailable", e => {
-        chunks.push(e.data);
-    });
-    
-    recorder.addEventListener("stop", () => {
-        const blob = new Blob(chunks);
-        const url = URL.createObjectURL(blob);
-        const date = new Date();
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = this.getBaseFileName() + "-" + date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear() + "." + captureFormat;
-        a.click();
-
-        animation = false;
-        captureCanvas.remove();
-    });
-    
-    recorder.start();
-
-    // 存储录制器引用以便清理
-    this.recorder = recorder;
-
-    return recorder;
+        resolve();
+    })
 }
 
-export function displayMessage(message, time) {
-    // 显示消息
-    if (!this.msgElem) {
-        this.msgElem = this.createElement("div");
-        this.msgElem.classList.add("ejs_message");
-        this.elements.parent.appendChild(this.msgElem);
+/**
+ * 创建DOM元素
+ * @param {string} type - 元素类型
+ * @returns {HTMLElement} - 创建的DOM元素
+ */
+export function createElement(type) {
+    return document.createElement(type);
+}
+
+/**
+ * 添加事件监听器
+ * @param {HTMLElement} element - 目标元素
+ * @param {string} listener - 事件监听器名称，多个监听器用空格分隔
+ * @param {Function} callback - 回调函数
+ * @returns {Array} - 事件监听器数据数组
+ */
+export function addEventListener(element, listener, callback) {
+    const listeners = listener.split(" ");
+    let rv = [];
+    for (let i = 0; i < listeners.length; i++) {
+        element.addEventListener(listeners[i], callback);
+        const data = { cb: callback, elem: element, listener: listeners[i] };
+        rv.push(data);
     }
-    
-    clearTimeout(this.msgTimeout);
-    this.msgTimeout = setTimeout(() => {
-        this.msgElem.innerText = "";
-    }, (typeof time === "number" && time > 0) ? time : 3000);
-    
-    this.msgElem.innerText = message;
+    return rv;
 }
 
-export function selectFile(accept) {
-    // 选择文件
-    return new Promise((resolve) => {
-        const input = this.createElement("input");
-        input.type = "file";
-        if (accept) {
-            input.accept = accept;
-        }
-        input.onchange = (e) => {
-            resolve(e.target.files[0]);
-        };
-        input.click();
-    });
-}
-
-export function saveAs(blob, filename) {
-    // 保存文件
-    const url = URL.createObjectURL(blob);
-    const a = this.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-export function getBaseFileName(force) {
-    // 获取基本文件名
-    if (!this.started && !force) return null;
-    if (force && this.config.gameUrl !== "game" && !this.config.gameUrl.startsWith("blob:")) {
-        return this.config.gameUrl.split("/").pop().split("#")[0].split("?")[0];
+/**
+ * 移除事件监听器
+ * @param {Array} data - 事件监听器数据数组
+ */
+export function removeEventListener(data) {
+    for (let i = 0; i < data.length; i++) {
+        data[i].elem.removeEventListener(data[i].listener, data[i].cb);
     }
-    if (typeof this.config.gameName === "string") {
-        const invalidCharacters = /[#<$+%>!`&*'|{}/\\?"=@:^\r\n]/ig;
-        const name = this.config.gameName.replace(invalidCharacters, "").trim();
+}
+
+/**
+ * 检查浏览器是否支持在本地保存游戏
+ * @param {Object} config - 配置对象
+ * @returns {boolean} - 是否支持本地保存
+ */
+export function saveInBrowserSupported(config) {
+    return !!window.indexedDB && (typeof config.gameName === "string" || !config.gameUrl.startsWith("blob:"));
+}
+
+/**
+ * 获取基本文件名
+ * @param {Object} config - 配置对象
+ * @param {boolean} started - 是否已启动
+ * @param {boolean} force - 是否强制获取
+ * @param {string} fileName - 当前文件名
+ * @returns {string} - 基本文件名
+ */
+export function getBaseFileName(config, started, force, fileName) {
+    //Only once game and core is loaded
+    if (!started && !force) return null;
+    if (force && config.gameUrl !== "game" && !config.gameUrl.startsWith("blob:")) {
+        return config.gameUrl.split("/").pop().split("#")[0].split("?")[0];
+    }
+    if (typeof config.gameName === "string") {
+        const invalidCharacters = /[#<$+%>!`&*'|{}\\/\?"=@:^\r\n]/ig;
+        const name = config.gameName.replace(invalidCharacters, "").trim();
         if (name) return name;
     }
-    if (!this.fileName) return "game";
-    let parts = this.fileName.split(".");
+    if (!fileName) return "game";
+    let parts = fileName.split(".");
     parts.splice(parts.length - 1, 1);
     return parts.join(".");
 }
 
-export function localization(text, log) {
-    // 本地化
-    if (typeof text === "undefined" || text.length === 0) return;
-    text = text.toString();
-    if (text.includes("EmulatorJS v")) return text;
-    if (this.config.langJson) {
-        if (typeof log === "undefined") log = true;
-        if (!this.config.langJson[text] && log) {
-            if (!this.missingLang.includes(text)) this.missingLang.push(text);
-            console.log(`Translation not found for '${text}'. Language set to '${this.config.language}'`);
-        }
-        return this.config.langJson[text] || text;
+/**
+ * 获取支持的模拟器核心列表
+ * @param {boolean} isSafari - 是否为Safari浏览器
+ * @param {boolean} isMobile - 是否为移动设备
+ * @returns {Object} - 核心列表对象
+ */
+export function getCores(isSafari, isMobile) {
+    let rv = {
+        "atari5200": ["a5200"],
+        "vb": ["beetle_vb"],
+        "nds": ["melonds", "desmume", "desmume2015"],
+        "arcade": ["fbneo", "fbalpha2012_cps1", "fbalpha2012_cps2"],
+        "nes": ["fceumm", "nestopia"],
+        "gb": ["gambatte"],
+        "coleco": ["gearcoleco"],
+        "segaMS": ["smsplus", "genesis_plus_gx", "picodrive"],
+        "segaMD": ["genesis_plus_gx", "picodrive"],
+        "segaGG": ["genesis_plus_gx"],
+        "segaCD": ["genesis_plus_gx", "picodrive"],
+        "sega32x": ["picodrive"],
+        "sega": ["genesis_plus_gx", "picodrive"],
+        "lynx": ["handy"],
+        "mame": ["mame2003_plus", "mame2003"],
+        "ngp": ["mednafen_ngp"],
+        "pce": ["mednafen_pce"],
+        "pcfx": ["mednafen_pcfx"],
+        "psx": ["pcsx_rearmed", "mednafen_psx_hw"],
+        "ws": ["mednafen_wswan"],
+        "gba": ["mgba"],
+        "n64": ["mupen64plus_next", "parallel_n64"],
+        "3do": ["opera"],
+        "psp": ["ppsspp"],
+        "atari7800": ["prosystem"],
+        "snes": ["snes9x"],
+        "atari2600": ["stella2014"],
+        "jaguar": ["virtualjaguar"],
+        "segaSaturn": ["yabause"],
+        "amiga": ["puae"],
+        "c64": ["vice_x64sc"],
+        "c128": ["vice_x128"],
+        "pet": ["vice_xpet"],
+        "plus4": ["vice_xplus4"],
+        "vic20": ["vice_xvic"],
+        "dos": ["dosbox_pure"]
+    };
+    if (isSafari && isMobile) {
+        rv.n64 = rv.n64.reverse();
     }
-    return text;
+    return rv;
 }
 
-export function handleResize() {
-    // 处理窗口大小调整
-    if (!this.canvas) return;
-    
-    const parent = this.elements.parent;
-    const canvas = this.canvas;
-    
-    // 获取父元素的尺寸
-    const parentWidth = parent.clientWidth;
-    const parentHeight = parent.clientHeight;
-    
-    // 计算宽高比
-    const aspectRatio = this.gameManager ? this.gameManager.getVideoDimensions("aspect") : (4/3);
-    
-    // 根据父元素尺寸和宽高比计算canvas尺寸
-    let width, height;
-    if (parentWidth / parentHeight > aspectRatio) {
-        height = parentHeight;
-        width = height * aspectRatio;
-    } else {
-        width = parentWidth;
-        height = width / aspectRatio;
-    }
-    
-    // 设置canvas尺寸
-    canvas.style.width = width + "px";
-    canvas.style.height = height + "px";
-    
-    // 居中显示
-    canvas.style.marginLeft = ((parentWidth - width) / 2) + "px";
-    canvas.style.marginTop = ((parentHeight - height) / 2) + "px";
-}
-
-export function toggleFullscreen(force) {
-    // 切换全屏模式
-    const element = this.elements.parent;
-    
-    if (force === true || (force !== false && !document.fullscreenElement)) {
-        if (element.requestFullscreen) {
-            element.requestFullscreen();
-        } else if (element.mozRequestFullScreen) {
-            element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullscreen) {
-            element.webkitRequestFullscreen();
-        } else if (element.msRequestFullscreen) {
-            element.msRequestFullscreen();
+/**
+ * 获取特定的核心名称
+ * @param {string} generic - 通用核心名称
+ * @param {Object} config - 配置对象
+ * @param {Object} cores - 核心列表
+ * @param {Function} preGetSetting - 获取设置的函数
+ * @returns {string} - 核心名称
+ */
+export function getCore(generic, config, cores, preGetSetting) {
+    const core = config.system;
+    if (generic) {
+        for (const k in cores) {
+            if (cores[k].includes(core)) {
+                return k;
+            }
         }
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
+        return core;
     }
+    const gen = getCore(true, config, cores, preGetSetting);
+    if (cores[gen] && cores[gen].includes(preGetSetting("retroarch_core"))) {
+        return preGetSetting("retroarch_core");
+    }
+    if (cores[core]) {
+        return cores[core][0];
+    }
+    return core;
 }

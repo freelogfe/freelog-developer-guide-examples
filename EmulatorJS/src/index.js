@@ -3,6 +3,13 @@ import loadEmulator from './data/loader.js';
 
 
 /**
+ * EmulatorJS - Main Index File
+ */
+
+// 导入加载器模块
+import loadEmulator from './data/loader.js';
+
+/**
  * 运行游戏的便捷函数
  * @param {Object} config - EmulatorJS配置选项
  */
