@@ -1,4 +1,8 @@
 class EmulatorJS {
+    destory() {
+        if (!this.started) return;
+        this.callEvent("exit");
+    }
     getCores() {
         let rv = {
             "atari5200": ["a5200"],
@@ -6759,8 +6763,9 @@ class EmulatorJS {
         console.log("Emulator state reset");
     }
 
-  
     
+
+   
 
     /**
      * Enhanced screen recording method

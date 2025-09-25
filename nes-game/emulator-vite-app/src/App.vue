@@ -37,11 +37,15 @@ watch(
     gameName.value = urlStore.gameName;
     console.log("urlValue", urlValue.value);
     if (value) {
-      emulator.value?.emulator?.destory();
-      // 添加延迟确保之前的实例完全清理
-      setTimeout(() => {
+      if (emulator.value) {
+        emulator.value?.emulator?.switchGame({
+          gameUrl: urlValue.value,
+          gameName: gameName.value,
+          // other config options as needed
+        });
+      }else {
         loadEmulator();
-      }, 200);
+      }
     }
   }
 );
@@ -53,7 +57,7 @@ onMounted(() => {
 
   // 监听全屏变化事件
 });
-console.log(freelogApp.getStaticPath("/emulator/"),9999)
+console.log(freelogApp.getStaticPath("/emulator/"), 9999);
 const loadEmulator = async () => {
   if (!urlValue.value) return;
   emulator.value = await runGame({

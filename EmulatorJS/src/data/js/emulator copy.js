@@ -6759,9 +6759,9 @@ class EmulatorJS {
         console.log("Emulator state reset");
     }
 
-  
     
 
+   
     /**
      * Enhanced screen recording method
      */

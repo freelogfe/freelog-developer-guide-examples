@@ -1,3 +1,11 @@
+import EmulatorJS from './emulator.js';
+
+// 将 EmulatorJS 挂载到全局对象上
+window.EmulatorJS = EmulatorJS;
+
+// 如果在模块环境中，也导出 EmulatorJS
+export default EmulatorJS;
+
 import loadEmulator from './loader.js';
 
 

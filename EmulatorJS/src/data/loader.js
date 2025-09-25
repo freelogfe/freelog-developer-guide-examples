@@ -4,7 +4,7 @@
  */
 
 // 静态导入所有模块
-import './js/emulator.js';
+import './js/files/emulator.js';
 import './js/GameManager.js';
 import './js/compression.js';
 import './js/gamepad.js';
@@ -92,7 +92,7 @@ export async function loadEmulator() {
         }
     }
 
-    window.EJS_emulator = new EmulatorJS(EJS_player, config);
+    window.EJS_emulator = new window.EmulatorJS(window.EJS_player, config);
     window.EJS_adBlocked = (url, del) => window.EJS_emulator.adBlocked(url, del);
     if (typeof window.EJS_ready === "function") {
         window.EJS_emulator.on("ready", window.EJS_ready);
