@@ -4,7 +4,7 @@
  */
 
 // 静态导入所有模块
-import EmulatorJS from './js/emulator.js';
+import EmulatorJS from './js/emulator/index.js';
 import './js/GameManager.js';
 import './js/compression.js';
 import './js/gamepad.js';
@@ -69,28 +69,9 @@ export async function loadEmulator() {
     config.hideSettings = window.EJS_hideSettings;
     config.shaders = Object.assign({}, window.EJS_SHADERS, window.EJS_shaders ? window.EJS_shaders : {});
 
-    let systemLang;
-    try {
-        systemLang = Intl.DateTimeFormat().resolvedOptions().locale;
-    } catch (e) { } //Ignore
-    if ((typeof window.EJS_language === "string" && window.EJS_language !== "en-US") || (systemLang && window.EJS_disableAutoLang !== false)) {
-        const language = window.EJS_language || systemLang;
-        try {
-            let path;
-            console.log("Loading language", language);
-            if ("undefined" != typeof EJS_paths && typeof EJS_paths[language] === "string") {
-                path = EJS_paths[language];
-            } else {
-                path = scriptPath + "localization/" + language + ".json";
-            }
-            config.language = language;
-            config.langJson = JSON.parse(await (await fetch(path)).text());
-        } catch (e) {
-            console.log("Missing language", language, "!!");
-            delete config.language;
-            delete config.langJson;
-        }
-    }
+    console.log('[EmulatorJS] 模块导入成功:', {
+        EmulatorJS_version: EmulatorJS.create ? '可用' : '不可用'
+    });
 
     window.EJS_emulator = EmulatorJS.create({...config, element: window.EJS_player});
     window.EJS_adBlocked = (url, del) => window.EJS_emulator.adBlocked(url, del);
@@ -111,6 +92,21 @@ export async function loadEmulator() {
     }
     if (typeof window.EJS_onSaveSave === "function") {
         window.EJS_emulator.on("saveSave", window.EJS_onSaveSave);
+    }
+    
+    // 如果设置了自动开始游戏，则触发启动按钮点击
+    if (window.EJS_startOnLoaded) {
+        setTimeout(() => {
+            const startButton = document.querySelector('.ejs_start_button');
+            if (startButton) {
+                startButton.click();
+            } else {
+                console.log('[EmulatorJS] 自动开始游戏: 未找到启动按钮，尝试直接调用startButtonClicked');
+                if (window.EJS_emulator && typeof window.EJS_emulator.startButtonClicked === 'function') {
+                    window.EJS_emulator.startButtonClicked();
+                }
+            }
+        }, 100);
     }
 }
 

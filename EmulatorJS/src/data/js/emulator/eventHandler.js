@@ -1,318 +1,647 @@
-﻿/**
- * EmulatorJS - Event Handler Module
- * This module provides functions for handling events in the EmulatorJS
- */
+﻿// Event handling functions
 
-import { addEventListener, removeEventListener } from './utils.js';
-import { createText } from './ui.js';
-import { downloadGameCore } from './fileDownloader.js';
-
-// 初始化事件系统
-export function initEventSystem(emulatorState) {
-  // 初始化事件监听器存储
-  emulatorState.eventListeners = {};
-}
-
-// 绑定事件监听器
-export function bindListeners(emulatorState, localization) {
-  // 创建各种菜单和控制器
-  createContextMenu(emulatorState);
-  createBottomMenuBar(emulatorState);
-  createControlSettingMenu(emulatorState);
-  createCheatsMenu(emulatorState);
-  createNetplayMenu(emulatorState);
-  setVirtualGamepad(emulatorState);
-  
-  // 键盘事件
-  addEventListener(emulatorState.elements.parent, "keydown keyup", function(e) {
-    keyChange(emulatorState, e);
-  });
-  
-  // 鼠标/触摸事件
-  addEventListener(emulatorState.elements.parent, "mousedown touchstart", (e) => {
-    if (document.activeElement !== emulatorState.elements.parent && emulatorState.config.noAutoFocus !== true) {
-      emulatorState.elements.parent.focus();
-    }
-  });
-  
-  // 窗口大小调整事件
-  addEventListener(window, "resize", function() {
-    handleResize(emulatorState);
-  });
-  
-  // 全屏切换事件
-  addEventListener(window, "webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange", () => {
-    setTimeout(() => {
-      handleResize(emulatorState);
-      if (emulatorState.config.noAutoFocus !== true) {
-        emulatorState.elements.parent.focus();
-      }
-    }, 0);
-  });
-  
-  // 窗口卸载事件
-  addEventListener(window, "beforeunload", (e) => {
-    if (!emulatorState.started) return;
-    callEvent(emulatorState, "exit");
-  });
-  
-  // 拖拽事件处理
-  setupDragAndDrop(emulatorState, localization);
-  
-  // 游戏手柄处理
-  setupGamepadHandler(emulatorState);
-}
-
-// 设置拖拽和放置功能
-function setupDragAndDrop(emulatorState, localization) {
-  let counter = 0;
-  
-  emulatorState.elements.statePopupPanel = createPopup(emulatorState, "", {}, true);
-  emulatorState.elements.statePopupPanel.innerText = localization("Drop save state here to load");
-  emulatorState.elements.statePopupPanel.style["text-align"] = "center";
-  emulatorState.elements.statePopupPanel.style["font-size"] = "28px";
-  
-  addEventListener(emulatorState.elements.parent, "dragenter", (e) => {
-    e.preventDefault();
-    if (!emulatorState.started) return;
-    counter++;
-    emulatorState.elements.statePopupPanel.parentElement.style.display = "block";
-  });
-  
-  addEventListener(emulatorState.elements.parent, "dragover", (e) => {
-    e.preventDefault();
-  });
-  
-  addEventListener(emulatorState.elements.parent, "dragleave", (e) => {
-    e.preventDefault();
-    if (!emulatorState.started) return;
-    counter--;
-    if (counter === 0) {
-      emulatorState.elements.statePopupPanel.parentElement.style.display = "none";
-    }
-  });
-  
-  addEventListener(emulatorState.elements.parent, "dragend", (e) => {
-    e.preventDefault();
-    if (!emulatorState.started) return;
-    counter = 0;
-    emulatorState.elements.statePopupPanel.parentElement.style.display = "none";
-  });
-  
-  addEventListener(emulatorState.elements.parent, "drop", (e) => {
-    e.preventDefault();
-    if (!emulatorState.started) return;
-    emulatorState.elements.statePopupPanel.parentElement.style.display = "none";
-    counter = 0;
-    
-    const items = e.dataTransfer.items;
-    let file;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].kind !== "file") continue;
-      file = items[i];
-      break;
-    }
-    
-    if (!file) return;
-    
-    const fileHandle = file.getAsFile();
-    fileHandle.arrayBuffer().then(data => {
-      if (emulatorState.gameManager && emulatorState.gameManager.loadState) {
-        emulatorState.gameManager.loadState(new Uint8Array(data));
-      }
+// Bind all event listeners
+function bindListeners() {
+    // Window events
+    this.addEventListener(window, "resize", () => this.handleResize());
+    this.addEventListener(window, "focus", () => {
+        this.hasFocus = true;
+        this.focusChanged = true;
     });
-  });
-}
-
-// 设置游戏手柄处理器
-function setupGamepadHandler(emulatorState) {
-  emulatorState.gamepad = new GamepadHandler(); // https://github.com/ethanaobrien/Gamepad
-  
-  emulatorState.gamepad.on("connected", (e) => {
-    if (!emulatorState.gamepadLabels) return;
+    this.addEventListener(window, "blur", () => {
+        this.hasFocus = false;
+        this.focusChanged = true;
+        if (this.config.pauseOnBlur) {
+            this.togglePause();
+        }
+    });
     
-    for (let i = 0; i < emulatorState.gamepadSelection.length; i++) {
-      if (emulatorState.gamepadSelection[i] === "") {
-        emulatorState.gamepadSelection[i] = emulatorState.gamepad.gamepads[e.gamepadIndex].id + "_" + emulatorState.gamepad.gamepads[e.gamepadIndex].index;
-        break;
-      }
+    // Game element events
+    this.addEventListener(this.game, "keydown", (e) => this.handleKeyDown(e));
+    this.addEventListener(this.game, "keyup", (e) => this.handleKeyUp(e));
+    this.addEventListener(this.game, "mousedown", (e) => this.handleMouseDown(e));
+    this.addEventListener(this.game, "mouseup", (e) => this.handleMouseUp(e));
+    this.addEventListener(this.game, "mousemove", (e) => this.handleMouseMove(e));
+    this.addEventListener(this.game, "wheel", (e) => this.handleMouseWheel(e));
+    this.addEventListener(this.game, "contextmenu", (e) => this.handleContextMenu(e));
+    
+    // Touch events
+    if (this.hasTouchScreen) {
+        this.addEventListener(this.game, "touchstart", (e) => this.handleTouchStart(e));
+        this.addEventListener(this.game, "touchend", (e) => this.handleTouchEnd(e));
+        this.addEventListener(this.game, "touchmove", (e) => this.handleTouchMove(e));
     }
     
-    if (emulatorState.updateGamepadLabels) {
-      emulatorState.updateGamepadLabels();
-    }
-  });
-  
-  emulatorState.gamepad.on("disconnected", (e) => {
-    const gamepadIndex = emulatorState.gamepad.gamepads.indexOf(emulatorState.gamepad.gamepads.find(f => f.index == e.gamepadIndex));
-    const gamepadSelection = emulatorState.gamepad.gamepads[gamepadIndex].id + "_" + emulatorState.gamepad.gamepads[gamepadIndex].index;
+    // Gamepad events
+    this.addEventListener(window, "gamepadconnected", (e) => this.handleGamepadConnect(e));
+    this.addEventListener(window, "gamepaddisconnected", (e) => this.handleGamepadDisconnect(e));
     
-    for (let i = 0; i < emulatorState.gamepadSelection.length; i++) {
-      if (emulatorState.gamepadSelection[i] === gamepadSelection) {
-        emulatorState.gamepadSelection[i] = "";
-      }
+    // Fullscreen events
+    this.addEventListener(document, "fullscreenchange", () => this.handleFullscreenChange());
+    this.addEventListener(document, "webkitfullscreenchange", () => this.handleFullscreenChange());
+    this.addEventListener(document, "mozfullscreenchange", () => this.handleFullscreenChange());
+    this.addEventListener(document, "MSFullscreenChange", () => this.handleFullscreenChange());
+    
+    // Drag and drop events
+    this.addEventListener(this.game, "dragover", (e) => this.handleDragOver(e));
+    this.addEventListener(this.game, "drop", (e) => this.handleDrop(e));
+    
+    // Set up gamepad polling
+    this.pollGamepads();
+}
+
+// Handle window resize
+function handleResize() {
+    const now = Date.now();
+    if (now - this.lastResize < 200) {
+        clearTimeout(this.resizeTimeout);
     }
     
-    setTimeout(() => {
-      if (emulatorState.updateGamepadLabels) {
-        emulatorState.updateGamepadLabels();
-      }
-    }, 10);
-  });
-  
-  emulatorState.gamepad.on("axischanged", function(e) {
-    gamepadEvent(emulatorState, e);
-  });
-  
-  emulatorState.gamepad.on("buttondown", function(e) {
-    gamepadEvent(emulatorState, e);
-  });
-  
-  emulatorState.gamepad.on("buttonup", function(e) {
-    gamepadEvent(emulatorState, e);
-  });
+    this.resizeTimeout = setTimeout(() => {
+        this.lastResize = now;
+        
+        // Get game container dimensions
+        const gameRect = this.game.getBoundingClientRect();
+        const width = gameRect.width;
+        const height = gameRect.height;
+        
+        // Adjust canvas size
+        if (this.canvas) {
+            const canvasRatio = this.canvas.width / this.canvas.height;
+            const gameRatio = width / height;
+            
+            let newWidth, newHeight;
+            
+            if (gameRatio > canvasRatio) {
+                // Fit height
+                newHeight = height;
+                newWidth = height * canvasRatio;
+            } else {
+                // Fit width
+                newWidth = width;
+                newHeight = width / canvasRatio;
+            }
+            
+            // Apply rotation if needed
+            if (this.videoRotation === 1 || this.videoRotation === 3) {
+                [newWidth, newHeight] = [newHeight, newWidth];
+            }
+            
+            this.canvas.style.width = newWidth + "px";
+            this.canvas.style.height = newHeight + "px";
+        }
+        
+        // Adjust UI elements
+        this.adjustUIElements();
+        
+    }, 200);
 }
 
-// 键盘事件处理
-function keyChange(emulatorState, e) {
-  // 键盘事件处理逻辑
-  // 这里简化处理，实际应该根据键盘按键映射到游戏控制器
+// Handle key down event
+function handleKeyDown(e) {
+    if (!this.hasKeyboardFocus && !this.config.allowKeyboardShortcuts) {
+        return;
+    }
+    
+    // Prevent default behavior for certain keys
+    const preventDefaultKeys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter", "Space", "Escape"];
+    if (preventDefaultKeys.includes(e.key)) {
+        e.preventDefault();
+    }
+    
+    // Handle key bindings
+    const key = e.key.toLowerCase();
+    this.keyboard[key] = true;
+    
+    // Map keys to controls
+    this.mapKeysToControls();
+    
+    // Handle special keys
+    if (key === "escape") {
+        this.toggleMenu();
+    } else if (key === "f11") {
+        this.toggleFullscreen();
+    } else if (key === "p" && e.ctrlKey) {
+        this.togglePause();
+    }
 }
 
-// 游戏手柄事件处理
-function gamepadEvent(emulatorState, e) {
-  // 游戏手柄事件处理逻辑
-  // 这里简化处理，实际应该根据游戏手柄输入映射到游戏控制器
+// Handle key up event
+function handleKeyUp(e) {
+    const key = e.key.toLowerCase();
+    this.keyboard[key] = false;
+    
+    // Map keys to controls
+    this.mapKeysToControls();
 }
 
-// 开始按钮点击处理
-export function startButtonClicked(emulatorState, e, localization) {
-  callEvent(emulatorState, "start-clicked");
-  
-  if (e.pointerType === "touch") {
-    emulatorState.touch = true;
-  }
-  
-  if (e.preventDefault) {
+// Map keys to controls
+function mapKeysToControls() {
+    // This function would map keyboard state to game controls
+    // Implementation depends on the specific key bindings
+}
+
+// Handle mouse down event
+function handleMouseDown(e) {
+    if (!this.hasFocus) return;
+    
     e.preventDefault();
-    if (e.target) e.target.remove();
-  } else if (e.remove) {
-    e.remove();
-  }
-  
-  createText(emulatorState, localization);
-  downloadGameCore(emulatorState, emulatorState.textElem, localization);
+    
+    const rect = this.game.getBoundingClientRect();
+    this.mouse.x = e.clientX - rect.left;
+    this.mouse.y = e.clientY - rect.top;
+    this.mouse.pressed = true;
+    
+    // Handle mouse button pressed
+    this.mouse_buttons[e.button] = true;
+    
+    // Handle left click
+    if (e.button === 0) {
+        // Left mouse button
+    } else if (e.button === 2) {
+        // Right mouse button
+    }
 }
 
-// 调用事件
-export function callEvent(emulatorState, event, data) {
-  if (!emulatorState.eventListeners || !Array.isArray(emulatorState.eventListeners[event])) {
-    return 0;
-  }
-  
-  emulatorState.eventListeners[event].forEach(callback => callback(data));
-  return emulatorState.eventListeners[event].length;
+// Handle mouse up event
+function handleMouseUp(e) {
+    if (!this.hasFocus) return;
+    
+    e.preventDefault();
+    
+    const rect = this.game.getBoundingClientRect();
+    this.mouse.x = e.clientX - rect.left;
+    this.mouse.y = e.clientY - rect.top;
+    this.mouse.pressed = false;
+    
+    // Handle mouse button released
+    this.mouse_buttons[e.button] = false;
 }
 
-// 添加事件监听
-export function on(emulatorState, event, func) {
-  if (!emulatorState.eventListeners) {
-    emulatorState.eventListeners = {};
-  }
-  
-  if (!Array.isArray(emulatorState.eventListeners[event])) {
-    emulatorState.eventListeners[event] = [];
-  }
-  
-  emulatorState.eventListeners[event].push(func);
+// Handle mouse move event
+function handleMouseMove(e) {
+    if (!this.hasFocus) return;
+    
+    const rect = this.game.getBoundingClientRect();
+    this.mouse.x = e.clientX - rect.left;
+    this.mouse.y = e.clientY - rect.top;
 }
 
-// 创建上下文菜单
-function createContextMenu(emulatorState) {
-  // 创建上下文菜单的逻辑
-  emulatorState.elements = emulatorState.elements || {};
-  emulatorState.elements.contextMenu = emulatorState.elements.contextMenu || {};
+// Handle mouse wheel event
+function handleMouseWheel(e) {
+    if (!this.hasFocus) return;
+    
+    e.preventDefault();
+    this.mouse.wheel = e.deltaY;
+    
+    // Handle zoom or volume control with mouse wheel
+    if (e.ctrlKey) {
+        // Zoom
+    } else {
+        // Volume
+        if (e.deltaY > 0) {
+            this.volumeDown();
+        } else {
+            this.volumeUp();
+        }
+    }
 }
 
-// 创建底部菜单栏
-function createBottomMenuBar(emulatorState) {
-  // 创建底部菜单栏的逻辑
-  emulatorState.elements = emulatorState.elements || {};
-  emulatorState.elements.bottomBar = emulatorState.elements.bottomBar || {};
+// Handle context menu event
+function handleContextMenu(e) {
+    if (!this.hasFocus) return;
+    
+    e.preventDefault();
+    
+    // Show context menu
+    this.createContextMenu();
 }
 
-// 创建控制设置菜单
-function createControlSettingMenu(emulatorState) {
-  // 创建控制设置菜单的逻辑
+// Handle touch start event
+function handleTouchStart(e) {
+    if (!this.hasFocus) return;
+    
+    e.preventDefault();
+    
+    const rect = this.game.getBoundingClientRect();
+    const touches = e.touches;
+    
+    for (let i = 0; i < touches.length; i++) {
+        const touch = touches[i];
+        const touchX = touch.clientX - rect.left;
+        const touchY = touch.clientY - rect.top;
+        
+        // Create touch event
+        this.touchEvents.push({
+            id: touch.identifier,
+            x: touchX,
+            y: touchY,
+            startTime: Date.now()
+        });
+    }
 }
 
-// 创建作弊菜单
-function createCheatsMenu(emulatorState) {
-  // 创建作弊菜单的逻辑
+// Handle touch end event
+function handleTouchEnd(e) {
+    if (!this.hasFocus) return;
+    
+    e.preventDefault();
+    
+    const touches = e.changedTouches;
+    
+    for (let i = 0; i < touches.length; i++) {
+        const touch = touches[i];
+        
+        // Remove touch event
+        this.touchEvents = this.touchEvents.filter(t => t.id !== touch.identifier);
+    }
 }
 
-// 创建网络对战菜单
-function createNetplayMenu(emulatorState) {
-  // 创建网络对战菜单的逻辑
+// Handle touch move event
+function handleTouchMove(e) {
+    if (!this.hasFocus) return;
+    
+    e.preventDefault();
+    
+    const rect = this.game.getBoundingClientRect();
+    const touches = e.changedTouches;
+    
+    for (let i = 0; i < touches.length; i++) {
+        const touch = touches[i];
+        const touchX = touch.clientX - rect.left;
+        const touchY = touch.clientY - rect.top;
+        
+        // Update touch event
+        for (let j = 0; j < this.touchEvents.length; j++) {
+            if (this.touchEvents[j].id === touch.identifier) {
+                this.touchEvents[j].x = touchX;
+                this.touchEvents[j].y = touchY;
+                break;
+            }
+        }
+    }
 }
 
-// 设置虚拟游戏手柄
-function setVirtualGamepad(emulatorState) {
-  // 设置虚拟游戏手柄的逻辑
-  emulatorState.virtualGamepad = emulatorState.virtualGamepad || document.createElement('div');
-  emulatorState.virtualGamepad.style.display = 'none';
-  if (emulatorState.elements && emulatorState.elements.parent) {
-    emulatorState.elements.parent.appendChild(emulatorState.virtualGamepad);
-  }
+// Handle gamepad connect event
+function handleGamepadConnect(e) {
+    console.log("Gamepad connected:", e.gamepad);
+    this.gamepad = e.gamepad;
 }
 
-// 创建弹出窗口
-function createPopup(emulatorState, title, content, modal = false) {
-  // 创建弹出窗口的逻辑
-  const popup = document.createElement('div');
-  popup.classList.add('ejs_popup');
-  
-  const popupContent = document.createElement('div');
-  popupContent.classList.add('ejs_popup_content');
-  
-  if (title) {
-    const popupTitle = document.createElement('div');
-    popupTitle.classList.add('ejs_popup_title');
-    popupTitle.innerText = title;
-    popupContent.appendChild(popupTitle);
-  }
-  
-  for (let i in content) {
-    popupContent.appendChild(content[i]);
-  }
-  
-  popup.appendChild(popupContent);
-  
-  if (modal) {
-    popup.classList.add('ejs_popup_modal');
-  }
-  
-  if (emulatorState.elements && emulatorState.elements.parent) {
-    emulatorState.elements.parent.appendChild(popup);
-  }
-  
-  return popupContent;
+// Handle gamepad disconnect event
+function handleGamepadDisconnect(e) {
+    console.log("Gamepad disconnected:", e.gamepad);
+    if (this.gamepad && this.gamepad.index === e.gamepad.index) {
+        this.gamepad = null;
+    }
 }
 
-// 关闭弹出窗口
-export function closePopup(emulatorState) {
-  // 关闭弹出窗口的逻辑
-  const popup = emulatorState.elements.parent.querySelector('.ejs_popup');
-  if (popup) {
-    popup.remove();
-  }
+// Poll gamepads
+function pollGamepads() {
+    if (!navigator.getGamepads) return;
+    
+    const gamepads = navigator.getGamepads();
+    
+    for (let i = 0; i < gamepads.length; i++) {
+        const gamepad = gamepads[i];
+        if (gamepad) {
+            this.gamepad = gamepad;
+            this.updateGamepadState(gamepad);
+            break;
+        }
+    }
+    
+    // Continue polling
+    requestAnimationFrame(() => this.pollGamepads());
 }
 
-// 处理窗口大小调整
-export function handleResize(emulatorState) {
-  // 处理窗口大小调整的逻辑
-  // 这里简化处理，实际应该根据容器大小调整游戏画布大小
-  if (emulatorState.canvas) {
-    // 调整画布大小
-  }
+// Update gamepad state
+function updateGamepadState(gamepad) {
+    if (!gamepad) return;
+    
+    // Update button states
+    for (let i = 0; i < gamepad.buttons.length; i++) {
+        const button = gamepad.buttons[i];
+        const pressed = button.pressed || button.value > this.axisThreshold;
+        
+        if (this.gamepadButtons[i] !== pressed) {
+            this.gamepadButtons[i] = pressed;
+            this.mapGamepadButtonsToControls();
+        }
+    }
+    
+    // Update analog stick states
+    for (let i = 0; i < gamepad.axes.length; i++) {
+        const value = gamepad.axes[i];
+        
+        if (Math.abs(this.gamepadAnalog[i] - value) > 0.01) {
+            this.gamepadAnalog[i] = value;
+            this.mapGamepadAxesToControls();
+        }
+    }
+}
+
+// Map gamepad buttons to controls
+function mapGamepadButtonsToControls() {
+    // This function would map gamepad button states to game controls
+    // Implementation depends on the specific gamepad mappings
+}
+
+// Map gamepad axes to controls
+function mapGamepadAxesToControls() {
+    // This function would map gamepad analog stick states to game controls
+    // Implementation depends on the specific gamepad mappings
+}
+
+// Update gamepad labels
+function updateGamepadLabels() {
+    // This function would update gamepad button labels based on the detected gamepad
+    // Implementation would use the Gamepad API's mapping property
+}
+
+// Handle fullscreen change event
+function handleFullscreenChange() {
+    const isFullscreen = document.fullscreenElement || 
+                        document.webkitFullscreenElement || 
+                        document.mozFullScreenElement || 
+                        document.msFullscreenElement;
+    
+    this.fullscreen = !!isFullscreen;
+    
+    if (this.fullscreen) {
+        // Entered fullscreen
+        this.game.classList.add("ejs_fullscreen");
+    } else {
+        // Exited fullscreen
+        this.game.classList.remove("ejs_fullscreen");
+    }
+    
+    // Trigger resize to adjust elements
+    this.handleResize();
+}
+
+// Toggle fullscreen
+function toggleFullscreen() {
+    if (!this.fullscreen) {
+        // Request fullscreen
+        if (this.game.requestFullscreen) {
+            this.game.requestFullscreen();
+        } else if (this.game.webkitRequestFullscreen) {
+            this.game.webkitRequestFullscreen();
+        } else if (this.game.mozRequestFullScreen) {
+            this.game.mozRequestFullScreen();
+        } else if (this.game.msRequestFullscreen) {
+            this.game.msRequestFullscreen();
+        }
+    } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+}
+
+// Handle drag over event
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+}
+
+// Handle drop event
+function handleDrop(e) {
+    e.preventDefault();
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        const file = files[0];
+        this.loadDroppedFile(file);
+    }
+}
+
+// Load dropped file
+function loadDroppedFile(file) {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+        const fileData = e.target.result;
+        
+        // Check file type and handle accordingly
+        if (file.name.endsWith(".rom") || 
+            file.name.endsWith(".iso") || 
+            file.name.endsWith(".bin") || 
+            file.name.endsWith(".cue") || 
+            file.name.endsWith(".zip") || 
+            file.name.endsWith(".7z")) {
+            // Game file
+            this.gameData = fileData;
+            this.romName = file.name.split('.').slice(0, -1).join('.');
+            this.romExtension = file.name.split('.').pop().toLowerCase();
+            
+            // Restart game with new file
+            this.restart();
+        } else if (file.name.toLowerCase().includes("bios")) {
+            // BIOS file
+            this.biosData = fileData;
+            this.displayMessage("BIOS loaded successfully");
+        }
+    };
+    
+    reader.readAsArrayBuffer(file);
+}
+
+// Toggle pause
+function togglePause() {
+    if (!this.started) return;
+    
+    this.paused = !this.paused;
+    
+    if (this.paused) {
+        // Pause game
+        if (this.Module && this.Module.pause) {
+            this.Module.pause();
+        }
+        this.displayMessage("Game Paused");
+    } else {
+        // Resume game
+        if (this.Module && this.Module.resume) {
+            this.Module.resume();
+        }
+        this.displayMessage("Game Resumed");
+    }
+}
+
+// Toggle fast forward
+function toggleFastForward() {
+    if (!this.started) return;
+    
+    this.isFastForward = !this.isFastForward;
+    
+    if (this.isFastForward) {
+        // Enable fast forward
+        if (this.Module && this.Module.setSpeed) {
+            this.Module.setSpeed(2.0);
+        }
+        this.displayMessage("Fast Forward: On");
+    } else {
+        // Disable fast forward
+        if (this.Module && this.Module.setSpeed) {
+            this.Module.setSpeed(1.0);
+        }
+        this.displayMessage("Fast Forward: Off");
+    }
+}
+
+// Toggle slow motion
+function toggleSlowMotion() {
+    if (!this.started) return;
+    
+    this.isSlowMotion = !this.isSlowMotion;
+    
+    if (this.isSlowMotion) {
+        // Enable slow motion
+        if (this.Module && this.Module.setSpeed) {
+            this.Module.setSpeed(0.5);
+        }
+        this.displayMessage("Slow Motion: On");
+    } else {
+        // Disable slow motion
+        if (this.Module && this.Module.setSpeed) {
+            this.Module.setSpeed(1.0);
+        }
+        this.displayMessage("Slow Motion: Off");
+    }
+}
+
+// Toggle mute
+function toggleMute() {
+    if (!this.started) return;
+    
+    this.muted = !this.muted;
+    
+    if (this.muted) {
+        // Mute audio
+        if (this.Module && this.Module.setMute) {
+            this.Module.setMute(true);
+        }
+        this.displayMessage("Muted");
+    } else {
+        // Unmute audio
+        if (this.Module && this.Module.setMute) {
+            this.Module.setMute(false);
+        }
+        this.displayMessage("Unmuted");
+    }
+}
+
+// Volume up
+function volumeUp() {
+    if (!this.started) return;
+    
+    this.volume = Math.min(1.0, this.volume + 0.1);
+    
+    if (this.Module && this.Module.setVolume) {
+        this.Module.setVolume(this.volume);
+    }
+    
+    this.displayMessage(`Volume: ${Math.round(this.volume * 100)}%`);
+}
+
+// Volume down
+function volumeDown() {
+    if (!this.started) return;
+    
+    this.volume = Math.max(0.0, this.volume - 0.1);
+    
+    if (this.Module && this.Module.setVolume) {
+        this.Module.setVolume(this.volume);
+    }
+    
+    this.displayMessage(`Volume: ${Math.round(this.volume * 100)}%`);
+}
+
+// Add event listeners to the EmulatorJS prototype
+function setupEventHandlerFunctions() {
+    if (window.EmulatorJS) {
+        // 事件监听器管理
+        EmulatorJS.prototype.on = function(event, callback) {
+            if (!this._events) {
+                this._events = {};
+            }
+            if (!this._events[event]) {
+                this._events[event] = [];
+            }
+            this._events[event].push(callback);
+        };
+        
+        EmulatorJS.prototype.emit = function(event, ...args) {
+            if (!this._events || !this._events[event]) {
+                return;
+            }
+            this._events[event].forEach(callback => {
+                try {
+                    callback.apply(this, args);
+                } catch (e) {
+                    console.error(`Error in event handler for ${event}:`, e);
+                }
+            });
+        };
+        
+        EmulatorJS.prototype.off = function(event, callback) {
+            if (!this._events || !this._events[event]) {
+                return;
+            }
+            if (callback) {
+                this._events[event] = this._events[event].filter(cb => cb !== callback);
+            } else {
+                delete this._events[event];
+            }
+        };
+        
+        // 其他事件处理方法
+        EmulatorJS.prototype.bindListeners = bindListeners;
+        EmulatorJS.prototype.handleResize = handleResize;
+        EmulatorJS.prototype.handleKeyDown = handleKeyDown;
+        EmulatorJS.prototype.handleKeyUp = handleKeyUp;
+        EmulatorJS.prototype.mapKeysToControls = mapKeysToControls;
+        EmulatorJS.prototype.handleMouseDown = handleMouseDown;
+        EmulatorJS.prototype.handleMouseUp = handleMouseUp;
+        EmulatorJS.prototype.handleMouseMove = handleMouseMove;
+        EmulatorJS.prototype.handleMouseWheel = handleMouseWheel;
+        EmulatorJS.prototype.handleContextMenu = handleContextMenu;
+        EmulatorJS.prototype.handleTouchStart = handleTouchStart;
+        EmulatorJS.prototype.handleTouchEnd = handleTouchEnd;
+        EmulatorJS.prototype.handleTouchMove = handleTouchMove;
+        EmulatorJS.prototype.handleGamepadConnect = handleGamepadConnect;
+        EmulatorJS.prototype.handleGamepadDisconnect = handleGamepadDisconnect;
+        EmulatorJS.prototype.pollGamepads = pollGamepads;
+        EmulatorJS.prototype.updateGamepadState = updateGamepadState;
+        EmulatorJS.prototype.mapGamepadButtonsToControls = mapGamepadButtonsToControls;
+        EmulatorJS.prototype.mapGamepadAxesToControls = mapGamepadAxesToControls;
+        EmulatorJS.prototype.updateGamepadLabels = updateGamepadLabels;
+        EmulatorJS.prototype.handleFullscreenChange = handleFullscreenChange;
+        EmulatorJS.prototype.toggleFullscreen = toggleFullscreen;
+        EmulatorJS.prototype.handleDragOver = handleDragOver;
+        EmulatorJS.prototype.handleDrop = handleDrop;
+        EmulatorJS.prototype.loadDroppedFile = loadDroppedFile;
+        EmulatorJS.prototype.togglePause = togglePause;
+        EmulatorJS.prototype.toggleFastForward = toggleFastForward;
+        EmulatorJS.prototype.toggleSlowMotion = toggleSlowMotion;
+        EmulatorJS.prototype.toggleMute = toggleMute;
+        EmulatorJS.prototype.volumeUp = volumeUp;
+        EmulatorJS.prototype.volumeDown = volumeDown;
+    }
+}
+
+// Export functions
+export { setupEventHandlerFunctions };
+
+// Run setup when loaded
+if (typeof window !== 'undefined') {
+    setupEventHandlerFunctions();
 }

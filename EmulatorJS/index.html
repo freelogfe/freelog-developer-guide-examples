@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
   <head>
     <title>EmulatorJS</title>
@@ -286,7 +286,7 @@
           if (initialScreen) {
             initialScreen.remove();
           }
-          gameElement.innerHTML =
+          gameElement.innerHTML = 
             '<div class="loading-message">正在加载游戏...</div>';
 
           // 使用 EmulatorManager 运行游戏
@@ -296,8 +296,16 @@
             gameName: game.name,
             core: game.core,
             pathtodata: "./src/data",
+            corePath: "https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@latest/data/cores/",
             debug: enableDebug,
             threads: enableThreads,
+            onGameStart: function() {
+              // 游戏成功启动后，清除加载消息
+              const loadingMessage = document.querySelector('.loading-message');
+              if (loadingMessage) {
+                loadingMessage.remove();
+              }
+            }
           });
 
           // 成功加载后确保保留Emulator容器

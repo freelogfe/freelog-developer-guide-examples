@@ -1,4 +1,58 @@
-// 工具函数模块
+// 工具函数模块 - 包含通用工具函数
+
+// 注意：这些函数需要绑定到EmulatorJS实例上才能正常工作
+// 它们原本是EmulatorJS类的方法，现在作为独立函数导出
+
+export function isChild(parent, child) {
+    // 检查child是否是parent的子元素
+    let node = child.parentNode;
+    while (node != null) {
+        if (node == parent) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
+
+export function localization(text, log) {
+    if (typeof text === "undefined" || text.length === 0) return;
+    text = text.toString();
+    if (text.includes("EmulatorJS v")) return text;
+    if (this.config.langJson) {
+        if (typeof log === "undefined") log = true;
+        if (!this.config.langJson[text] && log) {
+            if (!this.missingLang.includes(text)) this.missingLang.push(text);
+            console.log(`Translation not found for '${text}'. Language set to '${this.config.language}'`);
+        }
+        return this.config.langJson[text] || text;
+    }
+    return text;
+}
+
+export function createPopup(message, buttons) {
+    // 创建弹出窗口
+    console.log("Create popup");
+    return null;
+}
+
+export function closePopup() {
+    // 关闭弹出窗口
+    console.log("Close popup");
+}
+
+export function callEvent(event, data) {
+    if (!this.functions) this.functions = {};
+    if (!Array.isArray(this.functions[event])) return 0;
+    this.functions[event].forEach(e => e(data));
+    return this.functions[event].length;
+}
+
+export function on(event, func) {
+    if (!this.functions) this.functions = {};
+    if (!Array.isArray(this.functions[event])) this.functions[event] = [];
+    this.functions[event].push(func);
+}
 
 /**
  * 检查核心是否需要线程支持

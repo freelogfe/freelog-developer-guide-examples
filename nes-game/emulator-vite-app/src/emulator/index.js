@@ -1,4 +1,5 @@
-import EmulatorJS from './emulator.js';
+// 从模块目录导入EmulatorJS
+import EmulatorJS from './modules/index.js';
 
 // 将 EmulatorJS 挂载到全局对象上
 window.EmulatorJS = EmulatorJS;
@@ -7,8 +8,6 @@ window.EmulatorJS = EmulatorJS;
 export default EmulatorJS;
 
 import loadEmulator from './loader.js';
-
-
 
 /**
  * 运行游戏的便捷函数
