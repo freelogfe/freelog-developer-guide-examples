@@ -1,233 +1,259 @@
-// EmulatorJS Main Entry Point
-// Import modules
+﻿/**
+ * EmulatorJS 模块入口文件
+ * 整合所有功能模块并提供统一的导出
+ */
 
-// EmulatorJS - Modular Version
-import { getCores, requiresThreads, requiresWebGL2, getCore } from './core.js';
-import { downloadFile, toData } from './file.js';
-import { createElement, addEventListener, removeEventListener } from './dom.js';
-import { versionAsInt, checkForUpdates } from './util.js';
-import { setColor, setupAds, adBlocked } from './ui.js';
-import { initControlVars, buildButtonOptions, preGetSetting, setElements, getLocalStorageKey } from './configManager.js';
+// 导入模块化组件
+import EmulatorCore from './modules/emulatorCore.js';
+import utils from './modules/utils.js';
+import fileDownloader from './modules/fileDownloader.js';
+import ui from './modules/ui.js';
+import eventHandler from './modules/eventHandler.js';
+import storage from './modules/storage.js';
+import gameManager from './modules/gameManager.js';
 
-class EmulatorJS {
-    constructor(element, config) {
-        this.ejs_version = "4.2.3";
-        this.extensions = [];
-        initControlVars(this);
-        this.debug = (window.EJS_DEBUG_XX === true);
-        if (this.debug || (window.location && ["localhost", "127.0.0.1"].includes(location.hostname))) checkForUpdates(this);
-        this.netplayEnabled = (window.EJS_DEBUG_XX === true) && (window.EJS_EXPERIMENTAL_NETPLAY === true);
-        this.config = config;
-        this.config.buttonOpts = buildButtonOptions(this, this.config.buttonOpts);
-        this.config.settingsLanguage = window.EJS_settingsLanguage || false;
-        this.currentPopup = null;
-        this.isFastForward = false;
-        this.isSlowMotion = false;
-        this.failedToStart = false;
-        this.rewindEnabled = preGetSetting(this, "rewindEnabled") === "enabled";
-        this.touch = false;
-        this.cheats = [];
-        this.started = false;
-        this.volume = (typeof this.config.volume === "number") ? this.config.volume : 0.5;
-        if (this.config.defaultControllers) this.defaultControllers = this.config.defaultControllers;
-        this.muted = false;
-        this.paused = true;
-        this.missingLang = [];
-        setElements(this, element);
-        setColor(this, this.config.color || "");
-        this.config.alignStartButton = (typeof this.config.alignStartButton === "string") ? this.config.alignStartButton : "bottom";
-        this.config.backgroundColor = (typeof this.config.backgroundColor === "string") ? this.config.backgroundColor : "rgb(51, 51, 51)";
-        if (this.config.adUrl) {
-            this.config.adSize = (Array.isArray(this.config.adSize)) ? this.config.adSize : ["300px", "250px"];
-            setupAds(this, this.config.adUrl, this.config.adSize[0], this.config.adSize[1]);
-        }
-        this.isMobile = (function () {
-            let check = false;
-            (function (a) { if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true; })(navigator.userAgent || navigator.vendor || window.opera);
-            return check;
-        })();
-        this.hasTouchScreen = (function () {
-            if (window.PointerEvent && ("maxTouchPoints" in navigator)) {
-                if (navigator.maxTouchPoints > 0) {
-                    return true;
+// 创建一个主模块对象，包含所有子模块
+const EmulatorJS = {
+    // 核心模块
+    Core: EmulatorCore,
+    
+    // 工具模块
+    utils,
+    fileDownloader,
+    ui,
+    eventHandler,
+    storage,
+    gameManager,
+    
+    // 版本信息
+    version: '3.0.0',
+    
+    // 创建完整的模拟器实例
+    create(options = {}) {
+        // 创建核心实例
+        const core = new EmulatorCore(options.element || document.body, options);
+        
+        // 创建一个整合了所有功能的主对象
+        const emulator = {
+            // 核心功能
+            loadROM: (...args) => core.loadROM(...args),
+            run: (...args) => core.run(...args),
+            pause: (...args) => core.pause(...args),
+            resume: (...args) => core.resume(...args),
+            reset: (...args) => core.reset(...args),
+            close: (...args) => core.close(...args),
+            stopGame: (...args) => core.stopGame(...args),
+            
+            // 状态管理
+            saveState: (...args) => core.saveState(...args),
+            loadState: (...args) => core.loadState(...args),
+            
+            // 作弊码
+            addCheat: (...args) => core.addCheat(...args),
+            toggleCheat: (...args) => core.toggleCheat(...args),
+            removeCheat: (...args) => core.removeCheat(...args),
+            
+            // 媒体功能
+            takeScreenshot: (...args) => core.takeScreenshot(...args),
+            
+            // 设置
+            getSettings: (...args) => core.getSettings(...args),
+            setSettings: (...args) => core.setSettings(...args),
+            
+            // 状态查询
+            getState: (...args) => core.getState(...args),
+            
+            // 事件处理
+            on: (...args) => core.on(...args),
+            off: (...args) => core.off(...args),
+            callEvent: (...args) => core.callEvent(...args),
+            
+            // UI交互
+            showMenu: (...args) => core.showMenu(...args),
+            hideMenu: (...args) => core.hideMenu(...args),
+            toggleFullscreen: (...args) => core.toggleFullscreen(...args),
+            
+            // 存储
+            loadSavedData: (...args) => core.loadSavedData(...args),
+            saveGameState: (...args) => core.saveGameState(...args),
+            
+            // 特殊功能
+            startButtonClicked: (...args) => core.startButtonClicked(...args),
+            adBlocked: (...args) => core.adBlocked(...args),
+            
+            // 销毁
+            destroy: () => core.destroy(),
+            
+            // 原始核心引用
+            core,
+            
+            // 版本信息
+            version: EmulatorJS.version
+        };
+        
+        return emulator;
+    },
+    
+    // 工具函数
+    utils: {
+        // 生成唯一ID
+        generateId(length = 8) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        },
+        
+        // 深拷贝对象
+        deepClone(obj) {
+            if (obj === null || typeof obj !== 'object') {
+                return obj;
+            }
+            
+            if (obj instanceof Date) {
+                return new Date(obj.getTime());
+            }
+            
+            if (obj instanceof Array) {
+                return obj.map(item => this.deepClone(item));
+            }
+            
+            if (typeof obj === 'object') {
+                const clonedObj = {};
+                for (const key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        clonedObj[key] = this.deepClone(obj[key]);
+                    }
                 }
-            } else {
-                if (window.matchMedia && window.matchMedia("(any-pointer:coarse)").matches) {
-                    return true;
-                } else if (window.TouchEvent || ("ontouchstart" in window)) {
-                    return true;
-                }
+                return clonedObj;
             }
-            return false;
-        })();
-        this.canvas = createElement(this, "canvas");
-        this.canvas.classList.add("ejs_canvas");
-        this.videoRotation = ([0, 1, 2, 3].includes(this.config.videoRotation)) ? this.config.videoRotation : preGetSetting(this, "videoRotation") || 0;
-        this.videoRotationChanged = false;
-        this.capture = this.capture || {};
-        this.capture.photo = this.capture.photo || {};
-        this.capture.photo.source = ["canvas", "retroarch"].includes(this.capture.photo.source) ? this.capture.photo.source : "canvas";
-        this.capture.photo.format = (typeof this.capture.photo.format === "string") ? this.capture.photo.format : "png";
-        this.capture.photo.upscale = (typeof this.capture.photo.upscale === "number") ? this.capture.photo.upscale : 1;
-        this.capture.video = this.capture.video || {};
-        this.capture.video.format = (typeof this.capture.video.format === "string") ? this.capture.video.format : "detect";
-        this.capture.video.upscale = (typeof this.capture.video.upscale === "number") ? this.capture.video.upscale : 1;
-        this.capture.video.fps = (typeof this.capture.video.fps === "number") ? this.capture.video.fps : 30;
-        this.capture.video.videoBitrate = (typeof this.capture.video.videoBitrate === "number") ? this.capture.video.videoBitrate : 2.5 * 1024 * 1024;
-        this.capture.video.audioBitrate = (typeof this.capture.video.audioBitrate === "number") ? this.capture.video.audioBitrate : 192 * 1024;
-        this.bindListeners();
-        this.config.netplayUrl = this.config.netplayUrl || "https://netplay.emulatorjs.org";
-        this.fullscreen = false;
-        this.enableMouseLock = false;
-        this.supportsWebgl2 = !!document.createElement("canvas").getContext("webgl2") && (this.config.forceLegacyCores !== true);
-        this.webgl2Enabled = (() => {
-            let setting = preGetSetting(this, "webgl2Enabled");
-            if (setting === "disabled" || !this.supportsWebgl2) {
-                return false;
-            } else if (setting === "enabled") {
-                return true;
-            }
-            return null;
-        })();
-        this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        if (this.config.disableDatabases) {
-            this.storage = {
-                rom: new window.EJS_DUMMYSTORAGE(),
-                bios: new window.EJS_DUMMYSTORAGE(),
-                core: new window.EJS_DUMMYSTORAGE()
-            }
-        } else {
-            this.storage = {
-                rom: new window.EJS_STORAGE("EmulatorJS-roms", "rom"),
-                bios: new window.EJS_STORAGE("EmulatorJS-bios", "bios"),
-                core: new window.EJS_STORAGE("EmulatorJS-core", "core")
-            }
+        },
+        
+        // 检测浏览器支持
+        checkSupport() {
+            const support = {
+                canvas: !!document.createElement('canvas').getContext('2d'),
+                webgl: !!document.createElement('canvas').getContext('webgl'),
+                webaudio: !!window.AudioContext || !!window.webkitAudioContext,
+                mediaRecorder: typeof MediaRecorder !== 'undefined',
+                gamepad: !!navigator.getGamepads,
+                typedArrays: typeof ArrayBuffer !== 'undefined',
+                requestAnimationFrame: typeof requestAnimationFrame !== 'undefined'
+            };
+            
+            return support;
+        },
+        
+        // 加载脚本
+        loadScript(url) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        },
+        
+        // 加载样式
+        loadStyle(url) {
+            return new Promise((resolve, reject) => {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = url;
+                link.onload = resolve;
+                link.onerror = reject;
+                document.head.appendChild(link);
+            });
         }
-        // This is not cache. This is save data
-        this.storage.states = new window.EJS_STORAGE("EmulatorJS-states", "states");
-
-        this.game.classList.add("ejs_game");
-        if (typeof this.config.backgroundImg === "string") {
-            this.game.classList.add("ejs_game_background");
-            if (this.config.backgroundBlur) this.game.classList.add("ejs_game_background_blur");
-            this.game.setAttribute("style", `--ejs-background-image: url("${this.config.backgroundImg}"); --ejs-background-color: ${this.config.backgroundColor};`);
-            this.on("start", () => {
-                this.game.classList.remove("ejs_game_background");
-                if (this.config.backgroundBlur) this.game.classList.remove("ejs_game_background_blur");
-            })
-        } else {
-            this.game.setAttribute("style", "--ejs-background-color: " + this.config.backgroundColor + ";");
+    },
+    
+    // 配置默认值
+    defaults: {
+        // 核心设置
+        core: {
+            shader: '',
+            disk: 0,
+            aspectRatio: 0,
+            rotation: 0,
+            
+            // 性能设置
+            fastForward: false,
+            fastForwardRate: 2.0,
+            slowMotion: false,
+            slowMotionRate: 0.5,
+            rewindEnabled: false,
+            rewindGranularity: 30,
+            
+            // 控制设置
+            directKeyboardInput: false,
+            altKeyForward: true,
+            mouseLocked: false,
+            
+            // 状态管理
+            stateSlot: 0,
+            autoSaveInterval: 0
+        },
+        
+        // 游戏手柄设置
+        gamepad: {
+            enabled: true,
+            menuButton: true,
+            leftHanded: false,
+            showVirtualGamepad: true,
+            hideGamepadOnKeyboard: true,
+            buttonOpacity: 0.7,
+            joystickOpacity: 0.7
+        },
+        
+        // 截图设置
+        screenshot: {
+            format: 'png',
+            upscale: 1,
+            source: 0
+        },
+        
+        // 录制设置
+        recording: {
+            fps: 60,
+            format: 'webm',
+            upscale: 1,
+            videoBitrate: 5000000,
+            audioBitrate: 128000
+        },
+        
+        // 网络对战设置
+        netplay: {
+            playerName: '',
+            host: 'ws://localhost:8081',
+            pingInterval: 1000,
+            syncTolerance: 50
         }
+    }
+};
 
-        if (Array.isArray(this.config.cheats)) {
-            for (let i = 0; i < this.config.cheats.length; i++) {
-                const cheat = this.config.cheats[i];
-                if (Array.isArray(cheat) && cheat[0] && cheat[1]) {
-                    this.cheats.push({
-                        desc: cheat[0],
-                        checked: false,
-                        code: cheat[1],
-                        is_permanent: true
-                    })
-                }
-            }
-        }
-
-        this.createStartButton();
-        this.handleResize();
-    }
-    
-    // Core methods
-    getCores() {
-        return getCores(this);
-    }
-    
-    requiresThreads(core) {
-        return requiresThreads(core);
-    }
-    
-    requiresWebGL2(core) {
-        return requiresWebGL2(core);
-    }
-    
-    getCore(generic) {
-        return getCore(this, generic);
-    }
-    
-    // File management methods
-    downloadFile(path, progressCB, notWithPath, opts) {
-        return downloadFile(this, path, progressCB, notWithPath, opts);
-    }
-    
-    toData(data, rv) {
-        return toData(this, data, rv);
-    }
-    
-    // DOM utilities
-    createElement(type) {
-        return createElement(this, type);
-    }
-    
-    addEventListener(element, listener, callback) {
-        return addEventListener(this, element, listener, callback);
-    }
-    
-    removeEventListener(data) {
-        return removeEventListener(this, data);
-    }
-    
-    // Utility methods
-    versionAsInt(ver) {
-        return versionAsInt(this, ver);
-    }
-    
-    checkForUpdates() {
-        return checkForUpdates(this);
-    }
-    
-    // UI methods
-    setColor(color) {
-        return setColor(this, color);
-    }
-    
-    setupAds(ads, width, height) {
-        return setupAds(this, ads, width, height);
-    }
-    
-    adBlocked(url, del) {
-        return adBlocked(this, url, del);
-    }
-    
-    // Configuration methods
-    initControlVars() {
-        return initControlVars(this);
-    }
-    
-    buildButtonOptions(buttonOpts) {
-        return buildButtonOptions(this, buttonOpts);
-    }
-    
-    preGetSetting(setting) {
-        return preGetSetting(this, setting);
-    }
-    
-    setElements(element) {
-        return setElements(this, element);
-    }
-    
-    getLocalStorageKey() {
-        return getLocalStorageKey(this);
-    }
-}
-
-// Also attach to window for global access
-window.EmulatorJS = EmulatorJS;
-
+// 导出主模块
 export default EmulatorJS;
 
-// Add create static method for creating instances
-EmulatorJS.create = function(config) {
-    // Check if config.element is already a DOM element or a selector string
-    const element = (config.element instanceof HTMLElement) ? config.element : (document.querySelector(config.element) || config.element);
-    return new EmulatorJS(element, config);
-};
+// 为了兼容旧的全局变量访问方式
+if (typeof window !== 'undefined') {
+    window.EmulatorJS = EmulatorJS;
+    
+    // 同时导出各个子模块
+    window.EmulatorCore = EmulatorCore;
+    window.EmulatorUtils = utils;
+    window.EmulatorFileDownloader = fileDownloader;
+    window.EmulatorUI = ui;
+    window.EmulatorEventHandler = eventHandler;
+    window.EmulatorStorage = storage;
+    window.EmulatorGameManager = gameManager;
+    
+    // 为了兼容旧版本，继续提供原有的模块引用
+    window.GamepadController = { setup: (...args) => console.warn('GamepadController is deprecated, use emulator.core instead'), createVirtualGamepad: (...args) => console.warn('GamepadController is deprecated, use emulator.core instead') };
+    window.MenuManager = { showMenu: (...args) => console.warn('MenuManager is deprecated, use emulator.core instead'), hideMenu: (...args) => console.warn('MenuManager is deprecated, use emulator.core instead') };
+    window.NetplayManager = { startSocketIO: (...args) => console.warn('NetplayManager is deprecated, use emulator.core instead') };
+    window.ScreenshotManager = { takeScreenshot: (...args) => console.warn('ScreenshotManager is deprecated, use emulator.core instead') };
+    window.ShaderManager = { enableShader: (...args) => console.warn('ShaderManager is deprecated, use emulator.core instead') };
+}

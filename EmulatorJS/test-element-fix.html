@@ -1,0 +1,521 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmulatorJS DOM元素处理测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .emulator-container {
+            width: 800px;
+            height: 400px;
+            margin: 20px auto;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .test-controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .test-case {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        .test-case h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .element-test {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .element-card {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .warning {
+            color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EmulatorJS DOM元素处理测试</h1>
+        
+        <div class="emulator-container" id="emulatorContainer">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white;">
+                模拟器加载区域
+            </div>
+        </div>
+        
+        <div class="test-controls">
+            <button id="testAll">运行所有测试</button>
+            <button id="testElementMethods">测试元素处理方法</button>
+            <button id="testEmulatorCreation">测试模拟器创建</button>
+            <button id="clearLog">清空日志</button>
+        </div>
+        
+        <div class="output" id="output"></div>
+        
+        <div class="test-case">
+            <h3>元素处理测试</h3>
+            <div class="element-test">
+                <div class="element-card">
+                    <h4>通过ID获取元素</h4>
+                    <button id="testById">测试</button>
+                </div>
+                <div class="element-card">
+                    <h4>通过选择器获取元素</h4>
+                    <button id="testBySelector">测试</button>
+                </div>
+                <div class="element-card">
+                    <h4>测试无效元素</h4>
+                    <button id="testInvalid">测试</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>模拟器实例创建测试</h3>
+            <div class="element-test">
+                <div class="element-card">
+                    <h4>通过元素对象创建</h4>
+                    <button id="createWithElement">测试</button>
+                </div>
+                <div class="element-card">
+                    <h4>通过ID选择器创建</h4>
+                    <button id="createWithId">测试</button>
+                </div>
+                <div class="element-card">
+                    <h4>通过CSS选择器创建</h4>
+                    <button id="createWithSelector">测试</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用于测试的隐藏元素 -->
+        <div id="hiddenTestElement" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        // 导入EmulatorJS主模块
+        import EmulatorJS from './src/data/js/emulator/index.js';
+        
+        // 用于显示输出信息
+        function log(message) {
+            const output = document.getElementById('output');
+            output.textContent += message + '\n';
+            output.scrollTop = output.scrollHeight;
+            console.log(message);
+        }
+        
+        function logSuccess(message) {
+            log('✅ ' + message);
+        }
+        
+        function logError(message) {
+            log('❌ ' + message);
+        }
+        
+        function logWarning(message) {
+            log('⚠️ ' + message);
+        }
+        
+        // 清空输出
+        function clearLog() {
+            const output = document.getElementById('output');
+            output.textContent = '';
+        }
+        
+        // 全局变量存储模拟器实例
+        let emulatorInstance = null;
+        
+        // 测试核心功能
+        async function runAllTests() {
+            clearLog();
+            log('\n=== 开始所有测试 ===');
+            
+            try {
+                // 检查EmulatorJS模块是否加载成功
+                if (!EmulatorJS) {
+                    logError('EmulatorJS 模块加载失败！');
+                    return;
+                }
+                
+                logSuccess(`EmulatorJS 模块加载成功！版本: ${EmulatorJS.version}`);
+                
+                // 测试工具模块
+                if (!EmulatorJS.EmulatorUtils) {
+                    logError('EmulatorUtils 模块不可用！');
+                } else {
+                    logSuccess('EmulatorUtils 模块可用');
+                }
+                
+                // 测试UI模块
+                if (!EmulatorJS.EmulatorUI) {
+                    logError('EmulatorUI 模块不可用！');
+                } else {
+                    logSuccess('EmulatorUI 模块可用');
+                    // 检查initUI方法
+                    if (typeof EmulatorJS.EmulatorUI.initUI === 'function') {
+                        logSuccess('initUI 方法存在');
+                    } else {
+                        logError('initUI 方法不存在！');
+                    }
+                }
+                
+                // 运行元素处理测试
+                await testElementHandling();
+                
+                // 运行模拟器创建测试
+                await testEmulatorCreationTests();
+                
+                log('\n=== 所有测试完成 ===');
+            } catch (error) {
+                logError(`测试过程中发生未捕获错误: ${error.message}`);
+                console.error(error);
+            }
+        }
+        
+        // 测试元素处理方法
+        async function testElementHandling() {
+            log('\n=== 测试元素处理方法 ===');
+            
+            if (!EmulatorJS.EmulatorUtils) {
+                logError('EmulatorUtils 模块不可用，无法测试元素处理方法');
+                return;
+            }
+            
+            const utils = EmulatorJS.EmulatorUtils;
+            
+            // 测试 getElement 方法 - 通过ID
+            try {
+                const element = utils.getElement('emulatorContainer');
+                if (element && element.id === 'emulatorContainer') {
+                    logSuccess('通过ID获取元素测试成功');
+                } else {
+                    logError('通过ID获取元素测试失败');
+                }
+            } catch (error) {
+                logError(`通过ID获取元素测试异常: ${error.message}`);
+            }
+            
+            // 测试 getElement 方法 - 通过CSS选择器
+            try {
+                const element = utils.getElement('.emulator-container');
+                if (element && element.classList.contains('emulator-container')) {
+                    logSuccess('通过CSS选择器获取元素测试成功');
+                } else {
+                    logError('通过CSS选择器获取元素测试失败');
+                }
+            } catch (error) {
+                logError(`通过CSS选择器获取元素测试异常: ${error.message}`);
+            }
+            
+            // 测试 getElement 方法 - 无效输入
+            try {
+                const nonExistent = utils.getElement('nonExistentElement');
+                if (nonExistent === null) {
+                    logSuccess('获取不存在元素测试成功（正确返回null）');
+                } else {
+                    logError('获取不存在元素测试失败');
+                }
+            } catch (error) {
+                logError(`获取不存在元素测试异常: ${error.message}`);
+            }
+            
+            // 测试 getElement 方法 - 无效类型
+            try {
+                const invalidType = utils.getElement(123);
+                if (invalidType === null) {
+                    logSuccess('无效类型输入测试成功（正确返回null）');
+                } else {
+                    logError('无效类型输入测试失败');
+                }
+            } catch (error) {
+                logError(`无效类型输入测试异常: ${error.message}`);
+            }
+            
+            // 测试 hasMethod 方法
+            try {
+                const hasGetElement = utils.hasMethod(utils, 'getElement');
+                const hasNonExistent = utils.hasMethod(utils, 'nonExistentMethod');
+                if (hasGetElement && !hasNonExistent) {
+                    logSuccess('hasMethod 方法测试成功');
+                } else {
+                    logError('hasMethod 方法测试失败');
+                }
+            } catch (error) {
+                logError(`hasMethod 方法测试异常: ${error.message}`);
+            }
+            
+            // 测试 safeCall 方法
+            try {
+                const result1 = utils.safeCall(utils, 'getElement', 'emulatorContainer');
+                const result2 = utils.safeCall(utils, 'nonExistentMethod', 'test');
+                if (result1 && result2 === null) {
+                    logSuccess('safeCall 方法测试成功');
+                } else {
+                    logError('safeCall 方法测试失败');
+                }
+            } catch (error) {
+                logError(`safeCall 方法测试异常: ${error.message}`);
+            }
+        }
+        
+        // 测试模拟器创建
+        async function testEmulatorCreationTests() {
+            log('\n=== 测试模拟器创建 ===');
+            
+            // 确保先销毁之前的实例
+            if (emulatorInstance) {
+                try {
+                    emulatorInstance.destroy();
+                    emulatorInstance = null;
+                } catch (e) {
+                    // 忽略销毁错误
+                }
+            }
+            
+            // 准备测试配置
+            const options = {
+                system: 'nes',
+                gameUrl: 'test-game.nes',
+                color: '#4CAF50',
+                debug: true,
+                // 由于没有实际的游戏ROM，我们设置一个空的游戏URL
+                gameName: '测试游戏',
+                // 添加错误处理
+                onError: function(error) {
+                    logWarning(`模拟器错误（预期行为，因为没有提供实际游戏ROM）: ${error.message}`);
+                }
+            };
+            
+            try {
+                log('尝试通过元素对象创建模拟器...');
+                const container = document.getElementById('emulatorContainer');
+                emulatorInstance = EmulatorJS.create(container, options);
+                
+                if (emulatorInstance) {
+                    logSuccess('通过元素对象创建模拟器成功');
+                    log(`模拟器版本: ${emulatorInstance.version}`);
+                    
+                    // 检查核心属性
+                    if (emulatorInstance.core) {
+                        logSuccess('模拟器核心属性存在');
+                    } else {
+                        logWarning('模拟器核心属性不存在');
+                    }
+                    
+                    // 测试API方法
+                    const methods = ['runGame', 'pause', 'resume', 'destroy', 'on', 'off'];
+                    methods.forEach(method => {
+                        if (typeof emulatorInstance[method] === 'function') {
+                            logSuccess(`API方法 ${method} 存在`);
+                        } else {
+                            logError(`API方法 ${method} 不存在`);
+                        }
+                    });
+                    
+                    // 销毁当前实例，准备下一个测试
+                    emulatorInstance.destroy();
+                    emulatorInstance = null;
+                    
+                    // 清空容器
+                    document.getElementById('emulatorContainer').innerHTML = '';
+                    
+                    // 尝试通过ID选择器创建模拟器
+                    log('\n尝试通过ID选择器创建模拟器...');
+                    emulatorInstance = EmulatorJS.create('#emulatorContainer', options);
+                    
+                    if (emulatorInstance) {
+                        logSuccess('通过ID选择器创建模拟器成功');
+                        logSuccess('DOM元素处理修复已生效！');
+                    } else {
+                        logError('通过ID选择器创建模拟器失败');
+                    }
+                    
+                } else {
+                    logError('通过元素对象创建模拟器失败');
+                }
+            } catch (error) {
+                logError(`模拟器创建测试异常: ${error.message}`);
+                console.error(error);
+            } finally {
+                // 清理资源
+                if (emulatorInstance) {
+                    try {
+                        emulatorInstance.destroy();
+                        document.getElementById('emulatorContainer').innerHTML = '';
+                    } catch (e) {
+                        // 忽略清理错误
+                    }
+                    emulatorInstance = null;
+                }
+            }
+        }
+        
+        // 绑定事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 运行所有测试
+            document.getElementById('testAll').addEventListener('click', runAllTests);
+            
+            // 测试元素处理方法
+            document.getElementById('testElementMethods').addEventListener('click', function() {
+                clearLog();
+                testElementHandling();
+            });
+            
+            // 测试模拟器创建
+            document.getElementById('testEmulatorCreation').addEventListener('click', function() {
+                clearLog();
+                testEmulatorCreationTests();
+            });
+            
+            // 清空日志
+            document.getElementById('clearLog').addEventListener('click', clearLog);
+            
+            // 单个元素测试
+            document.getElementById('testById').addEventListener('click', function() {
+                clearLog();
+                log('测试通过ID获取元素...');
+                const element = EmulatorJS.EmulatorUtils?.getElement('emulatorContainer');
+                if (element) {
+                    logSuccess('元素获取成功！ID: ' + element.id);
+                } else {
+                    logError('元素获取失败');
+                }
+            });
+            
+            document.getElementById('testBySelector').addEventListener('click', function() {
+                clearLog();
+                log('测试通过CSS选择器获取元素...');
+                const element = EmulatorJS.EmulatorUtils?.getElement('.emulator-container');
+                if (element) {
+                    logSuccess('元素获取成功！类名: ' + element.className);
+                } else {
+                    logError('元素获取失败');
+                }
+            });
+            
+            document.getElementById('testInvalid').addEventListener('click', function() {
+                clearLog();
+                log('测试无效元素...');
+                const element = EmulatorJS.EmulatorUtils?.getElement('nonExistentElement');
+                if (element === null) {
+                    logSuccess('正确返回null');
+                } else {
+                    logError('测试失败，预期返回null但得到了其他值');
+                }
+            });
+            
+            // 模拟器创建测试
+            document.getElementById('createWithElement').addEventListener('click', function() {
+                clearLog();
+                log('通过元素对象创建模拟器...');
+                try {
+                    const container = document.getElementById('emulatorContainer');
+                    emulatorInstance = EmulatorJS.create(container, {
+                        system: 'nes',
+                        gameName: '测试游戏'
+                    });
+                    logSuccess('模拟器创建成功');
+                } catch (error) {
+                    logError('模拟器创建失败: ' + error.message);
+                }
+            });
+            
+            document.getElementById('createWithId').addEventListener('click', function() {
+                clearLog();
+                log('通过ID选择器创建模拟器...');
+                try {
+                    emulatorInstance = EmulatorJS.create('#emulatorContainer', {
+                        system: 'nes',
+                        gameName: '测试游戏'
+                    });
+                    logSuccess('模拟器创建成功');
+                } catch (error) {
+                    logError('模拟器创建失败: ' + error.message);
+                }
+            });
+            
+            document.getElementById('createWithSelector').addEventListener('click', function() {
+                clearLog();
+                log('通过CSS选择器创建模拟器...');
+                try {
+                    emulatorInstance = EmulatorJS.create('.emulator-container', {
+                        system: 'nes',
+                        gameName: '测试游戏'
+                    });
+                    logSuccess('模拟器创建成功');
+                } catch (error) {
+                    logError('模拟器创建失败: ' + error.message);
+                }
+            });
+        });
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', function() {
+            log('页面加载完成，测试界面已准备就绪');
+            log('点击上方按钮开始测试DOM元素处理和模拟器创建功能');
+        });
+    </script>
+</body>
+</html>

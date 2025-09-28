@@ -1,4 +1,4 @@
-﻿class EmulatorJS {
+﻿export default class EmulatorJS {
     destory() {
         if (!this.started) return;
         this.callEvent("exit");

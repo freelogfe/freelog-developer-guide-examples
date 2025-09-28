@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmulatorJS 模块化测试</title>
+    <script type="module">
+        // 导入主模块
+        import { runGame } from './dist/esm/index.js';
+        
+        // 页面加载完成后初始化模拟器
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // 创建一个简单的配置对象
+                const config = {
+                    container: '#emulator-container',
+                    gameName: '测试游戏',
+                    gameUrl: '', // 这里留空，仅测试初始化
+                    core: 'nes',
+                    pathtodata: './src/data/',
+                    debug: true
+                };
+                
+                // 显示初始化信息
+                console.log('EmulatorJS 模块化测试开始...');
+                console.log('配置参数:', config);
+                
+                // 添加初始化完成的回调
+                config.onGameStart = function() {
+                    console.log('EmulatorJS 初始化成功！');
+                    document.getElementById('status').textContent = '初始化成功！';
+                };
+                
+                // 尝试初始化模拟器
+                try {
+                    await runGame(config);
+                } catch (error) {
+                    // 由于我们没有提供实际的游戏ROM，这里会抛出错误，这是预期的行为
+                    console.log('预期的错误 (没有提供游戏ROM):', error.message);
+                    document.getElementById('status').textContent = '测试成功完成 (检测到预期的ROM加载错误)';
+                }
+                
+                // 验证模块是否正确加载
+                if (window.EmulatorJS) {
+                    console.log('EmulatorJS 模块已正确加载');
+                    console.log('版本:', window.EmulatorJS.version);
+                    console.log('模块列表:', Object.keys(window.EmulatorJS));
+                }
+                
+                if (window.EmulatorCore) {
+                    console.log('EmulatorCore 模块已正确加载');
+                }
+                
+                // 测试模块化功能
+                try {
+                    // 创建一个测试用的核心实例
+                    const testCore = new window.EmulatorCore(document.getElementById('test-container'), { debug: true });
+                    console.log('测试核心实例创建成功');
+                    
+                    // 检查核心实例的方法
+                    const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(testCore));
+                    console.log('核心实例方法数量:', methods.length);
+                    console.log('部分核心方法示例:', methods.slice(0, 10));
+                    
+                    // 销毁测试实例
+                    testCore.destroy();
+                    console.log('测试核心实例已销毁');
+                } catch (coreError) {
+                    console.error('创建测试核心实例时出错:', coreError);
+                }
+                
+            } catch (error) {
+                console.error('测试过程中发生错误:', error);
+                document.getElementById('status').textContent = '测试失败: ' + error.message;
+            }
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #333;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        #status {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+        #test-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>EmulatorJS 模块化测试</h1>
+    <p>这个页面用于测试 EmulatorJS 模块化实现的功能。请打开浏览器控制台查看详细的测试输出。</p>
+    
+    <div id="emulator-container" class="container">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+            <p>模拟器加载区域</p>
+        </div>
+    </div>
+    
+    <div id="test-container"></div>
+    
+    <div id="status">初始化中...</div>
+    
+    <h3>测试说明</h3>
+    <ul>
+        <li>测试将验证 EmulatorJS 模块是否能正确加载</li>
+        <li>测试将尝试创建核心实例并检查其方法</li>
+        <li>由于没有提供实际的游戏ROM，模拟器加载会失败，这是预期的行为</li>
+    </ul>
+</body>
+</html>

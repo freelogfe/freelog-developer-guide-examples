@@ -1,11 +1,4 @@
-// 从模块目录导入EmulatorJS
-import EmulatorJS from './modules/index.js';
 
-// 将 EmulatorJS 挂载到全局对象上
-window.EmulatorJS = EmulatorJS;
-
-// 如果在模块环境中，也导出 EmulatorJS
-export default EmulatorJS;
 
 import loadEmulator from './loader.js';
 
@@ -25,14 +18,8 @@ export async function runGame(config) {
   window.EJS_DEBUG_XX = config.debug || false;
   window.EJS_threads = config.threads || false;
   window.EJS_disableDatabases = config.disableDatabases || true;
-
-  try {
-    // Load the emulator
-    let controller = await loadEmulator();
-    return controller;
-  } catch (error) {
-    throw new Error(`Failed to load EmulatorJS: ${error.message}`);
-  }
+  let controller = await loadEmulator();
+  return controller;
 }
 
 // 兼容旧版本

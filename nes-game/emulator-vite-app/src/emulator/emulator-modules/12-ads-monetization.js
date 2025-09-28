@@ -1,33 +1,10 @@
-export class UIManager {
+/**
+ * Ads Monetization Module
+ * Manages advertisement display and timing
+ */
+export default class AdsMonetization {
     constructor(emulator) {
         this.emulator = emulator;
-    }
-
-    setColor(color) {
-        if (typeof color !== "string") color = "";
-        let getColor = function (color) {
-            color = color.toLowerCase();
-            if (color && /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/.test(color)) {
-                if (color.length === 4) {
-                    let rv = "#";
-                    for (let i = 1; i < 4; i++) {
-                        rv += color.slice(i, i + 1) + color.slice(i, i + 1);
-                    }
-                    color = rv;
-                }
-                let rv = [];
-                for (let i = 1; i < 7; i += 2) {
-                    rv.push(parseInt("0x" + color.slice(i, i + 2), 16));
-                }
-                return rv.join(", ");
-            }
-            return null;
-        }
-        if (!color || getColor(color) === null) {
-            this.emulator.elements.parent.setAttribute("style", "--ejs-primary-color: 26,175,255;");
-            return;
-        }
-        this.emulator.elements.parent.setAttribute("style", "--ejs-primary-color:" + getColor(color) + ";");
     }
 
     setupAds(ads, width, height) {
@@ -78,9 +55,25 @@ export class UIManager {
         } else {
             try {
                 document.querySelector('div[class="ejs_ad_iframe"]').remove();
-            } catch (e) {
-                console.warn("AdBlocker detected!");
-            }
+            } catch (e) { }
+            this.emulator.config.adUrl = url;
+            this.setupAds(this.emulator.config.adUrl, this.emulator.config.adSize[0], this.emulator.config.adSize[1]);
+        }
+    }
+
+    checkAdBlock() {
+        // Implementation for checking if ads are blocked
+        return false;
+    }
+
+    enableAdBlockDetection() {
+        // Implementation for enabling ad block detection
+    }
+
+    initializeFromConfig() {
+        if (this.emulator.config.adUrl) {
+            this.emulator.config.adSize = (Array.isArray(this.emulator.config.adSize)) ? this.emulator.config.adSize : ["300px", "250px"];
+            this.setupAds(this.emulator.config.adUrl, this.emulator.config.adSize[0], this.emulator.config.adSize[1]);
         }
     }
 }
