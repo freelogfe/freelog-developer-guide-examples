@@ -9,7 +9,7 @@ export default class FileHandling {
 
     downloadFile(path, progressCB, notWithPath, opts) {
         return new Promise(async cb => {
-            const data = this.emulator.toData(path); //check other data types
+            const data = this.toData(path); //check other data types
             if (data) {
                 data.then((game) => {
                     if (opts.method === "HEAD") {
@@ -114,14 +114,14 @@ export default class FileHandling {
         if (this.emulator.config.langJson) {
             if (typeof log === "undefined") log = true;
             if (typeof this.emulator.config.langJson[text] === "string") {
-                if (log && !this.emulator.missingKeys[text]) {
-                    this.emulator.missingKeys[text] = true;
+                if (log && !this.emulator.missingLang[text]) {
+                    this.emulator.missingLang.push(text);
                     console.log("Translation key found:", text, "->", this.emulator.config.langJson[text]);
                 }
                 return this.emulator.config.langJson[text];
             } else {
-                if (log && !this.emulator.missingKeys[text]) {
-                    this.emulator.missingKeys[text] = true;
+                if (log && !this.emulator.missingLang[text]) {
+                    this.emulator.missingLang.push(text);
                     console.warn("Missing translation key:", text);
                 }
             }

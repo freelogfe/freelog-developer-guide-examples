@@ -7,6 +7,13 @@ export default class CoreManagement {
         this.emulator = emulator;
     }
 
+    /**
+     * Sleep function for async operations
+     */
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     initGameCore(js, wasm, thread) {
         // 替换 var EJS_Runtime 为 window.EJS_Runtime 以确保在微前端环境中能正确挂载
         let modifiedJs = js;
@@ -54,12 +61,33 @@ export default class CoreManagement {
                 return;
             }
             this.emulator.Module = window.EJS_Runtime(this.emulator);
-            this.emulator.downloadFiles();
+            this.downloadFiles();
         })
         script.addEventListener("error", () => {
             this.emulator.startGameError("Failed to load core script");
         })
         document.head.appendChild(script);
+    }
+
+    /**
+     * Download and initialize game files
+     */
+    async downloadFiles() {
+        (async () => {
+            this.emulator.gameManager = new window.EJS_GameManager(this.emulator.Module, this.emulator);
+            await this.emulator.gameManager.loadExternalFiles();
+            await this.emulator.gameManager.mountFileSystems();
+            this.emulator.callEvent("saveDatabaseLoaded", this.emulator.gameManager.FS);
+            if (this.emulator.getCore() === "ppsspp") {
+                await this.emulator.gameManager.loadPpssppAssets();
+            }
+            await this.emulator.downloadRom();
+            await this.emulator.downloadBios();
+            await this.emulator.downloadStartState();
+            await this.emulator.downloadGameParent();
+            await this.emulator.downloadGamePatch();
+            this.emulator.startGame();
+        })();
     }
 
     async startGame() {
@@ -70,7 +98,7 @@ export default class CoreManagement {
 
     checkStarted() {
         return new Promise(async (resolve) => {
-            await sleep(10);
+            await this.emulator.sleep(10);
             if (this.emulator.gameManager && this.emulator.gameManager.isRunning && this.emulator.gameManager.isRunning()) {
                 resolve();
             } else {
