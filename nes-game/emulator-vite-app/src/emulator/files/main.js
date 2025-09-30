@@ -1,22 +1,36 @@
 /**
- * Main EmulatorJS Class - Complete implementation matching original emulator.js
- * This file contains the complete EmulatorJS class with all methods
+ * Main EmulatorJS Class - Modularized implementation
+ * This file contains the core EmulatorJS class structure and imports all modules
  */
-import SystemDetection from './01-system-detection.js';
-import DOMUtilities from './02-dom-utilities.js';
-import FileHandling from './03-file-handling.js';
-import CoreManagement from './04-core-management.js';
-import EventSystem from './05-event-system.js';
-import Localization from './06-localization.js';
-import UIComponents from './07-ui-components.js';
-import GameStateManager from './08-game-state-manager.js';
-import AudioVideoManager from './09-audio-video-manager.js';
-import InputHandler from './10-input-handler.js';
-import NetplayManager from './11-netplay-manager.js';
-import AdsMonetization from './12-ads-monetization.js';
+import CoreSystem from './core-system.js';
+import DOMUtilities from './dom-utilities.js';
+import FileHandling from './file-handling.js';
+import CoreManagement from './core-management.js';
+import EventSystem from './event-system.js';
+import Localization from './localization.js';
+import UIComponents from './ui-components.js';
+import GameStateManager from './game-state-manager.js';
+import AudioVideoManager from './audio-video-manager.js';
+import InputHandler from './input-handler.js';
+import NetplayManager from './netplay-manager.js';
+import AdsMonetization from './ads-monetization.js';
 
 export default class EmulatorJS {
     constructor(element, config) {
+        // Initialize all modules
+        this.systemDetection = new CoreSystem(this);
+        this.domUtilities = new DOMUtilities(this);
+        this.fileHandling = new FileHandling(this);
+        this.coreManagement = new CoreManagement(this);
+        this.eventSystem = new EventSystem(this);
+        this.localization = new Localization(this);
+        this.uiComponents = new UIComponents(this);
+        this.gameStateManager = new GameStateManager(this);
+        this.audioVideoManager = new AudioVideoManager(this);
+        this.inputHandler = new InputHandler(this);
+        this.netplayManager = new NetplayManager(this);
+        this.adsMonetization = new AdsMonetization(this);
+
         // Step 1: Initialize core properties (exactly as in original)
         this.ejs_version = "4.2.3";
         this.extensions = [];
@@ -43,8 +57,8 @@ export default class EmulatorJS {
         this.paused = true;
         this.missingLang = [];
 
-        // Step 3: Initialize core modules first (needed for DOM operations)
-        this.systemDetection = new SystemDetection(this);
+        // Step 3: Initialize modules (needed for DOM operations)
+        this.systemDetection = new CoreSystem(this);
         this.domUtilities = new DOMUtilities(this);
         this.fileHandling = new FileHandling(this);
         this.coreManagement = new CoreManagement(this);
@@ -63,13 +77,13 @@ export default class EmulatorJS {
         this.config.alignStartButton = (typeof this.config.alignStartButton === "string") ? this.config.alignStartButton : "bottom";
         this.config.backgroundColor = (typeof this.config.backgroundColor === "string") ? this.config.backgroundColor : "rgb(51, 51, 51)";
 
-        // Step 4: Setup ads if configured
+        // Step 5: Setup ads if configured
         if (this.config.adUrl) {
             this.config.adSize = (Array.isArray(this.config.adSize)) ? this.config.adSize : ["300px", "250px"];
             this.setupAds(this.config.adUrl, this.config.adSize[0], this.config.adSize[1]);
         }
 
-        // Step 5: Initialize device detection and canvas
+        // Step 6: Initialize device detection and canvas
         this.isMobile = (function () {
             let check = false;
             (function (a) { if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true; })(navigator.userAgent || navigator.vendor || window.opera);
@@ -91,7 +105,7 @@ export default class EmulatorJS {
             return false;
         })();
 
-        // Step 6: Initialize canvas and capture settings
+        // Step 7: Initialize canvas and capture settings
         this.canvas = this.createElement("canvas");
         this.canvas.classList.add("ejs_canvas");
         this.videoRotation = ([0, 1, 2, 3].includes(this.config.videoRotation)) ? this.config.videoRotation : this.preGetSetting("videoRotation") || 0;
@@ -109,7 +123,7 @@ export default class EmulatorJS {
         this.capture.video.videoBitrate = (typeof this.capture.video.videoBitrate === "number") ? this.capture.video.videoBitrate : 2.5 * 1024 * 1024;
         this.capture.video.audioBitrate = (typeof this.capture.video.audioBitrate === "number") ? this.capture.video.audioBitrate : 192 * 1024;
 
-        // Step 7: Bind listeners and initialize system properties
+        // Step 8: Bind listeners and initialize system properties
         this.bindListeners();
         this.config.netplayUrl = this.config.netplayUrl || "https://netplay.emulatorjs.org";
         this.fullscreen = false;
@@ -126,7 +140,7 @@ export default class EmulatorJS {
         })();
         this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-        // Step 8: Initialize storage
+        // Step 9: Initialize storage
         if (this.config.disableDatabases) {
             this.storage = {
                 rom: new window.EJS_DUMMYSTORAGE(),
@@ -142,7 +156,7 @@ export default class EmulatorJS {
         }
         this.storage.states = new window.EJS_STORAGE("EmulatorJS-states", "states");
 
-        // Step 9: Initialize game background
+        // Step 10: Initialize game background
         this.game.classList.add("ejs_game");
         if (typeof this.config.backgroundImg === "string") {
             this.game.classList.add("ejs_game_background");
@@ -156,7 +170,7 @@ export default class EmulatorJS {
             this.game.setAttribute("style", "--ejs-background-color: " + this.config.backgroundColor + ";");
         }
 
-        // Step 10: Process cheats if provided
+        // Step 11: Process cheats if provided
         if (Array.isArray(this.config.cheats)) {
             for (let i = 0; i < this.config.cheats.length; i++) {
                 const cheat = this.config.cheats[i];
@@ -171,340 +185,15 @@ export default class EmulatorJS {
             }
         }
 
-        // Step 11: Create start button and handle resize
-        this.startButton = this.createStartButton();
-        this.handleResize();
-    }
-
-    get virtualGamepad() {
-        return this._virtualGamepad;
-    }
-
-    set virtualGamepad(value) {
-        this._virtualGamepad = value;
-    }
-
-    get resetTimeout() {
-        return this._resetTimeout;
-    }
-
-    set resetTimeout(value) {
-        this._resetTimeout = value;
-    }
-
-    get functions() {
-        return this._functions || {};
-    }
-
-    set functions(value) {
-        this._functions = value;
-    }
-
-    /**
-     * Initialize default controller variables
-     */
-    initControlVars() {
-        this.defaultControllers = {
-            0: {
-                0: {
-                    "value": "x",
-                    "value2": "BUTTON_2"
-                },
-                1: {
-                    "value": "s",
-                    "value2": "BUTTON_4"
-                },
-                2: {
-                    "value": "v",
-                    "value2": "SELECT"
-                },
-                3: {
-                    "value": "enter",
-                    "value2": "START"
-                },
-                4: {
-                    "value": "up arrow",
-                    "value2": "DPAD_UP"
-                },
-                5: {
-                    "value": "down arrow",
-                    "value2": "DPAD_DOWN"
-                },
-                6: {
-                    "value": "left arrow",
-                    "value2": "DPAD_LEFT"
-                },
-                7: {
-                    "value": "right arrow",
-                    "value2": "DPAD_RIGHT"
-                },
-                8: {
-                    "value": "z",
-                    "value2": "BUTTON_1"
-                },
-                9: {
-                    "value": "a",
-                    "value2": "BUTTON_3"
-                },
-                10: {
-                    "value": "q",
-                    "value2": "LEFT_TOP_SHOULDER"
-                },
-                11: {
-                    "value": "e",
-                    "value2": "RIGHT_TOP_SHOULDER"
-                },
-                12: {
-                    "value": "tab",
-                    "value2": "LEFT_BOTTOM_SHOULDER"
-                },
-                13: {
-                    "value": "r",
-                    "value2": "RIGHT_BOTTOM_SHOULDER"
-                },
-                14: {
-                    "value": "",
-                    "value2": "LEFT_STICK"
-                },
-                15: {
-                    "value": "",
-                    "value2": "RIGHT_STICK"
-                },
-                16: {
-                    "value": "h",
-                    "value2": "LEFT_STICK_X:+1"
-                },
-                17: {
-                    "value": "f",
-                    "value2": "LEFT_STICK_X:-1"
-                },
-                18: {
-                    "value": "g",
-                    "value2": "LEFT_STICK_Y:+1"
-                },
-                19: {
-                    "value": "t",
-                    "value2": "LEFT_STICK_Y:-1"
-                },
-                20: {
-                    "value": "l",
-                    "value2": "RIGHT_STICK_X:+1"
-                },
-                21: {
-                    "value": "j",
-                    "value2": "RIGHT_STICK_X:-1"
-                },
-                22: {
-                    "value": "k",
-                    "value2": "RIGHT_STICK_Y:+1"
-                },
-                23: {
-                    "value": "i",
-                    "value2": "RIGHT_STICK_Y:-1"
-                },
-                24: {
-                    "value": "1"
-                },
-                25: {
-                    "value": "2"
-                },
-                26: {
-                    "value": "3"
-                },
-                27: {},
-                28: {},
-                29: {},
-            },
-            1: {},
-            2: {},
-            3: {}
-        }
-        this.keyMap = {
-            0: "",
-            8: "backspace",
-            9: "tab",
-            13: "enter",
-            16: "shift",
-            17: "ctrl",
-            18: "alt",
-            19: "pause/break",
-            20: "caps lock",
-            27: "escape",
-            32: "space",
-            33: "page up",
-            34: "page down",
-            35: "end",
-            36: "home",
-            37: "left arrow",
-            38: "up arrow",
-            39: "right arrow",
-            40: "down arrow",
-            45: "insert",
-            46: "delete",
-            48: "0",
-            49: "1",
-            50: "2",
-            51: "3",
-            52: "4",
-            53: "5",
-            54: "6",
-            55: "7",
-            56: "8",
-            57: "9",
-            65: "a",
-            66: "b",
-            67: "c",
-            68: "d",
-            69: "e",
-            70: "f",
-            71: "g",
-            72: "h",
-            73: "i",
-            74: "j",
-            75: "k",
-            76: "l",
-            77: "m",
-            78: "n",
-            79: "o",
-            80: "p",
-            81: "q",
-            82: "r",
-            83: "s",
-            84: "t",
-            85: "u",
-            86: "v",
-            87: "w",
-            88: "x",
-            89: "y",
-            90: "z",
-            91: "left window key",
-            92: "right window key",
-            93: "select key",
-            96: "numpad 0",
-            97: "numpad 1",
-            98: "numpad 2",
-            99: "numpad 3",
-            100: "numpad 4",
-            101: "numpad 5",
-            102: "numpad 6",
-            103: "numpad 7",
-            104: "numpad 8",
-            105: "numpad 9",
-            106: "multiply",
-            107: "add",
-            109: "subtract",
-            110: "decimal point",
-            111: "divide",
-            112: "f1",
-            113: "f2",
-            114: "f3",
-            115: "f4",
-            116: "f5",
-            117: "f6",
-            118: "f7",
-            119: "f8",
-            120: "f9",
-            121: "f10",
-            122: "f11",
-            123: "f12",
-            144: "num lock",
-            145: "scroll lock",
-            186: "semi-colon",
-            187: "equal sign",
-            188: "comma",
-            189: "dash",
-            190: "period",
-            191: "forward slash",
-            192: "grave accent",
-            219: "open bracket",
-            220: "back slash",
-            221: "close bracket",
-            222: "single quote"
-        }
-    }
-
-    /**
-     * Initialize all modules
-     */
-    async initializeModules(element) {
-        // Initialize modules
-        this.systemDetection = new SystemDetection(this);
-        this.domUtilities = new DOMUtilities(this);
-        this.fileHandling = new FileHandling(this);
-        this.coreManagement = new CoreManagement(this);
-        this.eventSystem = new EventSystem(this);
-        this.localization = new Localization(this);
-        this.uiComponents = new UIComponents(this);
-        this.gameStateManager = new GameStateManager(this);
-        this.audioVideoManager = new AudioVideoManager(this);
-        this.inputHandler = new InputHandler(this);
-        this.netplayManager = new NetplayManager(this);
-        this.adsMonetization = new AdsMonetization(this);
-
-        // Bind localization method
-        this.localizationModule = this.localization;
-        this.localization = this.localization.localization.bind(this.localization);
-
-        // Initialize capture settings
-        this.audioVideoManager.initializeCaptureSettings();
-
-        // Initialize input handler
-        this.inputHandler.initializeInput();
-
-        // Initialize ads from config
-        this.adsMonetization.initializeFromConfig();
-
-        // Set elements
-        this.setElements(element);
-
-        // Load settings
-        this.gameStateManager.loadSettings();
-
-        // Update cheat UI
-        this.updateCheatUI();
-
-        // Update gamepad labels
-        this.updateGamepadLabels();
-
-        // Set volume if not muted
-        if (!this.muted) this.setVolume(this.volume);
-
-        // Focus parent element if auto focus is enabled
-        if (this.config.noAutoFocus !== true) this.elements.parent.focus();
-
-        // Remove loading text
-        this.textElem.remove();
-        this.textElem = null;
-
-        // Update game classes
-        this.game.classList.remove("ejs_game");
-        this.game.classList.add("ejs_canvas_parent");
-
-        // Create context menu
+        // Step 12: Initialize UI components
         this.uiComponents.createContextMenu();
-
-        // Create bottom menu bar
         this.uiComponents.createBottomMenuBar();
 
-        // Create control setting menu
-        this.createControlSettingMenu();
-
-        // Create cheats menu
-        this.createCheatsMenu();
-
-        // Create netplay menu
-        this.createNetplayMenu();
-
-        // Set virtual gamepad
-        this.setVirtualGamepad();
-
-        // Bind listeners
-        this.bindListeners();
-
-        // Handle resize
+        // Step 13: Create start button and handle resize
+        this.startButton = this.createStartButton();
         this.handleResize();
 
-        // Call ready event
+        // Step 14: Call ready event
         this.callEvent("ready");
     }
 
@@ -1004,77 +693,6 @@ export default class EmulatorJS {
         this.elements.parent.setAttribute("style", "--ejs-primary-color:" + getColor(color) + ";");
     }
 
-    initializeSystemProperties() {
-        this.isMobile = (function () {
-            let check = false;
-            (function (a) { if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true; })(navigator.userAgent || navigator.vendor || window.opera);
-            return check;
-        })();
-        this.hasTouchScreen = (function () {
-            if (window.PointerEvent && ("maxTouchPoints" in navigator)) {
-                if (navigator.maxTouchPoints > 0) {
-                    return true;
-                }
-            } else {
-                if (window.matchMedia && window.matchMedia("(any-pointer:coarse)").matches) {
-                    return true;
-                } else if (window.TouchEvent || ("ontouchstart" in window)) {
-                    return true;
-                }
-            }
-            return false;
-        })();
-        this.config.netplayUrl = this.config.netplayUrl || "https://netplay.emulatorjs.org";
-        this.fullscreen = false;
-        this.enableMouseLock = false;
-        this.supportsWebgl2 = !!document.createElement("canvas").getContext("webgl2") && (this.config.forceLegacyCores !== true);
-        this.webgl2Enabled = (() => {
-            let setting = this.preGetSetting("webgl2Enabled");
-            if (setting === "disabled" || !this.supportsWebgl2) {
-                return false;
-            } else if (setting === "enabled") {
-                return true;
-            }
-            return null;
-        })();
-        this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        if (this.config.disableDatabases) {
-            this.storage = {
-                rom: new window.EJS_DUMMYSTORAGE(),
-                core: new window.EJS_DUMMYSTORAGE(),
-                states: new window.EJS_DUMMYSTORAGE()
-            };
-        } else {
-            this.storage = {
-                rom: new window.EJS_STORAGE("rom"),
-                core: new window.EJS_STORAGE("core"),
-                states: new window.EJS_STORAGE("states")
-            };
-        }
-    }
-
-    initializeStorage() {
-        return !!window.indexedDB && (typeof this.config.gameName === "string" || !this.config.gameUrl.startsWith("blob:"));
-    }
-
-    setupGameBackground() {
-        if (typeof this.config.backgroundImg === "string") {
-            this.game.classList.add("ejs_game_background");
-            if (this.config.backgroundBlur) this.game.classList.add("ejs_game_background_blur");
-            this.game.setAttribute("style", `--ejs-background-image: url("${this.config.backgroundImg}"); --ejs-background-color: ${this.config.backgroundColor};`);
-            this.on("start", () => {
-                this.game.classList.remove("ejs_game_background");
-                if (this.config.backgroundBlur) this.game.classList.remove("ejs_game_background_blur");
-            })
-        } else {
-            this.game.setAttribute("style", "--ejs-background-color: " + this.config.backgroundColor + ";");
-        }
-    }
-
-    initializeCheats() {
-        // Initialize cheats system
-    }
-
     createStartButton() {
         const button = this.createElement("div");
         button.classList.add("ejs_start_button");
@@ -1103,12 +721,20 @@ export default class EmulatorJS {
         return button;
     }
 
-    initializeCanvas() {
-        this.canvas = this.createElement("canvas");
-        this.canvas.classList.add("ejs_canvas");
-        this.videoRotation = ([0, 1, 2, 3].includes(this.config.videoRotation)) ? this.config.videoRotation : this.preGetSetting("videoRotation") || 0;
-        this.videoRotationChanged = false;
-        this.game.appendChild(this.canvas);
+    startButtonClicked(e) {
+        this.callEvent("start-clicked");
+        if (e.pointerType === "touch") {
+            this.touch = true;
+        }
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+        this.textElem = this.createElement("div");
+        this.textElem.classList.add("ejs_loading_text");
+        if (typeof this.config.backgroundImg === "string") this.textElem.classList.add("ejs_loading_text_glow");
+        this.textElem.innerText = this.localization("Loading...");
+        this.elements.parent.appendChild(this.textElem);
+        this.downloadGameCore();
     }
 
     createText() {
@@ -1130,23 +756,6 @@ export default class EmulatorJS {
             this.msgElem.innerText = "";
         }, (typeof time === "number" && time > 0) ? time : 3000)
         this.msgElem.innerText = message;
-    }
-
-    // Additional placeholder methods that need full implementation
-    startButtonClicked(e) {
-        this.callEvent("start-clicked");
-        if (e.pointerType === "touch") {
-            this.touch = true;
-        }
-        if (e.preventDefault) {
-            e.preventDefault();
-        }
-        this.textElem = this.createElement("div");
-        this.textElem.classList.add("ejs_loading_text");
-        if (typeof this.config.backgroundImg === "string") this.textElem.classList.add("ejs_loading_text_glow");
-        this.textElem.innerText = this.localization("Loading...");
-        this.elements.parent.appendChild(this.textElem);
-        this.downloadGameCore();
     }
 
     downloadGameCore() {
@@ -1291,11 +900,139 @@ export default class EmulatorJS {
     }
 
     setupSettingsMenu() {
-        // Setup settings menu
+        this.settingsMenu = this.createElement("div");
+        this.settingsMenu.classList.add("ejs_settings_parent");
+        const nested = this.createElement("div");
+        nested.classList.add("ejs_settings_transition");
+        this.settings = {};
+        this.allSettings = {};
+        const menus = [];
+        let parentMenuCt = 0;
+
+        const createSettingParent = (child, title, parentElement) => {
+            const rv = this.createElement("div");
+            rv.classList.add("ejs_setting_menu");
+
+            if (child) {
+                const menuOption = this.createElement("div");
+                menuOption.classList.add("ejs_settings_main_bar");
+                const span = this.createElement("span");
+                span.innerText = title;
+
+                menuOption.appendChild(span);
+            }
+        };
+
+        const addToMenu = (text, setting, options, defaultValue, parentElement, restartRequired) => {
+            const option = this.createElement("div");
+            option.classList.add("ejs_settings_item");
+            const label = this.createElement("div");
+            label.classList.add("ejs_settings_label");
+            label.innerText = this.localization(text);
+            option.appendChild(label);
+            const select = this.createElement("select");
+            select.classList.add("ejs_settings_select");
+            if (restartRequired) select.classList.add("ejs_restart_required");
+            for (const k in options) {
+                const opt = this.createElement("option");
+                opt.value = k;
+                opt.innerText = this.localization(options[k]);
+                if (k === defaultValue) opt.selected = true;
+                select.appendChild(opt);
+            }
+            option.appendChild(select);
+            parentElement.appendChild(option);
+            this.settings[setting] = defaultValue;
+            this.allSettings[setting] = defaultValue;
+            select.addEventListener("change", () => {
+                this.setSettingValue(setting, select.value);
+                if (restartRequired) {
+                    select.classList.add("ejs_restart_required");
+                }
+            });
+        };
+
+        const addButton = (text, setting, parentElement, callback) => {
+            const button = this.createElement("button");
+            button.classList.add("ejs_settings_button");
+            button.innerText = this.localization(text);
+            button.addEventListener("click", () => {
+                if (callback) callback();
+            });
+            parentElement.appendChild(button);
+        };
+
+        const checkForEmptyMenu = (inputOptions) => {
+            for (const k in inputOptions) {
+                if (inputOptions[k].visible !== false) return false;
+            }
+            return true;
+        };
+
+        const home = createSettingParent(false, "Settings", nested);
+        menus.push(home);
+        parentMenuCt++;
+
+        // Audio settings
+        const audioSettings = createSettingParent(true, "Audio", home);
+        addToMenu("Volume", "volume", {}, this.volume, audioSettings, false);
+
+        // Video settings
+        const videoSettings = createSettingParent(true, "Video", home);
+        addToMenu("WebGL2", "webgl2", {
+            "enabled": "Enabled",
+            "disabled": "Disabled"
+        }, this.webgl2Enabled ? "enabled" : "disabled", videoSettings, true);
+
+        // Input settings
+        const inputSettings = createSettingParent(true, "Input", home);
+        addToMenu("Virtual Gamepad", "virtual-gamepad", {
+            "enabled": "Enabled",
+            "disabled": "Disabled"
+        }, "enabled", inputSettings, false);
+
+        // Save settings
+        if (this.saveInBrowserSupported()) {
+            const saveSettings = createSettingParent(true, "Save States", home);
+            addToMenu("Save State Slot", "save-state-slot", ["1", "2", "3", "4", "5", "6", "7", "8", "9"], "1", saveSettings, false);
+            addToMenu("Save State Location", "save-state-location", {
+                "download": "Download",
+                "browser": "Keep in Browser"
+            }, "download", saveSettings, false);
+        }
+
+        // Netplay settings (if enabled)
+        if (this.netplayEnabled) {
+            const netplaySettings = createSettingParent(true, "Netplay", home);
+            addToMenu("Netplay Server", "netplay-server", {}, this.config.netplayUrl, netplaySettings, true);
+        }
+
+        if (parentMenuCt === 0) {
+            this.on("start", () => {
+                this.settingsMenu.style.display = "none";
+            });
+        }
     }
 
     updateCheatUI() {
         // Update cheat UI
+    }
+
+    checkSupportedOpts() {
+        if (!this.gameManager.supportsStates()) {
+            this.elements.bottomBar.saveState[0].style.display = "none";
+            this.elements.bottomBar.loadState[0].style.display = "none";
+            this.elements.bottomBar.netplay[0].style.display = "none";
+            this.elements.contextMenu.save.style.display = "none";
+            this.elements.contextMenu.load.style.display = "none";
+        }
+        if (typeof this.config.gameId !== "number" || !this.config.netplayUrl || this.netplayEnabled === false) {
+            this.elements.bottomBar.netplay[0].style.display = "none";
+        }
+    }
+
+    setupDisksMenu() {
+        // Setup disks menu
     }
 
     updateGamepadLabels() {
@@ -1612,7 +1349,224 @@ export default class EmulatorJS {
         });
     }
 
-    getSettingValue(id) {
-        return this.allSettings[id] || this.settings[id] || null;
+    // Initialize default controller variables
+    initControlVars() {
+        this.defaultControllers = {
+            0: {
+                0: {
+                    "value": "x",
+                    "value2": "BUTTON_2"
+                },
+                1: {
+                    "value": "s",
+                    "value2": "BUTTON_4"
+                },
+                2: {
+                    "value": "v",
+                    "value2": "SELECT"
+                },
+                3: {
+                    "value": "enter",
+                    "value2": "START"
+                },
+                4: {
+                    "value": "up arrow",
+                    "value2": "DPAD_UP"
+                },
+                5: {
+                    "value": "down arrow",
+                    "value2": "DPAD_DOWN"
+                },
+                6: {
+                    "value": "left arrow",
+                    "value2": "DPAD_LEFT"
+                },
+                7: {
+                    "value": "right arrow",
+                    "value2": "DPAD_RIGHT"
+                },
+                8: {
+                    "value": "z",
+                    "value2": "BUTTON_1"
+                },
+                9: {
+                    "value": "a",
+                    "value2": "BUTTON_3"
+                },
+                10: {
+                    "value": "q",
+                    "value2": "LEFT_TOP_SHOULDER"
+                },
+                11: {
+                    "value": "e",
+                    "value2": "RIGHT_TOP_SHOULDER"
+                },
+                12: {
+                    "value": "tab",
+                    "value2": "LEFT_BOTTOM_SHOULDER"
+                },
+                13: {
+                    "value": "r",
+                    "value2": "RIGHT_BOTTOM_SHOULDER"
+                },
+                14: {
+                    "value": "",
+                    "value2": "LEFT_STICK"
+                },
+                15: {
+                    "value": "",
+                    "value2": "RIGHT_STICK"
+                },
+                16: {
+                    "value": "h",
+                    "value2": "LEFT_STICK_X:+1"
+                },
+                17: {
+                    "value": "f",
+                    "value2": "LEFT_STICK_X:-1"
+                },
+                18: {
+                    "value": "g",
+                    "value2": "LEFT_STICK_Y:+1"
+                },
+                19: {
+                    "value": "t",
+                    "value2": "LEFT_STICK_Y:-1"
+                },
+                20: {
+                    "value": "l",
+                    "value2": "RIGHT_STICK_X:+1"
+                },
+                21: {
+                    "value": "j",
+                    "value2": "RIGHT_STICK_X:-1"
+                },
+                22: {
+                    "value": "k",
+                    "value2": "RIGHT_STICK_Y:+1"
+                },
+                23: {
+                    "value": "i",
+                    "value2": "RIGHT_STICK_Y:-1"
+                },
+                24: {
+                    "value": "1"
+                },
+                25: {
+                    "value": "2"
+                },
+                26: {
+                    "value": "3"
+                },
+                27: {},
+                28: {},
+                29: {},
+            },
+            1: {},
+            2: {},
+            3: {}
+        }
+        this.keyMap = {
+            0: "",
+            8: "backspace",
+            9: "tab",
+            13: "enter",
+            16: "shift",
+            17: "ctrl",
+            18: "alt",
+            19: "pause/break",
+            20: "caps lock",
+            27: "escape",
+            32: "space",
+            33: "page up",
+            34: "page down",
+            35: "end",
+            36: "home",
+            37: "left arrow",
+            38: "up arrow",
+            39: "right arrow",
+            40: "down arrow",
+            45: "insert",
+            46: "delete",
+            48: "0",
+            49: "1",
+            50: "2",
+            51: "3",
+            52: "4",
+            53: "5",
+            54: "6",
+            55: "7",
+            56: "8",
+            57: "9",
+            65: "a",
+            66: "b",
+            67: "c",
+            68: "d",
+            69: "e",
+            70: "f",
+            71: "g",
+            72: "h",
+            73: "i",
+            74: "j",
+            75: "k",
+            76: "l",
+            77: "m",
+            78: "n",
+            79: "o",
+            80: "p",
+            81: "q",
+            82: "r",
+            83: "s",
+            84: "t",
+            85: "u",
+            86: "v",
+            87: "w",
+            88: "x",
+            89: "y",
+            90: "z",
+            91: "left window key",
+            92: "right window key",
+            93: "select key",
+            96: "numpad 0",
+            97: "numpad 1",
+            98: "numpad 2",
+            99: "numpad 3",
+            100: "numpad 4",
+            101: "numpad 5",
+            102: "numpad 6",
+            103: "numpad 7",
+            104: "numpad 8",
+            105: "numpad 9",
+            106: "multiply",
+            107: "add",
+            109: "subtract",
+            110: "decimal point",
+            111: "divide",
+            112: "f1",
+            113: "f2",
+            114: "f3",
+            115: "f4",
+            116: "f5",
+            117: "f6",
+            118: "f7",
+            119: "f8",
+            120: "f9",
+            121: "f10",
+            122: "f11",
+            123: "f12",
+            144: "num lock",
+            145: "scroll lock",
+            186: "semi-colon",
+            187: "equal sign",
+            188: "comma",
+            189: "dash",
+            190: "period",
+            191: "forward slash",
+            192: "grave accent",
+            219: "open bracket",
+            220: "back slash",
+            221: "close bracket",
+            222: "single quote"
+        }
     }
 }

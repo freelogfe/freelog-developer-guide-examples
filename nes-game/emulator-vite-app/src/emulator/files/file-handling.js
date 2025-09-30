@@ -66,8 +66,7 @@ export default class FileHandling {
                     cb({
                         data: data,
                         headers: {
-                            "content-length": xhr.getResponseHeader("content-length"),
-                            "content-type": xhr.getResponseHeader("content-type")
+                            "content-length": xhr.getResponseHeader("content-length")
                         }
                     });
                 }
@@ -117,13 +116,13 @@ export default class FileHandling {
         if (this.emulator.config.langJson) {
             if (typeof log === "undefined") log = true;
             if (typeof this.emulator.config.langJson[text] === "string") {
-                if (log && !this.emulator.missingLang[text]) {
+                if (log && !this.emulator.missingLang.includes(text)) {
                     this.emulator.missingLang.push(text);
                     console.log("Translation key found:", text, "->", this.emulator.config.langJson[text]);
                 }
                 return this.emulator.config.langJson[text];
             } else {
-                if (log && !this.emulator.missingLang[text]) {
+                if (log && !this.emulator.missingLang.includes(text)) {
                     this.emulator.missingLang.push(text);
                     console.warn("Missing translation key:", text);
                 }
@@ -141,7 +140,7 @@ export default class FileHandling {
                 return fileName.split("/").pop().split("#")[0].split("?")[0];
             }
             return fileName;
-        } else if (this.emulator.toData(fileName, true)) {
+        } else if (this.toData(fileName, true)) {
             return "game";
         }
         return fileName;

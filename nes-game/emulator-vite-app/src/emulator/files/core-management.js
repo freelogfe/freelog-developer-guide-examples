@@ -7,7 +7,6 @@ export default class CoreManagement {
         this.emulator = emulator;
     }
 
-
     initGameCore(js, wasm, thread) {
         // 替换 var EJS_Runtime 为 window.EJS_Runtime 以确保在微前端环境中能正确挂载
         let modifiedJs = js;
@@ -92,7 +91,7 @@ export default class CoreManagement {
 
     checkStarted() {
         return new Promise(async (resolve) => {
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await this.emulator.sleep(10);
             if (this.emulator.gameManager && this.emulator.gameManager.isRunning && this.emulator.gameManager.isRunning()) {
                 resolve();
             } else {
