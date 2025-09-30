@@ -873,8 +873,8 @@ class UIManager {
         this.emulator.netplayMenu = body.parentElement;
         const createButton = this.emulator.netplayMenu.getElementsByTagName("a")[0];
         const rooms = this.emulator.createElement("div");
-        const title = this.emulator.createElement("strong");
-        title.innerText = this.emulator.localization("Rooms");
+        const title1 = this.emulator.createElement("strong");
+        title1.innerText = this.emulator.localization("Rooms");
         const table = this.emulator.createElement("table");
         table.classList.add("ejs_netplay_table");
         table.style.width = "100%";
@@ -895,7 +895,7 @@ class UIManager {
         table.appendChild(thead);
         const tbody = this.emulator.createElement("tbody");
         table.appendChild(tbody);
-        rooms.appendChild(title);
+        rooms.appendChild(title1);
         rooms.appendChild(table);
 
         const joined = this.emulator.createElement("div");
