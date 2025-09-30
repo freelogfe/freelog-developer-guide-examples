@@ -6,7 +6,7 @@
 // 导入所有模块
 import { CoreManager } from './CoreManager.js';
 import { FileManager } from './FileManager.js';
-import { MenuManager } from './MenuManager.js';
+
 import { ControlManager } from './ControlManager.js';
 import { GamepadManager } from './GamepadManager.js';
 import { VirtualGamepad } from './VirtualGamepad.js';
@@ -31,7 +31,6 @@ class EmulatorJSModular {
         // 初始化各个管理器
         this.coreManager = new CoreManager(this);
         this.fileManager = new FileManager(this);
-        this.menuManager = new MenuManager(this);
         this.controlManager = new ControlManager(this);
         this.gamepadManager = new GamepadManager(this);
         this.virtualGamepad = new VirtualGamepad(this);
@@ -327,11 +326,11 @@ class EmulatorJSModular {
     downloadRom() { return this.fileManager.downloadRom(); }
     
     // 菜单管理
-    createContextMenu() { return this.menuManager.createContextMenu(); }
-    createBottomMenuBar() { return this.menuManager.createBottomMenuBar(); }
-    createControlSettingMenu() { return this.menuManager.createControlSettingMenu(); }
-    createCheatsMenu() { return this.menuManager.createCheatsMenu(); }
-    createNetplayMenu() { return this.menuManager.createNetplayMenu(); }
+    createContextMenu() { return this.uiManager.createContextMenu(); }
+    createBottomMenuBar() { return this.uiManager.createBottomMenuBar(); }
+    createControlSettingMenu() { return this.uiManager.createControlSettingMenu(); }
+    createCheatsMenu() { return this.uiManager.createCheatsMenu(); }
+    createNetplayMenu() { return this.uiManager.createNetplayMenu(); }
     
     // 虚拟手柄
     setVirtualGamepad() { return this.virtualGamepad.setVirtualGamepad(); }
@@ -344,7 +343,7 @@ class EmulatorJSModular {
     gamepadEvent(e) { return this.gamepadManager.gamepadEvent(e); }
     checkGamepadInputs() { return this.gamepadManager.checkGamepadInputs(); }
 
-    createBottomMenuBarListeners() { return this.menuManager.createBottomMenuBarListeners(); }
+    createBottomMenuBarListeners() { return this.uiManager.createBottomMenuBarListeners(); }
     initControlVars() { return this.controlManager.initControlVars(); }
     keyLookup(controllerkey) { return this.controlManager.keyLookup(controllerkey); }
     keyChange(e) { return this.controlManager.keyChange(e); }

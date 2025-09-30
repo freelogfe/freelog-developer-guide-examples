@@ -7,23 +7,7 @@ class GameManager {
         this.emulator = emulator;
     }
 
-    downloadFiles() {
-        (async () => {
-            this.emulator.gameManager = new window.EJS_GameManager(this.emulator.Module, this.emulator);
-            await this.emulator.gameManager.loadExternalFiles();
-            await this.emulator.gameManager.mountFileSystems();
-            this.emulator.callEvent("saveDatabaseLoaded", this.emulator.gameManager.FS);
-            if (this.emulator.getCore() === "ppsspp") {
-                await this.emulator.gameManager.loadPpssppAssets();
-            }
-            await this.emulator.downloadRom();
-            await this.emulator.downloadBios();
-            await this.emulator.downloadStartState();
-            await this.emulator.downloadGameParent();
-            await this.emulator.downloadGamePatch();
-            this.emulator.startGame();
-        })();
-    }
+
 
     initModule(wasmData, threadData) {
         if (typeof window.EJS_Runtime !== "function") {
@@ -118,7 +102,7 @@ class GameManager {
                     if (this.emulator.debug) console.warn("Could not fullscreen on load");
                 }
             }
-            this.emulator.menu.open();
+            this.emulator.uiManager.open();
             if (this.emulator.isSafari && this.emulator.isMobile) {
                 //Safari is --- funny
                 this.emulator.checkStarted();
@@ -163,9 +147,9 @@ class GameManager {
     bindListeners() {
         this.emulator.createContextMenu();
         this.emulator.createBottomMenuBar();
-        this.emulator.menuManager.createControlSettingMenu();
-        this.emulator.menuManager.createCheatsMenu();
-        this.emulator.menuManager.createNetplayMenu();
+        this.emulator.uiManager.createControlSettingMenu();
+        this.emulator.uiManager.createCheatsMenu();
+        this.emulator.uiManager.createNetplayMenu();
         this.emulator.virtualGamepad.setVirtualGamepad();
         this.emulator.addEventListener(this.emulator.elements.parent, "keydown keyup", this.emulator.keyChange.bind(this.emulator));
         this.emulator.addEventListener(this.emulator.elements.parent, "mousedown touchstart", (e) => {
