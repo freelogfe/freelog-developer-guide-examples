@@ -2,7 +2,7 @@
  * 文件管理模块
  * 负责游戏文件的下载、处理和管理
  */
-class FileManager {
+export class FileManager {
     constructor(emulator) {
         this.emulator = emulator;
     }

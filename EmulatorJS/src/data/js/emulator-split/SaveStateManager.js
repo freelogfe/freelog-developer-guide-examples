@@ -2,7 +2,7 @@
  * 存档管理模块
  * 负责处理游戏存档的保存、加载和管理
  */
-class SaveStateManager {
+export class SaveStateManager {
     constructor(emulator) {
         this.emulator = emulator;
         this.autoSaveInterval = null;

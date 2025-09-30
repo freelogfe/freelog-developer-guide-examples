@@ -2,7 +2,7 @@
  * 核心管理模块
  * 负责游戏核心的加载、初始化和管理
  */
-class CoreManager {
+export class CoreManager {
     constructor(emulator) {
         this.emulator = emulator;
     }

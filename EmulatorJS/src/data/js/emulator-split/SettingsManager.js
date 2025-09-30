@@ -3,7 +3,7 @@
  * 设置管理模块
  * 负责管理模拟器的设置选项和配置
  */
-class SettingsManager {
+export class SettingsManager {
     constructor(emulator) {
         this.emulator = emulator;
     }

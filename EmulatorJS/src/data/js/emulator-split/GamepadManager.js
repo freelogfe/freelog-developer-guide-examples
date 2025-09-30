@@ -2,7 +2,7 @@
  * 游戏手柄管理模块
  * 负责处理游戏手柄的连接、输入和配置
  */
-class GamepadManager {
+ export class GamepadManager {
     constructor(emulator) {
         this.emulator = emulator;
         this.gamepad = new GamepadHandler(); //https://github.com/ethanaobrien/Gamepad

@@ -3,7 +3,7 @@
  * 虚拟手柄模块
  * 负责管理触摸屏设备的虚拟手柄UI
  */
-class VirtualGamepad {
+export class VirtualGamepad {
     constructor(emulator) {
         this.emulator = emulator;
     }

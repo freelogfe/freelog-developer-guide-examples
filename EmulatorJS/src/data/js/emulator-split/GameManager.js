@@ -2,7 +2,7 @@
  * 游戏管理模块
  * 负责游戏的启动、运行和状态管理
  */
-class GameManager {
+export class GameManager {
     constructor(emulator) {
         this.emulator = emulator;
     }

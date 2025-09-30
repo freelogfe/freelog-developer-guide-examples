@@ -4,58 +4,8 @@
  */
 
 // 导入拆分后的模块
-import EmulatorCore from './js/emulator-modules/core.js';
-import EmulatorUI from './js/emulator-modules/ui.js';
-import EmulatorControls from './js/emulator-modules/controls-base.js';
-import EmulatorSettings from './js/emulator-modules/settings-core.js';
-import EmulatorNetplay from './js/emulator-modules/netplay.js';
-import EmulatorUtils from './js/emulator-modules/utils.js';
+import EmulatorJS from './js/emulator-split/index.js';
 
-// 创建完整的模拟器类
-class EmulatorJS {
-  constructor(player, config) {
-    // 先初始化基础模块
-    this.settings = new EmulatorSettings(this);
-    this.utils = new EmulatorUtils(this);
-    
-    // 初始化功能模块
-    this.controls = new EmulatorControls(this);
-    this.netplay = new EmulatorNetplay(this);
-    
-    // 最后初始化核心和UI
-    // 根据原文件构造器定义初始化核心模块
-    this.core = new EmulatorCore(config);
-    // 设置模块引用
-    this.core.player = player;
-    this.core.utils = this.utils;
-    this.core.settings = this.settings;
-    this.core.controls = this.controls;
-    this.core.netplay = this.netplay;
-    
-    // 初始化UI（传递完整上下文）
-    this.ui = new EmulatorUI(this);
-    
-    // 确保事件系统兼容
-    this.on = this.core.on.bind(this.core);
-    this.off = this.core.off.bind(this.core);
-    this.callEvent = this.core.callEvent.bind(this.core);
-    
-    // 保留原有API方法
-    this.adBlocked = this.ui.adBlocked.bind(this.ui);
-    this.startButtonClicked = this.ui.startButtonClicked.bind(this.ui);
-    
-    // 代理核心方法
-    this.start = this.core.start.bind(this.core);
-    this.stop = this.core.stop.bind(this.core);
-    this.pause = this.core.pause.bind(this.core);
-    this.resume = this.core.resume.bind(this.core);
-  }
-  
-  // 保留静态初始化方法
-  static init(config) {
-    return new EmulatorJS(null, config);
-  }
-}
 import './js/GameManager.js';
 import './js/compression.js';
 import './js/gamepad.js';

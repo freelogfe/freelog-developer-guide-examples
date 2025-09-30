@@ -2,7 +2,13 @@
  * 控制管理模块
  * 负责处理游戏控制、键盘和手柄输入
  */
-class ControlManager {
+/**
+ * 控制管理器类，负责处理键盘和游戏手柄的输入控制
+ */
+/**
+ * 控制管理器类，负责处理键盘和游戏手柄的输入控制
+ */
+export class ControlManager {
     constructor(emulator) {
         this.emulator = emulator;
         this.initControlVars();

@@ -2,7 +2,7 @@
  * 存储管理模块
  * 负责管理模拟器的各种存储功能，包括本地存储和缓存
  */
-class StorageManager {
+export class StorageManager {
     constructor(emulator) {
         this.emulator = emulator;
         this.initStorage();

@@ -2,7 +2,7 @@
  * 网络游戏管理模块
  * 负责处理多人在线游戏功能
  */
-class NetplayManager {
+export class NetplayManager {
     constructor(emulator) {
         this.emulator = emulator;
         this.enabled = false;

@@ -2,7 +2,7 @@
  * 用户界面管理模块
  * 负责管理模拟器的各种UI元素和交互
  */
-class UIManager {
+export class UIManager {
     constructor(emulator) {
         this.emulator = emulator;
         this.createBottomMenuBar();
