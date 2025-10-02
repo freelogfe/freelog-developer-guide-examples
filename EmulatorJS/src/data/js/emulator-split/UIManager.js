@@ -5,7 +5,8 @@
 export class UIManager {
     constructor(emulator) {
         this.emulator = emulator;
-        this.createBottomMenuBar();
+        // 初始化事件监听器
+        this.mousemoveListener = null;
         // 这些函数现在在 VirtualGamepad 中实现
         // 不再需要在 UIManager 中直接调用
     }
@@ -1017,12 +1018,12 @@ export class UIManager {
             if (angle < 85 || angle > 95) return;
             show();
         }
-        if (this.emulator.uiManager.mousemoveListener) this.emulator.removeEventListener(this.emulator.uiManager.mousemoveListener);
+        if (this.mousemoveListener) this.emulator.removeEventListener(this.mousemoveListener);
 
-        if ((this.emulator.preGetSetting("menubarBehavior") || "downward") === "downward") {
-            this.emulator.uiManager.mousemoveListener = this.emulator.addEventListener(this.emulator.elements.parent, "mousemove", mouseListener);
+        if ((this.emulator.preGetSafeSetting("menubarBehavior") || "downward") === "downward") {
+            this.mousemoveListener = this.emulator.addEventListener(this.emulator.elements.parent, "mousemove", mouseListener);
         } else {
-            this.emulator.uiManager.mousemoveListener = this.emulator.addEventListener(this.emulator.elements.parent, "mousemove", clickListener);
+            this.mousemoveListener = this.emulator.addEventListener(this.emulator.elements.parent, "mousemove", clickListener);
         }
 
         this.emulator.addEventListener(this.emulator.elements.parent, "click", clickListener);
@@ -1654,12 +1655,12 @@ export class UIManager {
             if (angle < 85 || angle > 95) return;
             show();
         }
-        if (this.emulator.uiManager.mousemoveListener) this.emulator.removeEventListener(this.emulator.uiManager.mousemoveListener);
+        if (this.mousemoveListener) this.emulator.removeEventListener(this.mousemoveListener);
 
-        if ((this.emulator.preGetSetting("menubarBehavior") || "downward") === "downward") {
-            this.emulator.uiManager.mousemoveListener = this.emulator.addEventListener(this.emulator.elements.parent, "mousemove", mouseListener);
+        if ((this.emulator.preGetSafeSetting("menubarBehavior") || "downward") === "downward") {
+            this.mousemoveListener = this.emulator.addEventListener(this.emulator.elements.parent, "mousemove", mouseListener);
         } else {
-            this.emulator.uiManager.mousemoveListener = this.emulator.addEventListener(this.emulator.elements.parent, "mousemove", clickListener);
+            this.mousemoveListener = this.emulator.addEventListener(this.emulator.elements.parent, "mousemove", clickListener);
         }
 
         this.emulator.addEventListener(this.emulator.elements.parent, "click", clickListener);

@@ -12,10 +12,22 @@ export class ControlManager {
     constructor(emulator) {
         this.emulator = emulator;
         this.initControlVars();
-        this.bindKeyboardListeners();
+    }
+
+    createElement(type) {
+        return document.createElement(type);
     }
 
     initControlVars() {
+        // 确保 defaultControllers 存在，否则使用空对象作为默认值
+        if (!this.emulator.defaultControllers) {
+            this.emulator.defaultControllers = {
+                0: {},
+                1: {},
+                2: {},
+                3: {}
+            };
+        }
         this.controls = JSON.parse(JSON.stringify(this.emulator.defaultControllers));
         this.gamepadLabels = [];
         this.gamepadSelection = [];
@@ -36,6 +48,21 @@ export class ControlManager {
                 }
             }
         };
+    }
+
+    setElements(element) {
+        const game = this.emulator.createElement("div");
+        const elem = document.querySelector(element);
+        elem.innerHTML = "";
+        elem.appendChild(game);
+        this.emulator.game = game;
+
+        this.emulator.elements = {
+            main: this.emulator.game,
+            parent: elem
+        }
+        this.emulator.elements.parent.classList.add("ejs_parent");
+        this.emulator.elements.parent.setAttribute("tabindex", -1);
     }
 
     bindKeyboardListeners() {

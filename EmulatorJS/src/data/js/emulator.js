@@ -1,4 +1,4 @@
-class EmulatorJS {
+export class EmulatorJS {
     getCores() {
         let rv = {
             "atari5200": ["a5200"],

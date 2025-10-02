@@ -219,6 +219,10 @@ export class GameManager {
         });
     }
 
+    supportsStates() {
+        return true; // 默认支持状态保存
+    }
+    
     checkSupportedOpts() {
         if (!this.emulator.gameManager.supportsStates()) {
             this.emulator.elements.bottomBar.saveState[0].style.display = "none";

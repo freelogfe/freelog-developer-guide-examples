@@ -4,8 +4,8 @@
  */
 
 // 导入拆分后的模块
-import EmulatorJS from './js/emulator-split/index.js';
-
+import { EmulatorJS } from './js/emulator-split/index.js';
+// import { EmulatorJS } from './js/emulator.js';
 import './js/GameManager.js';
 import './js/compression.js';
 import './js/gamepad.js';

@@ -2,6 +2,43 @@
  * 文件管理模块
  * 负责游戏文件的下载、处理和管理
  */
+
+// 简单的EJS_GameManager模拟
+class EJS_GameManager {
+    constructor(Module, emulator) {
+        this.Module = Module;
+        this.emulator = emulator;
+        this.FS = Module.FS || {
+            writeFile: () => {},
+            analyzePath: () => ({ exists: false }),
+            mkdir: () => {}
+        };
+    }
+    
+    loadExternalFiles() {
+        return Promise.resolve();
+    }
+    
+    mountFileSystems() {
+        return Promise.resolve();
+    }
+    
+    loadPpssppAssets() {
+        return Promise.resolve();
+    }
+    
+    getDiskCount() {
+        return 0;
+    }
+    
+    restart() {
+        // 简单重启模拟
+        return Promise.resolve();
+    }
+}
+
+window.EJS_GameManager = EJS_GameManager;
+
 export class FileManager {
     constructor(emulator) {
         this.emulator = emulator;

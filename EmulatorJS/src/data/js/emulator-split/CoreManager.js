@@ -74,8 +74,8 @@ export class CoreManager {
             return core;
         }
         const gen = this.getCore(true);
-        if (cores[gen] && cores[gen].includes(this.emulator.preGetSetting("retroarch_core"))) {
-            return this.emulator.preGetSetting("retroarch_core");
+        if (cores[gen] && cores[gen].includes(this.emulator.preGetSafeSetting("retroarch_core"))) {
+            return this.emulator.preGetSafeSetting("retroarch_core");
         }
         if (cores[core]) {
             return cores[core][0];
@@ -159,7 +159,7 @@ export class CoreManager {
             }
             let threads = false;
             if (typeof window.SharedArrayBuffer === "function") {
-                const opt = this.emulator.preGetSetting("ejs_threads");
+                const opt = this.emulator.preGetSafeSetting("ejs_threads");
                 if (opt) {
                     threads = (opt === "enabled");
                 } else {
