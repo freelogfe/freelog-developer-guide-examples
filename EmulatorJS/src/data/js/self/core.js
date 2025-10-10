@@ -63,7 +63,6 @@ export function getCores() {
     }
     return rv;
 }
-
 export function downloadGameCore() {
     this.textElem.innerText = this.localization("Download Game Core");
     if (!this.config.threads && this.requiresThreads(this.getCore())) {

@@ -205,7 +205,7 @@ export class EmulatorJS {
             }
         }
 
-        const button = createStartButton(this);
+        const button = this.createStartButton();
         if (this.config.startOnLoad === true) {
             this.startButtonClicked(button);
         }

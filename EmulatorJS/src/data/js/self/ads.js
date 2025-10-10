@@ -40,7 +40,6 @@
     })
 
 }
-
 export function adBlocked(url, del) {
     if (del) {
         document.querySelector('div[class="ejs_ad_iframe"]').remove();

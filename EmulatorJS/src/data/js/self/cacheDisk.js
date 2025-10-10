@@ -51,7 +51,6 @@
         }
     })();
 }
-
 export function setupDisksMenu() {
     this.disksMenu = this.createElement("div");
     this.disksMenu.classList.add("ejs_settings_parent");

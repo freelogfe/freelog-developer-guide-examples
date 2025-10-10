@@ -1,4 +1,4 @@
-﻿export const setVirtualGamepad = () => {
+﻿export function setVirtualGamepad() {
     this.virtualGamepad = this.createElement("div");
     this.toggleVirtualGamepad = (show) => {
         this.virtualGamepad.style.display = show ? "" : "none";

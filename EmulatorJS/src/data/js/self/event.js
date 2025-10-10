@@ -10,12 +10,12 @@ export function callEvent(event, data) {
     return this.functions[event].length;
 }
 export function bindListeners() {
-    addEventListener(this.elements.parent, "keydown keyup", this.keyChange);
-    addEventListener(this.elements.parent, "mousedown touchstart", (e) => {
+    this.addEventListener(this.elements.parent, "keydown keyup", this.keyChange.bind(this));
+    this.addEventListener(this.elements.parent, "mousedown touchstart", (e) => {
         if (document.activeElement !== this.elements.parent && this.config.noAutoFocus !== true) this.elements.parent.focus();
     })
-    addEventListener(window, "resize", this.handleResize.bind(this));
-    //addEventListener(window, "blur", e => console.log(e), true); //TODO - add "click to make keyboard keys work" message?
+    this.addEventListener(window, "resize", this.handleResize.bind(this));
+    //this.addEventListener(window, "blur", e => console.log(e), true); //TODO - add "click to make keyboard keys work" message?
 
     let counter = 0;
     this.elements.statePopupPanel = this.createPopup("", {}, true);
@@ -24,26 +24,26 @@ export function bindListeners() {
     this.elements.statePopupPanel.style["font-size"] = "28px";
 
     //to fix a funny apple bug
-    addEventListener(window, "webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange", () => {
+    this.addEventListener(window, "webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange", () => {
         setTimeout(() => {
             this.handleResize.bind(this);
             if (this.config.noAutoFocus !== true) this.elements.parent.focus();
         }, 0);
     });
-    addEventListener(window, "beforeunload", (e) => {
+    this.addEventListener(window, "beforeunload", (e) => {
         if (!this.started) return;
         this.callEvent("exit");
     });
-    addEventListener(this.elements.parent, "dragenter", (e) => {
+    this.addEventListener(this.elements.parent, "dragenter", (e) => {
         e.preventDefault();
         if (!this.started) return;
         counter++;
         this.elements.statePopupPanel.parentElement.style.display = "block";
     });
-    addEventListener(this.elements.parent, "dragover", (e) => {
+    this.addEventListener(this.elements.parent, "dragover", (e) => {
         e.preventDefault();
     });
-    addEventListener(this.elements.parent, "dragleave", (e) => {
+    this.addEventListener(this.elements.parent, "dragleave", (e) => {
         e.preventDefault();
         if (!this.started) return;
         counter--;
@@ -51,14 +51,14 @@ export function bindListeners() {
             this.elements.statePopupPanel.parentElement.style.display = "none";
         }
     });
-    addEventListener(this.elements.parent, "dragend", (e) => {
+    this.addEventListener(this.elements.parent, "dragend", (e) => {
         e.preventDefault();
         if (!this.started) return;
         counter = 0;
         this.elements.statePopupPanel.parentElement.style.display = "none";
     });
 
-    addEventListener(this.elements.parent, "drop", (e) => {
+    this.addEventListener(this.elements.parent, "drop", (e) => {
         e.preventDefault();
         if (!this.started) return;
         this.elements.statePopupPanel.parentElement.style.display = "none";
@@ -102,8 +102,6 @@ export function bindListeners() {
     this.gamepad.on("buttondown", this.gamepadEvent.bind(this));
     this.gamepad.on("buttonup", this.gamepadEvent.bind(this));
 }
-
-
 export function addEventListener(element, listener, callback) {
     const listeners = listener.split(" ");
     let rv = [];

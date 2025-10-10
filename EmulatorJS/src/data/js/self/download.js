@@ -253,7 +253,6 @@ export function downloadFiles() {
         this.startGame();
     })();
 }
-
 export function downloadFile(path, progressCB, notWithPath, opts) {
     return new Promise(async cb => {
         const data = this.toData(path); //check other data types

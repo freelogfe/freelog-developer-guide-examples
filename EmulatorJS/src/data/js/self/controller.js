@@ -219,7 +219,6 @@ export function getKeyMap() {
         222: "single quote"
     }
 };
-
 export const defaultButtonOptions = {
     playPause: {
         visible: true,
@@ -356,7 +355,6 @@ export function keyLookup(controllerkey) {
     }
     return -1;
 }
-   
 export function keyChange(e) {
     if (e.repeat) return;
     if (!this.started) return;
