@@ -1,6 +1,17 @@
-﻿
+﻿import { keyChange } from "./controller";
+export const on = (event, func) => {
+    if (!this.functions) this.functions = {};
+    if (!Array.isArray(this.functions[event])) this.functions[event] = [];
+    this.functions[event].push(func);
+}
+export const callEvent = (event, data) => {
+    if (!this.functions) this.functions = {};
+    if (!Array.isArray(this.functions[event])) return 0;
+    this.functions[event].forEach(e => e(data));
+    return this.functions[event].length;
+}
 export const bindListeners = (emulator) => {
-    addEventListener(emulator.elements.parent, "keydown keyup", emulator.keyChange.bind(emulator));
+    addEventListener(emulator.elements.parent, "keydown keyup", keyChange.bind(emulator));
     addEventListener(emulator.elements.parent, "mousedown touchstart", (e) => {
         if (document.activeElement !== emulator.elements.parent && emulator.config.noAutoFocus !== true) emulator.elements.parent.focus();
     })

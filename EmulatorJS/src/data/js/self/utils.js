@@ -5,3 +5,35 @@
 })();
 
 export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); 
+export const localization = (text, log) => {
+    if (typeof text === "undefined" || text.length === 0) return;
+    text = text.toString();
+    if (text.includes("EmulatorJS v")) return text;
+    if (this.config.langJson) {
+        if (typeof log === "undefined") log = true;
+        if (!this.config.langJson[text] && log) {
+            if (!this.missingLang.includes(text)) this.missingLang.push(text);
+            console.log(`Translation not found for '${text}'. Language set to '${this.config.language}'`);
+        }
+        return this.config.langJson[text] || text;
+    }
+    return text;
+}
+
+export const checkCompression = (data, msg, fileCbFunc) => {
+    if (!this.compression) {
+        this.compression = new window.EJS_COMPRESSION(this);
+    }
+    if (msg) {
+        this.textElem.innerText = msg;
+    }
+    return this.compression.decompress(data, (m, appendMsg) => {
+        this.textElem.innerText = appendMsg ? (msg + m) : m;
+    }, fileCbFunc);
+}
+export const checkCoreCompatibility = (version) => {
+    if (this.versionAsInt(version.minimumEJSVersion) > this.versionAsInt(this.ejs_version)) {
+        this.startGameError(this.localization("Outdated EmulatorJS version"));
+        throw new Error("Core requires minimum EmulatorJS version of " + version.minimumEJSVersion);
+    }
+}
