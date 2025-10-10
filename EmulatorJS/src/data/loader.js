@@ -3,16 +3,8 @@
  * This module provides functions to load the EmulatorJS emulator
  */
 
-// 导入拆分后的模块
-import { EmulatorJS } from './js/emulator-split/index.js';
-// import { EmulatorJS } from './js/emulator.js';
-import './js/GameManager.js';
-import './js/compression.js';
-import './js/gamepad.js';
-import './js/shaders.js';
-import './js/storage.js';
-import './js/nipplejs.js';
-import './js/socket.io.min.js'
+// 导入模块化的 EmulatorJS
+import { EmulatorJS } from './js/Emulator.js';
 
 /**
  * 加载 EmulatorJS 的主函数
@@ -70,10 +62,13 @@ export async function loadEmulator() {
     config.hideSettings = window.EJS_hideSettings;
     config.shaders = Object.assign({}, window.EJS_SHADERS, window.EJS_shaders ? window.EJS_shaders : {});
 
-
-
+    // 创建模块化的 EmulatorJS 实例
     window.EJS_emulator = new EmulatorJS(window.EJS_player, config);
+    
+    // 设置向后兼容的事件处理
     window.EJS_adBlocked = (url, del) => window.EJS_emulator.adBlocked(url, del);
+    
+    // 绑定事件回调
     if (typeof window.EJS_ready === "function") {
         window.EJS_emulator.on("ready", window.EJS_ready);
     }
@@ -92,21 +87,9 @@ export async function loadEmulator() {
     if (typeof window.EJS_onSaveSave === "function") {
         window.EJS_emulator.on("saveSave", window.EJS_onSaveSave);
     }
-
-    // 如果设置了自动开始游戏，则触发启动按钮点击
-    if (window.EJS_startOnLoaded) {
-        setTimeout(() => {
-            const startButton = document.querySelector('.ejs_start_button');
-            if (startButton) {
-                startButton.click();
-            } else {
-                console.log('[EmulatorJS] 自动开始游戏: 未找到启动按钮，尝试直接调用startButtonClicked');
-                if (window.EJS_emulator && typeof window.EJS_emulator.startButtonClicked === 'function') {
-                    window.EJS_emulator.startButtonClicked();
-                }
-            }
-        }, 100);
-    }
+    
+    // 返回模拟器实例
+    return window.EJS_emulator;
 }
 
 // 默认导出
