@@ -42,8 +42,8 @@ export async function runGame(config) {
 
   // Load the emulator
   console.log('[EmulatorJS] Calling loadEmulator...');
-  await loadEmulator();
-
+  const emulator = await loadEmulator();
+  return emulator;
 }
 
 // 兼容旧版本

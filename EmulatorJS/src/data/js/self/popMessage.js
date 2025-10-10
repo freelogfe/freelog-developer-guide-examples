@@ -56,3 +56,7 @@ export function createPopup(popupTitle, buttons, hidden) {
 
     return main;
 }
+
+export function isPopupOpen() {
+    return this.cheatMenu.style.display !== "none" || this.netplayMenu.style.display !== "none" || this.controlMenu.style.display !== "none" || this.currentPopup !== null;
+}

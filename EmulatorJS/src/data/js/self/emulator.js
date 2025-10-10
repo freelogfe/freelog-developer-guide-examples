@@ -4,13 +4,15 @@ import {
     getDefaultControllers, getKeyMap, createControlSettingMenu,
     defaultButtonOptions, defaultButtonAliases, keyLookup, keyChange, setupKeys
 } from "./controller.js"
-import { createBottomMenuBar, createContextMenu, 
-    createCheatsMenu, createStartButton } from "./ui.js"
+import {
+    createBottomMenuBar, createContextMenu,
+    createCheatsMenu, createStartButton
+} from "./ui.js"
 import { setVirtualGamepad } from "./virtualGamepad.js"
 import { bindListeners, addEventListener, removeEventListener, on, callEvent } from "./event.js"
-import { createNetplayMenu,defineNetplayFunctions } from "./netPlay.js"
+import { createNetplayMenu, defineNetplayFunctions } from "./netPlay.js"
 import { screenRecord, screenshot, takeScreenshot, collectScreenRecordingMediaTracks } from "./screenRecord.js"
-import { closePopup, createPopup, displayMessage } from "./popMessage.js"
+import { closePopup, createPopup, displayMessage, isPopupOpen } from "./popMessage.js"
 import { createText, setElements, setColor } from "./baseUI.js"
 import { setupAds, adBlocked } from "./ads.js"
 import { buildButtonOptions } from "./configs.js"
@@ -18,8 +20,12 @@ import { openCacheMenu, setupDisksMenu } from "./cacheDisk.js";
 import { createElement, versionAsInt, toData, requiresThreads, requiresWebGL2, saveInBrowserSupported } from "./utils.js"
 import { getSettingValue, setupSettingsMenu, loadSettings, getCoreSettings, preGetSetting, saveSettings, getLocalStorageKey } from "./settings.js";
 import { downloadFiles, downloadFile, downloadRom, downloadBios, downloadGameParent, downloadGamePatch, downloadGameFile, downloadStartState } from "./download.js"
+import { updateCheatUI, cheatChanged } from "./cheat.js"
 export class EmulatorJS {
     constructor(element, config) {
+        this.updateCheatUI = updateCheatUI.bind(this);
+        this.cheatChanged = cheatChanged.bind(this);
+        this.isPopupOpen = isPopupOpen.bind(this);
         this.createBottomMenuBar = createBottomMenuBar.bind(this);
         this.createContextMenu = createContextMenu.bind(this);
         this.createCheatsMenu = createCheatsMenu.bind(this);
@@ -412,9 +418,7 @@ export class EmulatorJS {
             file.click();
         })
     }
-    isPopupOpen() {
-        return this.cheatMenu.style.display !== "none" || this.netplayMenu.style.display !== "none" || this.controlMenu.style.display !== "none" || this.currentPopup !== null;
-    }
+
     isChild(first, second) {
         if (!first || !second) return false;
         const adown = first.nodeType === 9 ? first.documentElement : first;
@@ -711,53 +715,7 @@ export class EmulatorJS {
         popup.appendChild(popupMsg);
         return [popup, popupMsg];
     }
-    updateCheatUI() {
-        if (!this.gameManager) return;
-        this.elements.cheatRows.innerHTML = "";
 
-        const addToMenu = (desc, checked, code, is_permanent, i) => {
-            const row = this.createElement("div");
-            row.classList.add("ejs_cheat_row");
-            const input = this.createElement("input");
-            input.type = "checkbox";
-            input.checked = checked;
-            input.value = i;
-            input.id = "ejs_cheat_switch_" + i;
-            row.appendChild(input);
-            const label = this.createElement("label");
-            label.for = "ejs_cheat_switch_" + i;
-            label.innerText = desc;
-            row.appendChild(label);
-            label.addEventListener("click", (e) => {
-                input.checked = !input.checked;
-                this.cheats[i].checked = input.checked;
-                this.cheatChanged(input.checked, code, i);
-                this.saveSettings();
-            })
-            if (!is_permanent) {
-                const close = this.createElement("a");
-                close.classList.add("ejs_cheat_row_button");
-                close.innerText = "×";
-                row.appendChild(close);
-                close.addEventListener("click", (e) => {
-                    this.cheatChanged(false, code, i);
-                    this.cheats.splice(i, 1);
-                    this.updateCheatUI();
-                    this.saveSettings();
-                })
-            }
-            this.elements.cheatRows.appendChild(row);
-            this.cheatChanged(checked, code, i);
-        }
-        this.gameManager.resetCheat();
-        for (let i = 0; i < this.cheats.length; i++) {
-            addToMenu(this.cheats[i].desc, this.cheats[i].checked, this.cheats[i].code, this.cheats[i].is_permanent, i);
-        }
-    }
-    cheatChanged(checked, code, index) {
-        if (!this.gameManager) return;
-        this.gameManager.setCheat(index, checked, code);
-    }
 
     enableShader(name) {
         if (!this.gameManager) return;
@@ -790,47 +748,7 @@ export class EmulatorJS {
      * Load a new ROM without destroying the emulator instance
      * @param {string} romPath - Path to the ROM file
      */
-    async loadROM(romPath) {
-        try {
-            // Reset game state
-            this.reset();
-
-            // Load new ROM
-            const gameData = await this.downloadFile(romPath);
-            if (gameData === -1) {
-                throw new Error("Failed to download ROM file");
-            }
-
-            // Update game manager with new ROM
-            if (this.gameManager) {
-                this.gameManager.loadROM(romPath);
-            }
-
-            console.log("ROM loaded successfully:", romPath);
-        } catch (error) {
-            console.error("Error loading ROM:", error);
-            throw error;
-        }
-    }
-
-    /**
-     * Reset the emulator state
-     */
-    reset() {
-        // Reset internal state variables
-        this.started = false;
-        this.paused = true;
-
-        // Clear any existing game data if needed
-        if (this.gameManager) {
-            // Perform any necessary cleanup in the game manager
-            if (this.gameManager.reset) {
-                this.gameManager.reset();
-            }
-        }
-
-        console.log("Emulator state reset");
-    }
+    
 }
 
 window.EmulatorJS = EmulatorJS;
