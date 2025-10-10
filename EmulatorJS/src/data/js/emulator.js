@@ -1,3 +1,10 @@
+import { CoreManager } from './modules/Core.js';
+import { Downloader } from './modules/downloader.js';
+import { UIManager } from './modules/UI.js';
+import { InputManager } from './modules/Input.js';
+import { GameManager } from './modules/game.js';
+import { EventManager } from './modules/events.js';
+
 export class EmulatorJS {
     getCores() {
         let rv = {
