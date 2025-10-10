@@ -256,16 +256,16 @@
 
           try {
             // 加载游戏
-              controller.loadROM(rom);
 
-            // if (controller) {
-            // } else {
-            //   controller = await loadGame({
-            //     rom: rom,
-            //     name: name,
-            //     core: core,
-            //   });
-            // }
+            if (false) {
+              controller.loadROM(rom);
+            } else {
+              controller = await loadGame({
+                rom: rom,
+                name: name,
+                core: core,
+              });
+            }
           } catch (error) {
             console.error("Failed to load game:", error);
             showError("Failed to load game: " + error.message);
