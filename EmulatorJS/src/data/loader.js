@@ -4,8 +4,14 @@
  */
 
 // 导入模块化的 EmulatorJS
-import { EmulatorJS } from './js/Emulator.js';
-
+import { EmulatorJS } from './js/emulator.js';
+import './js/GameManager.js';
+import './js/compression.js';
+import './js/gamepad.js';
+import './js/shaders.js';
+import './js/storage.js';
+import './js/nipplejs.js';
+import './js/socket.io.min.js'
 /**
  * 加载 EmulatorJS 的主函数
  * @returns {Promise<void>}

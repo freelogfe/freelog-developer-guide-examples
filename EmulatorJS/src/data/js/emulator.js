@@ -571,8 +571,9 @@ export class EmulatorJS {
                 this.initGameCore(js, wasm, thread);
             });
         }
+        let version = this.ejs_version.endsWith("-beta") ? "nightly" : this.ejs_version;
         const report = "cores/reports/" + this.getCore() + ".json";
-        this.downloadFile(report, null, false, { responseType: "text", method: "GET" }).then(async rep => {
+        this.downloadFile(`https://cdn.emulatorjs.org/${version}/data/${report}`, null, true, { responseType: "text", method: "GET" }).then(async rep => {
             if (rep === -1 || typeof rep === "string" || typeof rep.data === "string") {
                 rep = {};
             } else {
@@ -612,9 +613,6 @@ export class EmulatorJS {
             // this.textElem.innerText = this.localization("Download Game Core") + progress;
             // }, false, { responseType: "arraybuffer", method: "GET" });
             // if (res === -1) {
-            console.log("File not found, attemping to fetch from emulatorjs cdn.");
-            console.error("**THIS METHOD IS A FAILSAFE, AND NOT OFFICIALLY SUPPORTED. USE AT YOUR OWN RISK**");
-            let version = this.ejs_version.endsWith("-beta") ? "nightly" : this.ejs_version;
             let res = await this.downloadFile(`https://cdn.emulatorjs.org/${version}/data/${corePath}`, (progress) => {
                 this.textElem.innerText = this.localization("Download Game Core") + progress;
             }, true, { responseType: "arraybuffer", method: "GET" });
@@ -6759,9 +6757,9 @@ export class EmulatorJS {
         console.log("Emulator state reset");
     }
 
-    
 
-   
+
+
     /**
      * Enhanced screen recording method
      */
