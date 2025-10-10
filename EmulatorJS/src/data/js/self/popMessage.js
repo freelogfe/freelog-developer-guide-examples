@@ -6,6 +6,18 @@
         this.currentPopup = null;
     }
 }
+export function displayMessage(message, time) {
+    if (!this.msgElem) {
+        this.msgElem = this.createElement("div");
+        this.msgElem.classList.add("ejs_message");
+        this.elements.parent.appendChild(this.msgElem);
+    }
+    clearTimeout(this.msgTimeout);
+    this.msgTimeout = setTimeout(() => {
+        this.msgElem.innerText = "";
+    }, (typeof time === "number" && time > 0) ? time : 3000)
+    this.msgElem.innerText = message;
+}
 //creates a full box popup.
 export function createPopup(popupTitle, buttons, hidden) {
     if (!hidden) this.closePopup();

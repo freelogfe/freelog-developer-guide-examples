@@ -1,4 +1,7 @@
-﻿export function saveSettings() {
+﻿export function getSettingValue(id) {
+    return this.allSettings[id] || this.settings[id] || null;
+}
+export function saveSettings() {
     if (!window.localStorage || this.config.disableLocalStorage || !this.settingsLoaded) return;
     if (!this.started && !this.failedToStart) return;
     const coreSpecific = {

@@ -1,4 +1,24 @@
 ﻿import { isSafari, isMobile } from "./utils";
+export function getCore(generic) {
+    const cores = getCores();
+    const core = this.config.system;
+    if (generic) {
+        for (const k in cores) {
+            if (cores[k].includes(core)) {
+                return k;
+            }
+        }
+        return core;
+    }
+    const gen = this.getCore(true);
+    if (cores[gen] && cores[gen].includes(this.preGetSetting("retroarch_core"))) {
+        return this.preGetSetting("retroarch_core");
+    }
+    if (cores[core]) {
+        return cores[core][0];
+    }
+    return core;
+}
 export function getCores() {
     let rv = {
         "atari5200": ["a5200"],

@@ -1,4 +1,4 @@
-import { isSafari, isMobile, localization, checkCompression, checkCoreCompatibility, getBaseFileName } from "./utils";
+import { isSafari, isMobile, localization, checkCompression, checkCoreCompatibility, getBaseFileName, createLink } from "./utils";
 import { getCores, downloadGameCore, initGameCore } from "./core";
 import { getDefaultControllers, getKeyMap, createContextMenu, defaultButtonOptions, defaultButtonAliases } from "./controller.js"
 import { createBottomMenuBar, createControlSettingMenu, createCheatsMenu, createStartButton } from "./ui.js"
@@ -6,76 +6,22 @@ import { setVirtualGamepad } from "./virtualGamepad.js"
 import { bindListeners, addEventListener, removeEventListener, on, callEvent } from "./event.js"
 import { createNetplayMenu } from "./netPlay.js"
 import { screenRecord } from "./screenRecord.js"
-import { closePopup, createPopup } from "./pop.js"
+import { closePopup, createPopup, displayMessage } from "./popMessage.js"
 import { createText, setElements, setColor } from "./baseUI.js"
 import { setupAds, adBlocked } from "./ads.js"
-import { setupSettingsMenu, loadSettings, getCoreSettings, preGetSetting, saveSettings, getLocalStorageKey } from "./settings.js";
+import { openCacheMenu, setupDisksMenu } from "./cacheDisk.js";
+import { createElement, versionAsInt, toData, requiresThreads, requiresWebGL2 } from "./utils.js"
+import { getSettingValue, setupSettingsMenu, loadSettings, getCoreSettings, preGetSetting, saveSettings, getLocalStorageKey } from "./settings.js";
 import { downloadFiles, downloadFile, downloadRom, downloadBios, downloadGameParent, downloadGamePatch, downloadGameFile, downloadStartState } from "./download.js"
 export class EmulatorJS {
-
-    requiresThreads(core) {
-        const requiresThreads = ["ppsspp", "dosbox_pure"];
-        return requiresThreads.includes(core);
-    }
-    requiresWebGL2(core) {
-        const requiresWebGL2 = ["ppsspp"];
-        return requiresWebGL2.includes(core);
-    }
-    getCore(generic) {
-        const cores = getCores();
-        const core = this.config.system;
-        if (generic) {
-            for (const k in cores) {
-                if (cores[k].includes(core)) {
-                    return k;
-                }
-            }
-            return core;
-        }
-        const gen = this.getCore(true);
-        if (cores[gen] && cores[gen].includes(this.preGetSetting("retroarch_core"))) {
-            return this.preGetSetting("retroarch_core");
-        }
-        if (cores[core]) {
-            return cores[core][0];
-        }
-        return core;
-    }
-    createElement(type) {
-        return document.createElement(type);
-    }
-
-
-    toData(data, rv) {
-        if (!(data instanceof ArrayBuffer) && !(data instanceof Uint8Array) && !(data instanceof Blob)) return null;
-        if (rv) return true;
-        return new Promise(async (resolve) => {
-            if (data instanceof ArrayBuffer) {
-                resolve(new Uint8Array(data));
-            } else if (data instanceof Uint8Array) {
-                resolve(data);
-            } else if (data instanceof Blob) {
-                resolve(new Uint8Array(await data.arrayBuffer()));
-            }
-            resolve();
-        })
-    }
-
-    versionAsInt(ver) {
-        if (ver.endsWith("-beta")) {
-            return 99999999;
-        }
-        let rv = ver.split(".");
-        if (rv[rv.length - 1].length === 1) {
-            rv[rv.length - 1] = "0" + rv[rv.length - 1];
-        }
-        return parseInt(rv.join(""));
-    }
     constructor(element, config) {
+        this.getCores = getCores.bind(this);
         this.defaultControllers = getDefaultControllers();
         this.keyMap = getKeyMap();
         this.addEventListener = addEventListener;
         this.removeEventListener = removeEventListener;
+        this.requiresWebGL2 = requiresWebGL2.bind(this);
+        this.requiresThreads = requiresThreads.bind(this);
         this.localization = localization.bind(this);
         this.checkCompression = checkCompression.bind(this);
         this.checkCoreCompatibility = checkCoreCompatibility.bind(this);
@@ -101,6 +47,15 @@ export class EmulatorJS {
         this.preGetSetting = preGetSetting.bind(this);
         this.getLocalStorageKey = getLocalStorageKey.bind(this);
         this.saveSettings = saveSettings.bind(this);
+        this.getSettingValue = getSettingValue.bind(this);
+        this.createLink = createLink.bind(this);
+        this.displayMessage = displayMessage.bind(this);
+        this.openCacheMenu = openCacheMenu.bind(this);
+        this.setupDisksMenu = setupDisksMenu.bind(this);
+        this.createElement = createElement.bind(this);
+        this.versionAsInt = versionAsInt.bind(this);
+        this.getCore = getCore.bind(this);
+        this.toData = toData.bind(this);
         this.on = on.bind(this);
         this.callEvent = callEvent.bind(this);
         this.ejs_version = "4.2.3";
@@ -274,18 +229,7 @@ export class EmulatorJS {
     saveInBrowserSupported() {
         return !!window.indexedDB && (typeof this.config.gameName === "string" || !this.config.gameUrl.startsWith("blob:"));
     }
-    displayMessage(message, time) {
-        if (!this.msgElem) {
-            this.msgElem = this.createElement("div");
-            this.msgElem.classList.add("ejs_message");
-            this.elements.parent.appendChild(this.msgElem);
-        }
-        clearTimeout(this.msgTimeout);
-        this.msgTimeout = setTimeout(() => {
-            this.msgElem.innerText = "";
-        }, (typeof time === "number" && time > 0) ? time : 3000)
-        this.msgElem.innerText = message;
-    }
+
 
     initModule(wasmData, threadData) {
         if (typeof window.EJS_Runtime !== "function") {
@@ -448,19 +392,7 @@ export class EmulatorJS {
             this.gamepadLabels[i].value = this.gamepadSelection[i] || "notconnected";
         }
     }
-    createLink(elem, link, text, useP) {
-        const elm = this.createElement("a");
-        elm.href = link;
-        elm.target = "_blank";
-        elm.innerText = this.localization(text);
-        if (useP) {
-            const p = this.createElement("p");
-            p.appendChild(elm);
-            elem.appendChild(p);
-        } else {
-            elem.appendChild(elm);
-        }
-    }
+
 
 
 
@@ -774,195 +706,8 @@ export class EmulatorJS {
         this.gameManager.setVariable(option, value);
         this.saveSettings();
     }
-    setupDisksMenu() {
-        this.disksMenu = this.createElement("div");
-        this.disksMenu.classList.add("ejs_settings_parent");
-        const nested = this.createElement("div");
-        nested.classList.add("ejs_settings_transition");
-        this.disks = {};
 
-        const home = this.createElement("div");
-        home.style.overflow = "auto";
-        const menus = [];
-        this.handleDisksResize = () => {
-            let needChange = false;
-            if (this.disksMenu.style.display !== "") {
-                this.disksMenu.style.opacity = "0";
-                this.disksMenu.style.display = "";
-                needChange = true;
-            }
-            let height = this.elements.parent.getBoundingClientRect().height;
-            let w2 = this.diskParent.parentElement.getBoundingClientRect().width;
-            let disksX = this.diskParent.getBoundingClientRect().x;
-            if (w2 > window.innerWidth) disksX += (w2 - window.innerWidth);
-            const onTheRight = disksX > (w2 - 15) / 2;
-            if (height > 375) height = 375;
-            home.style["max-height"] = (height - 95) + "px";
-            nested.style["max-height"] = (height - 95) + "px";
-            for (let i = 0; i < menus.length; i++) {
-                menus[i].style["max-height"] = (height - 95) + "px";
-            }
-            this.disksMenu.classList.toggle("ejs_settings_center_left", !onTheRight);
-            this.disksMenu.classList.toggle("ejs_settings_center_right", onTheRight);
-            if (needChange) {
-                this.disksMenu.style.display = "none";
-                this.disksMenu.style.opacity = "";
-            }
-        }
 
-        home.classList.add("ejs_setting_menu");
-        nested.appendChild(home);
-        let funcs = [];
-        this.changeDiskOption = (title, newValue) => {
-            this.disks[title] = newValue;
-            funcs.forEach(e => e(title));
-        }
-        let allOpts = {};
-
-        // TODO - Why is this duplicated?
-        const addToMenu = (title, id, options, defaultOption) => {
-            const span = this.createElement("span");
-            span.innerText = title;
-
-            const current = this.createElement("div");
-            current.innerText = "";
-            current.classList.add("ejs_settings_main_bar_selected");
-            span.appendChild(current);
-
-            const menu = this.createElement("div");
-            menus.push(menu);
-            menu.setAttribute("hidden", "");
-            menu.classList.add("ejs_parent_option_div");
-            const button = this.createElement("button");
-            const goToHome = () => {
-                const homeSize = this.getElementSize(home);
-                nested.style.width = (homeSize.width + 20) + "px";
-                nested.style.height = homeSize.height + "px";
-                menu.setAttribute("hidden", "");
-                home.removeAttribute("hidden");
-            }
-            this.addEventListener(button, "click", goToHome);
-
-            button.type = "button";
-            button.classList.add("ejs_back_button");
-            menu.appendChild(button);
-            const pageTitle = this.createElement("span");
-            pageTitle.innerText = title;
-            pageTitle.classList.add("ejs_menu_text_a");
-            button.appendChild(pageTitle);
-
-            const optionsMenu = this.createElement("div");
-            optionsMenu.classList.add("ejs_setting_menu");
-
-            let buttons = [];
-            let opts = options;
-            if (Array.isArray(options)) {
-                opts = {};
-                for (let i = 0; i < options.length; i++) {
-                    opts[options[i]] = options[i];
-                }
-            }
-            allOpts[id] = opts;
-
-            funcs.push((title) => {
-                if (id !== title) return;
-                for (let j = 0; j < buttons.length; j++) {
-                    buttons[j].classList.toggle("ejs_option_row_selected", buttons[j].getAttribute("ejs_value") === this.disks[id]);
-                }
-                this.menuOptionChanged(id, this.disks[id]);
-                current.innerText = opts[this.disks[id]];
-            });
-
-            for (const opt in opts) {
-                const optionButton = this.createElement("button");
-                buttons.push(optionButton);
-                optionButton.setAttribute("ejs_value", opt);
-                optionButton.type = "button";
-                optionButton.value = opts[opt];
-                optionButton.classList.add("ejs_option_row");
-                optionButton.classList.add("ejs_button_style");
-
-                this.addEventListener(optionButton, "click", (e) => {
-                    this.disks[id] = opt;
-                    for (let j = 0; j < buttons.length; j++) {
-                        buttons[j].classList.remove("ejs_option_row_selected");
-                    }
-                    optionButton.classList.add("ejs_option_row_selected");
-                    this.menuOptionChanged(id, opt);
-                    current.innerText = opts[opt];
-                    goToHome();
-                })
-                if (defaultOption === opt) {
-                    optionButton.classList.add("ejs_option_row_selected");
-                    this.menuOptionChanged(id, opt);
-                    current.innerText = opts[opt];
-                }
-
-                const msg = this.createElement("span");
-                msg.innerText = opts[opt];
-                optionButton.appendChild(msg);
-
-                optionsMenu.appendChild(optionButton);
-            }
-
-            home.appendChild(optionsMenu);
-
-            nested.appendChild(menu);
-        }
-
-        if (this.gameManager.getDiskCount() > 1) {
-            const diskLabels = {};
-            let isM3U = false;
-            let disks = {};
-            if (this.fileName.split(".").pop() === "m3u") {
-                disks = this.gameManager.Module.FS.readFile(this.fileName, { encoding: "utf8" }).split("\n");
-                isM3U = true;
-            }
-            for (let i = 0; i < this.gameManager.getDiskCount(); i++) {
-                // default if not an m3u loaded rom is "Disk x"
-                // if m3u, then use the file name without the extension
-                // if m3u, and contains a |, then use the string after the | as the disk label
-                if (!isM3U) {
-                    diskLabels[i.toString()] = "Disk " + (i + 1);
-                } else {
-                    // get disk name from m3u
-                    const diskLabelValues = disks[i].split("|");
-                    // remove the file extension from the disk file name
-                    let diskLabel = diskLabelValues[0].replace("." + diskLabelValues[0].split(".").pop(), "");
-                    if (diskLabelValues.length >= 2) {
-                        // has a label - use that instead
-                        diskLabel = diskLabelValues[1];
-                    }
-                    diskLabels[i.toString()] = diskLabel;
-                }
-            }
-            addToMenu(this.localization("Disk"), "disk", diskLabels, this.gameManager.getCurrentDisk().toString());
-        }
-
-        this.disksMenu.appendChild(nested);
-
-        this.diskParent.appendChild(this.disksMenu);
-        this.diskParent.style.position = "relative";
-
-        const homeSize = this.getElementSize(home);
-        nested.style.width = (homeSize.width + 20) + "px";
-        nested.style.height = homeSize.height + "px";
-
-        this.disksMenu.style.display = "none";
-
-        if (this.debug) {
-            console.log("Available core options", allOpts);
-        }
-
-        if (this.config.defaultOptions) {
-            for (const k in this.config.defaultOptions) {
-                this.changeDiskOption(k, this.config.defaultOptions[k]);
-            }
-        }
-    }
-    getSettingValue(id) {
-        return this.allSettings[id] || this.settings[id] || null;
-    }
 
     createSubPopup(hidden) {
         const popup = this.createElement("div");

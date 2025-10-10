@@ -19,7 +19,19 @@ export function localization(text, log) {
     }
     return text;
 }
-
+export function createLink(elem, link, text, useP) {
+    const elm = this.createElement("a");
+    elm.href = link;
+    elm.target = "_blank";
+    elm.innerText = this.localization(text);
+    if (useP) {
+        const p = this.createElement("p");
+        p.appendChild(elm);
+        elem.appendChild(p);
+    } else {
+        elem.appendChild(elm);
+    }
+}
 export function checkCompression(data, msg, fileCbFunc) {
     if (!this.compression) {
         this.compression = new window.EJS_COMPRESSION(this);
@@ -52,4 +64,45 @@ export function getBaseFileName(force) {
     let parts = this.fileName.split(".");
     parts.splice(parts.length - 1, 1);
     return parts.join(".");
+}
+
+
+export function createElement(type) {
+    return document.createElement(type);
+}
+
+
+export function toData(data, rv) {
+    if (!(data instanceof ArrayBuffer) && !(data instanceof Uint8Array) && !(data instanceof Blob)) return null;
+    if (rv) return true;
+    return new Promise(async (resolve) => {
+        if (data instanceof ArrayBuffer) {
+            resolve(new Uint8Array(data));
+        } else if (data instanceof Uint8Array) {
+            resolve(data);
+        } else if (data instanceof Blob) {
+            resolve(new Uint8Array(await data.arrayBuffer()));
+        }
+        resolve();
+    })
+}
+
+export function versionAsInt(ver) {
+    if (ver.endsWith("-beta")) {
+        return 99999999;
+    }
+    let rv = ver.split(".");
+    if (rv[rv.length - 1].length === 1) {
+        rv[rv.length - 1] = "0" + rv[rv.length - 1];
+    }
+    return parseInt(rv.join(""));
+}
+
+export function requiresThreads(core) {
+    const requiresThreads = ["ppsspp", "dosbox_pure"];
+    return requiresThreads.includes(core);
+}
+export function requiresWebGL2(core) {
+    const requiresWebGL2 = ["ppsspp"];
+    return requiresWebGL2.includes(core);
 }
