@@ -4,7 +4,7 @@
     return check;
 })();
 
-export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); 
+export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 export function localization(text, log) {
     if (typeof text === "undefined" || text.length === 0) return;
     text = text.toString();
@@ -36,4 +36,20 @@ export function checkCoreCompatibility(version) {
         this.startGameError(this.localization("Outdated EmulatorJS version"));
         throw new Error("Core requires minimum EmulatorJS version of " + version.minimumEJSVersion);
     }
+}
+export function getBaseFileName(force) {
+    //Only once game and core is loaded
+    if (!this.started && !force) return null;
+    if (force && this.config.gameUrl !== "game" && !this.config.gameUrl.startsWith("blob:")) {
+        return this.config.gameUrl.split("/").pop().split("#")[0].split("?")[0];
+    }
+    if (typeof this.config.gameName === "string") {
+        const invalidCharacters = /[#<$+%>!`&*'|{}/\\?"=@:^\r\n]/ig;
+        const name = this.config.gameName.replace(invalidCharacters, "").trim();
+        if (name) return name;
+    }
+    if (!this.fileName) return "game";
+    let parts = this.fileName.split(".");
+    parts.splice(parts.length - 1, 1);
+    return parts.join(".");
 }
