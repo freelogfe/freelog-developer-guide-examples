@@ -1,16 +1,16 @@
 ﻿import { keyChange } from "./controller";
-export const on = (event, func) => {
+export function on(event, func) {
     if (!this.functions) this.functions = {};
     if (!Array.isArray(this.functions[event])) this.functions[event] = [];
     this.functions[event].push(func);
 }
-export const callEvent = (event, data) => {
+export function callEvent(event, data) {
     if (!this.functions) this.functions = {};
     if (!Array.isArray(this.functions[event])) return 0;
     this.functions[event].forEach(e => e(data));
     return this.functions[event].length;
 }
-export const bindListeners = (emulator) => {
+export function bindListeners(emulator) {
     addEventListener(emulator.elements.parent, "keydown keyup", keyChange.bind(emulator));
     addEventListener(emulator.elements.parent, "mousedown touchstart", (e) => {
         if (document.activeElement !== emulator.elements.parent && emulator.config.noAutoFocus !== true) emulator.elements.parent.focus();
@@ -105,7 +105,7 @@ export const bindListeners = (emulator) => {
 }
 
 
-export const addEventListener = (element, listener, callback) => {
+export function addEventListener(element, listener, callback) {
     const listeners = listener.split(" ");
     let rv = [];
     for (let i = 0; i < listeners.length; i++) {
@@ -115,7 +115,7 @@ export const addEventListener = (element, listener, callback) => {
     }
     return rv;
 }
-export const removeEventListener = (data) => {
+export function removeEventListener(data) {
     for (let i = 0; i < data.length; i++) {
         data[i].elem.removeEventListener(data[i].listener, data[i].cb);
     }

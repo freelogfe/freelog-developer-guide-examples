@@ -1,5 +1,5 @@
 ﻿
-export const createContextMenu = (emulator) => {
+export function createContextMenu(emulator) {
     emulator.elements.contextmenu = emulator.createElement("div");
     emulator.elements.contextmenu.classList.add("ejs_context_menu");
     emulator.addEventListener(emulator.game, "contextmenu", (e) => {
@@ -232,7 +232,7 @@ export const createContextMenu = (emulator) => {
 }
 
 
-export const createBottomMenuBar = () => {
+export function createBottomMenuBar() {
     emulator.elements.menu = emulator.createElement("div");
 
     //prevent weird glitch on some devices
@@ -867,7 +867,7 @@ export const createBottomMenuBar = () => {
 
 
 
-export const createCheatsMenu = (emulator) => {
+export function createCheatsMenu(emulator) {
     const body = emulator.createPopup("Cheats", {
         "Add Cheat": () => {
             const popups = emulator.createSubPopup();
@@ -965,7 +965,7 @@ export const createCheatsMenu = (emulator) => {
 
 
 
-export const createStartButton = (emulator) => {
+export function createStartButton(emulator) {
     const button = emulator.createElement("div");
     button.classList.add("ejs_start_button");
     let border = 0;
@@ -986,6 +986,3 @@ export const createStartButton = (emulator) => {
     emulator.addEventListener(button, "click", emulator.startButtonClicked.bind(emulator));
 
 }
-
-
-

@@ -1,4 +1,4 @@
-﻿export const openCacheMenu = (emulator) => {
+﻿export function openCacheMenu(emulator) {
     (async () => {
         const list = emulator.createElement("table");
         const tbody = emulator.createElement("tbody");

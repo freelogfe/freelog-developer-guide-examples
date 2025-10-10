@@ -1,4 +1,4 @@
-﻿export const createNetplayMenu = (emulator) => {
+﻿export function createNetplayMenu(emulator) {
     const body = emulator.createPopup("Netplay", {
         "Create a Room": () => {
             if (emulator.isNetplay) {
@@ -128,7 +128,7 @@
 }
 
 
-export const defineNetplayFunctions = (emulator) => {
+export function defineNetplayFunctions(emulator) {
     function guidGenerator() {
         const S4 = function () {
             return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);

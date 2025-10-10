@@ -1,4 +1,4 @@
-﻿export const getDefaultControllers = () => {
+﻿export function getDefaultControllers() {
     return {
         0: {
             0: {
@@ -115,7 +115,7 @@
         3: {}
     }
 };
-export const getKeyMap = () => {
+export function getKeyMap() {
     return {
         0: "",
         8: "backspace",
@@ -345,7 +345,7 @@ export const defaultButtonOptions = {
 export const defaultButtonAliases = {
     volume: "volumeSlider"
 };
-export const keyLookup = (controllerkey, emulator) => {
+export function keyLookup(controllerkey, emulator) {
     if (controllerkey === undefined) return 0;
     if (typeof controllerkey === "number") return controllerkey;
     controllerkey = controllerkey.toString().toLowerCase()
@@ -357,7 +357,7 @@ export const keyLookup = (controllerkey, emulator) => {
     return -1;
 }
    
-export const keyChange = (e, emulator) => {
+export function keyChange(e, emulator) {
     if (e.repeat) return;
     if (!emulator.started) return;
     if (emulator.controlPopup.parentElement.parentElement.getAttribute("hidden") === null) {
@@ -392,7 +392,7 @@ export const keyChange = (e, emulator) => {
         }
     }
 }
-export const setupKeys = (emulator) => {
+export function setupKeys(emulator) {
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 30; j++) {
             if (emulator.controls[i][j]) {
@@ -405,7 +405,7 @@ export const setupKeys = (emulator) => {
         }
     }
 }
-export const createControlSettingMenu = (emulator) => {
+export function createControlSettingMenu(emulator) {
     let buttonListeners = [];
     emulator.checkGamepadInputs = () => buttonListeners.forEach(elem => elem());
     emulator.gamepadLabels = [];

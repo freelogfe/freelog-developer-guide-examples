@@ -1,13 +1,13 @@
 ﻿
  // End start button
- export const createText = (emulator) => {
+export function createText(emulator) {
     emulator.textElem = emulator.createElement("div");
     emulator.textElem.classList.add("ejs_loading_text");
     if (typeof emulator.config.backgroundImg === "string") emulator.textElem.classList.add("ejs_loading_text_glow");
     emulator.textElem.innerText = emulator.localization("Loading...");
     emulator.elements.parent.appendChild(emulator.textElem);
 }
-export const setElements = (element, emulator) => {
+export function setElements(element, emulator) {
     const game = emulator.createElement("div");
     const elem = document.querySelector(element);
     elem.innerHTML = "";
@@ -21,7 +21,7 @@ export const setElements = (element, emulator) => {
     emulator.elements.parent.classList.add("ejs_parent");
     emulator.elements.parent.setAttribute("tabindex", -1);
 }
-export const setColor = (color, emulator) => {
+export function setColor(color, emulator) {
     if (typeof color !== "string") color = "";
     let getColor = function (color) {
         color = color.toLowerCase();

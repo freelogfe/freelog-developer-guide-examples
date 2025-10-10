@@ -1,7 +1,7 @@
 ﻿ /**
      * Enhanced screen recording method
      */
- export const screenRecord = () => {
+export function screenRecord() {
     const captureFps = this.getSettingValue("screenRecordingFPS") || this.capture.video.fps;
     const captureFormat = this.getSettingValue("screenRecordFormat") || this.capture.video.format;
     const captureUpscale = this.getSettingValue("screenRecordUpscale") || this.capture.video.upscale;

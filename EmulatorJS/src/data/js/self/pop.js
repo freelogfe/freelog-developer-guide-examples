@@ -1,4 +1,4 @@
-﻿export const closePopup = () => {
+﻿export function closePopup() {
     if (this.currentPopup !== null) {
         try {
             this.currentPopup.remove();
@@ -7,7 +7,7 @@
     }
 }
 //creates a full box popup.
-export const createPopup = (popupTitle, buttons, hidden) => {
+export function createPopup(popupTitle, buttons, hidden) {
     if (!hidden) this.closePopup();
     const popup = this.createElement("div");
     popup.classList.add("ejs_popup_container");

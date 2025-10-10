@@ -1,5 +1,5 @@
 ﻿import { isSafari, isMobile } from "./utils";
-export const getCores = () => {
+export function getCores() {
     let rv = {
         "atari5200": ["a5200"],
         "vb": ["beetle_vb"],
@@ -44,7 +44,7 @@ export const getCores = () => {
     return rv;
 }
 
-export const downloadGameCore = () => {
+export function downloadGameCore() {
     this.textElem.innerText = this.localization("Download Game Core");
     if (!this.config.threads && this.requiresThreads(this.getCore())) {
         this.startGameError(this.localization("Error for site owner") + "\n" + this.localization("Check console"));
@@ -156,7 +156,7 @@ export const downloadGameCore = () => {
         });
     });
 }
-export const initGameCore = (js, wasm, thread) => {
+export function initGameCore(js, wasm, thread) {
     // 替换 var EJS_Runtime 为 window.EJS_Runtime 以确保在微前端环境中能正确挂载
     let modifiedJs = js;
     if (js instanceof Uint8Array) {

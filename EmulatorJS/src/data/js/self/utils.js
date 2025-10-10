@@ -5,7 +5,7 @@
 })();
 
 export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); 
-export const localization = (text, log) => {
+export function localization(text, log) {
     if (typeof text === "undefined" || text.length === 0) return;
     text = text.toString();
     if (text.includes("EmulatorJS v")) return text;
@@ -20,7 +20,7 @@ export const localization = (text, log) => {
     return text;
 }
 
-export const checkCompression = (data, msg, fileCbFunc) => {
+export function checkCompression(data, msg, fileCbFunc) {
     if (!this.compression) {
         this.compression = new window.EJS_COMPRESSION(this);
     }
@@ -31,7 +31,7 @@ export const checkCompression = (data, msg, fileCbFunc) => {
         this.textElem.innerText = appendMsg ? (msg + m) : m;
     }, fileCbFunc);
 }
-export const checkCoreCompatibility = (version) => {
+export function checkCoreCompatibility(version) {
     if (this.versionAsInt(version.minimumEJSVersion) > this.versionAsInt(this.ejs_version)) {
         this.startGameError(this.localization("Outdated EmulatorJS version"));
         throw new Error("Core requires minimum EmulatorJS version of " + version.minimumEJSVersion);

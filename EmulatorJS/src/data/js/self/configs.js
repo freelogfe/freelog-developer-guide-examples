@@ -1,4 +1,4 @@
-﻿export const buildButtonOptions = (buttonUserOpts, defaultButtonAliases, defaultButtonOptions) => {
+﻿export function buildButtonOptions(buttonUserOpts, defaultButtonAliases, defaultButtonOptions) {
     let mergedButtonOptions = defaultButtonOptions;
 
     // merge buttonUserOpts with mergedButtonOptions

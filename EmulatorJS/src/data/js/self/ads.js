@@ -1,4 +1,4 @@
-﻿export const setupAds = (ads, width, height) => {
+﻿export function setupAds(ads, width, height) {
     const div = this.createElement("div");
     const time = (typeof this.config.adMode === "number" && this.config.adMode > -1 && this.config.adMode < 3) ? this.config.adMode : 2;
     div.classList.add("ejs_ad_iframe");
@@ -41,7 +41,7 @@
 
 }
 
-export const adBlocked = (url, del) => {
+export function adBlocked(url, del) {
     if (del) {
         document.querySelector('div[class="ejs_ad_iframe"]').remove();
     } else {
