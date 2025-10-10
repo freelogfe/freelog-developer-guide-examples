@@ -14,7 +14,7 @@ import loadEmulator from './data/loader.js';
  */
 export async function runGame(config) {
   console.log('[EmulatorJS] Starting runGame with config:', config);
-  
+
   // 设置全局配置变量
   window.EJS_player = config.container;  // 使用 CSS 选择器
   window.EJS_gameName = config.gameName || "";
@@ -30,7 +30,7 @@ export async function runGame(config) {
   window.EJS_corePath = config.corePath || "https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@latest/data/cores/";
   // 添加onGameStart回调到全局配置
   window.EJS_onGameStart = config.onGameStart;
-  
+
   console.log('[EmulatorJS] Global config set:', {
     container: window.EJS_player,
     gameName: window.EJS_gameName,
@@ -39,16 +39,11 @@ export async function runGame(config) {
     pathtodata: window.EJS_pathtodata,
     onGameStart: window.EJS_onGameStart
   });
-  
-  try {
-    // Load the emulator
-    console.log('[EmulatorJS] Calling loadEmulator...');
-    await loadEmulator();
-    console.log('[EmulatorJS] loadEmulator completed successfully');
-  } catch (error) {
-    console.error('[EmulatorJS] Error in loadEmulator:', error);
-    throw new Error(`Failed to load EmulatorJS: ${error.message}`);
-  }
+
+  // Load the emulator
+  console.log('[EmulatorJS] Calling loadEmulator...');
+  await loadEmulator();
+
 }
 
 // 兼容旧版本

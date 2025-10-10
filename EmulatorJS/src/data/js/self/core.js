@@ -1,4 +1,4 @@
-﻿import { isSafari, isMobile } from "./utils";
+﻿import { isSafari, isMobile } from "./utils.js";
 export function getCore(generic) {
     const cores = getCores();
     const core = this.config.system;

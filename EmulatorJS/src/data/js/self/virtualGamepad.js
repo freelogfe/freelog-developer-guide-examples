@@ -1,21 +1,21 @@
-﻿export const setVirtualGamepad = (emulator) => {
-    emulator.virtualGamepad = emulator.createElement("div");
-    emulator.toggleVirtualGamepad = (show) => {
-        emulator.virtualGamepad.style.display = show ? "" : "none";
+﻿export const setVirtualGamepad = () => {
+    this.virtualGamepad = this.createElement("div");
+    this.toggleVirtualGamepad = (show) => {
+        this.virtualGamepad.style.display = show ? "" : "none";
     }
-    emulator.virtualGamepad.classList.add("ejs_virtualGamepad_parent");
-    emulator.elements.parent.appendChild(emulator.virtualGamepad);
+    this.virtualGamepad.classList.add("ejs_virtualGamepad_parent");
+    this.elements.parent.appendChild(this.virtualGamepad);
 
     const speedControlButtons = [
         { "type": "button", "text": "Fast", "id": "speed_fast", "location": "center", "left": -35, "top": 50, "fontSize": 15, "block": true, "input_value": 27 },
         { "type": "button", "text": "Slow", "id": "speed_slow", "location": "center", "left": 95, "top": 50, "fontSize": 15, "block": true, "input_value": 29 },
     ];
-    if (emulator.rewindEnabled) {
+    if (this.rewindEnabled) {
         speedControlButtons.push({ "type": "button", "text": "Rewind", "id": "speed_rewind", "location": "center", "left": 30, "top": 50, "fontSize": 15, "block": true, "input_value": 28 });
     }
 
     let info;
-    if (emulator.config.VirtualGamepadSettings && function (set) {
+    if (this.config.VirtualGamepadSettings && function (set) {
         if (!Array.isArray(set)) {
             console.warn("Virtual gamepad settings is not array! Using default gamepad settings");
             return false;
@@ -56,9 +56,9 @@
             }
         }
         return true;
-    }(emulator.config.VirtualGamepadSettings)) {
-        info = emulator.config.VirtualGamepadSettings;
-    } else if ("gba" === emulator.getControlScheme()) {
+    }(this.config.VirtualGamepadSettings)) {
+        info = this.config.VirtualGamepadSettings;
+    } else if ("gba" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 10, "top": 70, "bold": true, "input_value": 0 },
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 8 },
@@ -69,7 +69,7 @@
             { "type": "button", "text": "R", "id": "r", "location": "right", "right": 3, "top": -90, "bold": true, "block": true, "input_value": 11 }
         ];
         info.push(...speedControlButtons);
-    } else if ("gb" === emulator.getControlScheme()) {
+    } else if ("gb" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 10, "top": 70, "bold": true, "input_value": 0 },
@@ -78,7 +78,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("nes" === emulator.getControlScheme()) {
+    } else if ("nes" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "Y", "id": "y", "location": "right", "left": 40, "bold": true, "input_value": 1 },
             { "type": "button", "text": "X", "id": "x", "location": "right", "top": 40, "bold": true, "input_value": 9 },
@@ -89,7 +89,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("n64" === emulator.getControlScheme()) {
+    } else if ("n64" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -103,7 +103,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("snes" === emulator.getControlScheme()) {
+    } else if ("snes" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "Y", "id": "y", "location": "right", "top": 40, "bold": true, "input_value": 1 },
@@ -114,7 +114,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("md" === emulator.getControlScheme()) {
+    } else if ("md" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -125,7 +125,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("psx" === emulator.getControlScheme()) {
+    } else if ("psx" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -136,7 +136,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("ps2" === emulator.getControlScheme()) {
+    } else if ("ps2" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -147,7 +147,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xbox" === emulator.getControlScheme()) {
+    } else if ("xbox" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -158,7 +158,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xbox360" === emulator.getControlScheme()) {
+    } else if ("xbox360" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -169,7 +169,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xboxone" === emulator.getControlScheme()) {
+    } else if ("xboxone" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -180,7 +180,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("switch" === emulator.getControlScheme()) {
+    } else if ("switch" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -191,7 +191,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("dreamcast" === emulator.getControlScheme()) {
+    } else if ("dreamcast" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -202,7 +202,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("genesis" === emulator.getControlScheme()) {
+    } else if ("genesis" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -213,7 +213,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("arcade" === emulator.getControlScheme()) {
+    } else if ("arcade" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -224,7 +224,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("atari" === emulator.getControlScheme()) {
+    } else if ("atari" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -235,7 +235,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("c64" === emulator.getControlScheme()) {
+    } else if ("c64" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -246,7 +246,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("lynx" === emulator.getControlScheme()) {
+    } else if ("lynx" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -257,7 +257,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("tg16" === emulator.getControlScheme()) {
+    } else if ("tg16" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -268,7 +268,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("tgcd" === emulator.getControlScheme()) {
+    } else if ("tgcd" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -279,7 +279,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("3do" === emulator.getControlScheme()) {
+    } else if ("3do" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -290,7 +290,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("saturn" === emulator.getControlScheme()) {
+    } else if ("saturn" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -301,7 +301,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("psp" === emulator.getControlScheme()) {
+    } else if ("psp" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -312,7 +312,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("ps3" === emulator.getControlScheme()) {
+    } else if ("ps3" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -323,7 +323,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("ps4" === emulator.getControlScheme()) {
+    } else if ("ps4" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -334,7 +334,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("ps5" === emulator.getControlScheme()) {
+    } else if ("ps5" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -345,7 +345,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("wii" === emulator.getControlScheme()) {
+    } else if ("wii" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -356,7 +356,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("wiiu" === emulator.getControlScheme()) {
+    } else if ("wiiu" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -367,7 +367,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("3ds" === emulator.getControlScheme()) {
+    } else if ("3ds" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -378,7 +378,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("vita" === emulator.getControlScheme()) {
+    } else if ("vita" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -389,7 +389,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("n3ds" === emulator.getControlScheme()) {
+    } else if ("n3ds" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -400,7 +400,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("psv" === emulator.getControlScheme()) {
+    } else if ("psv" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -411,7 +411,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xboxseries" === emulator.getControlScheme()) {
+    } else if ("xboxseries" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -422,7 +422,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xboxxr" === emulator.getControlScheme()) {
+    } else if ("xboxxr" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -433,7 +433,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xboxxs" === emulator.getControlScheme()) {
+    } else if ("xboxxs" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -444,7 +444,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xboxx" === emulator.getControlScheme()) {
+    } else if ("xboxx" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -455,7 +455,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xboxs" === emulator.getControlScheme()) {
+    } else if ("xboxs" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -466,7 +466,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xboxr" === emulator.getControlScheme()) {
+    } else if ("xboxr" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -477,7 +477,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xboxone" === emulator.getControlScheme()) {
+    } else if ("xboxone" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -488,7 +488,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xbox360" === emulator.getControlScheme()) {
+    } else if ("xbox360" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -499,7 +499,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("xbox" === emulator.getControlScheme()) {
+    } else if ("xbox" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -510,7 +510,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("ps2" === emulator.getControlScheme()) {
+    } else if ("ps2" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -521,7 +521,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("psx" === emulator.getControlScheme()) {
+    } else if ("psx" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "O", "id": "o", "location": "right", "top": 40, "bold": true, "input_value": 8 },
@@ -532,7 +532,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("md" === emulator.getControlScheme()) {
+    } else if ("md" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -543,7 +543,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("snes" === emulator.getControlScheme()) {
+    } else if ("snes" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "Y", "id": "y", "location": "right", "top": 40, "bold": true, "input_value": 1 },
@@ -554,7 +554,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("nes" === emulator.getControlScheme()) {
+    } else if ("nes" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "Y", "id": "y", "location": "right", "left": 40, "bold": true, "input_value": 1 },
             { "type": "button", "text": "X", "id": "x", "location": "right", "top": 40, "bold": true, "input_value": 9 },
@@ -565,7 +565,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("gb" === emulator.getControlScheme()) {
+    } else if ("gb" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 10, "top": 70, "bold": true, "input_value": 0 },
@@ -574,7 +574,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("n64" === emulator.getControlScheme()) {
+    } else if ("n64" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
@@ -588,7 +588,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("n64" === emulator.getControlScheme()) {
+    } else if ("n64" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "B", "id": "b", "location": "right", "left": -10, "top": 95, "input_value": 1, "bold": true },
             { "type": "button", "text": "A", "id": "a", "location": "right", "left": 40, "top": 150, "input_value": 0, "bold": true },
@@ -604,7 +604,7 @@
             { "fontSize": 20, "type": "button", "text": "CR", "id": "cr", "joystickInput": true, "location": "right", "left": 65, "top": -25, "input_value": 20 }
         ];
         info.push(...speedControlButtons);
-    } else if ("nds" === emulator.getControlScheme()) {
+    } else if ("nds" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "Y", "id": "y", "location": "right", "top": 40, "bold": true, "input_value": 1 },
@@ -617,7 +617,7 @@
             { "type": "button", "text": "R", "id": "r", "location": "right", "right": 3, "top": -100, "bold": true, "block": true, "input_value": 11 }
         ];
         info.push(...speedControlButtons);
-    } else if ("snes" === emulator.getControlScheme()) {
+    } else if ("snes" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "X", "id": "x", "location": "right", "left": 40, "bold": true, "input_value": 9 },
             { "type": "button", "text": "Y", "id": "y", "location": "right", "top": 40, "bold": true, "input_value": 1 },
@@ -630,7 +630,7 @@
             { "type": "button", "text": "R", "id": "r", "location": "right", "right": 3, "top": -100, "bold": true, "block": true, "input_value": 11 }
         ];
         info.push(...speedControlButtons);
-    } else if (["segaMD", "segaCD", "sega32x"].includes(emulator.getControlScheme())) {
+    } else if (["segaMD", "segaCD", "sega32x"].includes(this.getControlScheme())) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "right": 145, "top": 70, "bold": true, "input_value": 1 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
@@ -643,14 +643,14 @@
             { "type": "button", "text": "Start", "id": "start", "location": "center", "left": 60, "fontSize": 15, "block": true, "input_value": 3 }
         ];
         info.push(...speedControlButtons);
-    } else if ("segaMS" === emulator.getControlScheme()) {
+    } else if ("segaMS" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "1", "id": "button_1", "location": "right", "left": 10, "top": 40, "bold": true, "input_value": 0 },
             { "type": "button", "text": "2", "id": "button_2", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 8 },
             { "type": "dpad", "id": "dpad", "location": "left", "left": "50%", "right": "50%", "joystickInput": false, "inputValues": [4, 5, 6, 7] }
         ];
         info.push(...speedControlButtons);
-    } else if ("segaGG" === emulator.getControlScheme()) {
+    } else if ("segaGG" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "1", "id": "button_1", "location": "right", "left": 10, "top": 70, "bold": true, "input_value": 0 },
             { "type": "button", "text": "2", "id": "button_2", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 8 },
@@ -658,7 +658,7 @@
             { "type": "button", "text": "Start", "id": "start", "location": "center", "left": 30, "fontSize": 15, "block": true, "input_value": 3 }
         ];
         info.push(...speedControlButtons);
-    } else if ("segaSaturn" === emulator.getControlScheme()) {
+    } else if ("segaSaturn" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "right": 145, "top": 70, "bold": true, "input_value": 1 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
@@ -672,7 +672,7 @@
             { "type": "button", "text": "Start", "id": "start", "location": "center", "left": 30, "fontSize": 15, "block": true, "input_value": 3 }
         ];
         info.push(...speedControlButtons);
-    } else if ("atari2600" === emulator.getControlScheme()) {
+    } else if ("atari2600" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "", "id": "button_1", "location": "right", "right": 10, "top": 70, "bold": true, "input_value": 0 },
             { "type": "dpad", "id": "dpad", "location": "left", "left": "50%", "right": "50%", "joystickInput": false, "inputValues": [4, 5, 6, 7] },
@@ -680,7 +680,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("atari7800" === emulator.getControlScheme()) {
+    } else if ("atari7800" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "1", "id": "button_1", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
             { "type": "button", "text": "2", "id": "button_2", "location": "right", "right": 5, "top": 70, "bold": true, "input_value": 8 },
@@ -690,7 +690,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": 30, "fontSize": 15, "block": true, "input_value": 2 },
         ];
         info.push(...speedControlButtons);
-    } else if ("lynx" === emulator.getControlScheme()) {
+    } else if ("lynx" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "B", "id": "button_1", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
             { "type": "button", "text": "A", "id": "button_2", "location": "right", "right": 5, "top": 70, "bold": true, "input_value": 8 },
@@ -700,7 +700,7 @@
             { "type": "button", "text": "Start", "id": "start", "location": "center", "left": 30, "fontSize": 15, "block": true, "input_value": 3 }
         ];
         info.push(...speedControlButtons);
-    } else if ("jaguar" === emulator.getControlScheme()) {
+    } else if ("jaguar" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "right": 145, "top": 70, "bold": true, "input_value": 8 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
@@ -710,7 +710,7 @@
             { "type": "button", "text": "Pause", "id": "pause", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("vb" === emulator.getControlScheme()) {
+    } else if ("vb" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "B", "id": "b", "location": "right", "right": 75, "top": 150, "bold": true, "input_value": 0 },
             { "type": "button", "text": "A", "id": "a", "location": "right", "right": 5, "top": 150, "bold": true, "input_value": 8 },
@@ -722,7 +722,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("3do" === emulator.getControlScheme()) {
+    } else if ("3do" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "right": 145, "top": 70, "bold": true, "input_value": 1 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
@@ -734,7 +734,7 @@
             { "type": "button", "text": "P", "id": "p", "location": "center", "left": 60, "fontSize": 15, "block": true, "bold": true, "input_value": 3 }
         ];
         info.push(...speedControlButtons);
-    } else if ("pce" === emulator.getControlScheme()) {
+    } else if ("pce" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "II", "id": "ii", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
             { "type": "button", "text": "I", "id": "i", "location": "right", "right": 5, "top": 70, "bold": true, "input_value": 8 },
@@ -743,7 +743,7 @@
             { "type": "button", "text": "Select", "id": "select", "location": "center", "left": -5, "fontSize": 15, "block": true, "input_value": 2 }
         ];
         info.push(...speedControlButtons);
-    } else if ("ngp" === emulator.getControlScheme()) {
+    } else if ("ngp" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "A", "id": "a", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
             { "type": "button", "text": "B", "id": "b", "location": "right", "right": 5, "top": 50, "bold": true, "input_value": 8 },
@@ -751,7 +751,7 @@
             { "type": "button", "text": "Option", "id": "option", "location": "center", "left": 30, "fontSize": 15, "block": true, "input_value": 3 }
         ];
         info.push(...speedControlButtons);
-    } else if ("ws" === emulator.getControlScheme()) {
+    } else if ("ws" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "B", "id": "b", "location": "right", "right": 75, "top": 150, "bold": true, "input_value": 0 },
             { "type": "button", "text": "A", "id": "a", "location": "right", "right": 5, "top": 150, "bold": true, "input_value": 8 },
@@ -760,14 +760,14 @@
             { "type": "button", "text": "Start", "id": "start", "location": "center", "left": 30, "fontSize": 15, "block": true, "input_value": 3 },
         ];
         info.push(...speedControlButtons);
-    } else if ("coleco" === emulator.getControlScheme()) {
+    } else if ("coleco" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "L", "id": "l", "location": "right", "left": 10, "top": 40, "bold": true, "input_value": 8 },
             { "type": "button", "text": "R", "id": "r", "location": "right", "left": 81, "top": 40, "bold": true, "input_value": 0 },
             { "type": "dpad", "id": "dpad", "location": "left", "left": "50%", "right": "50%", "joystickInput": false, "inputValues": [4, 5, 6, 7] }
         ];
         info.push(...speedControlButtons);
-    } else if ("pcfx" === emulator.getControlScheme()) {
+    } else if ("pcfx" === this.getControlScheme()) {
         info = [
             { "type": "button", "text": "I", "id": "i", "location": "right", "right": 5, "top": 70, "bold": true, "input_value": 8 },
             { "type": "button", "text": "II", "id": "ii", "location": "right", "right": 75, "top": 70, "bold": true, "input_value": 0 },
@@ -794,27 +794,27 @@
     }
     for (let i = 0; i < info.length; i++) {
         if (info[i].text) {
-            info[i].text = emulator.localization(info[i].text);
+            info[i].text = this.localization(info[i].text);
         }
     }
     info = JSON.parse(JSON.stringify(info));
 
-    const up = emulator.createElement("div");
+    const up = this.createElement("div");
     up.classList.add("ejs_virtualGamepad_top");
-    const down = emulator.createElement("div");
+    const down = this.createElement("div");
     down.classList.add("ejs_virtualGamepad_bottom");
-    const left = emulator.createElement("div");
+    const left = this.createElement("div");
     left.classList.add("ejs_virtualGamepad_left");
-    const right = emulator.createElement("div");
+    const right = this.createElement("div");
     right.classList.add("ejs_virtualGamepad_right");
     const elems = { top: up, center: down, left, right };
 
-    emulator.virtualGamepad.appendChild(up);
-    emulator.virtualGamepad.appendChild(down);
-    emulator.virtualGamepad.appendChild(left);
-    emulator.virtualGamepad.appendChild(right);
+    this.virtualGamepad.appendChild(up);
+    this.virtualGamepad.appendChild(down);
+    this.virtualGamepad.appendChild(left);
+    this.virtualGamepad.appendChild(right);
 
-    emulator.toggleVirtualGamepadLeftHanded = (enabled) => {
+    this.toggleVirtualGamepadLeftHanded = (enabled) => {
         left.classList.toggle("ejs_virtualGamepad_left", !enabled);
         right.classList.toggle("ejs_virtualGamepad_right", !enabled);
         left.classList.toggle("ejs_virtualGamepad_right", enabled);
@@ -823,7 +823,7 @@
 
     const leftHandedMode = false;
     const blockCSS = "height:31px;text-align:center;border:1px solid #ccc;border-radius:5px;line-height:31px;";
-    const controlSchemeCls = `cs_${emulator.getControlScheme()}`.split(/\s/g).join("_");
+    const controlSchemeCls = `cs_${this.getControlScheme()}`.split(/\s/g).join("_");
 
     for (let i = 0; i < info.length; i++) {
         if (info[i].type !== "button") continue;
@@ -858,7 +858,7 @@
             style += blockCSS;
         }
         if (["top", "center", "left", "right"].includes(info[i].location)) {
-            const button = emulator.createElement("div");
+            const button = this.createElement("div");
             button.style = style;
             button.innerText = info[i].text;
             button.classList.add("ejs_virtualGamepad_button", controlSchemeCls);
@@ -868,7 +868,7 @@
             elems[info[i].location].appendChild(button);
             const value = info[i].input_new_cores || info[i].input_value;
             let downValue = info[i].joystickInput === true ? 0x7fff : 1;
-            emulator.addEventListener(button, "touchstart touchend touchcancel", (e) => {
+            this.addEventListener(button, "touchstart touchend touchcancel", (e) => {
                 e.preventDefault();
                 if (e.type === "touchend" || e.type === "touchcancel") {
                     e.target.classList.remove("ejs_virtualGamepad_button_down");
@@ -882,30 +882,30 @@
                     window.setTimeout(() => {
                         // NES特殊处理：将X键映射到A键，Y键映射到B键
                         let mappedValue = value;
-                        if ("nes" === emulator.getControlScheme()) {
+                        if ("nes" === this.getControlScheme()) {
                             if (value == 9) { // X键映射到A键(8)
                                 mappedValue = 8;
                             } else if (value == 1) { // Y键映射到B键(0)
                                 mappedValue = 0;
                             }
                         }
-                        emulator.gameManager.simulateInput(0, mappedValue, 0);
+                        this.gameManager.simulateInput(0, mappedValue, 0);
                     })
                 } else {
                     e.target.classList.add("ejs_virtualGamepad_button_down");
                     // NES特殊处理：将X键映射到A键，Y键映射到B键
                     let mappedValue = value;
-                    if ("nes" === emulator.getControlScheme()) {
+                    if ("nes" === this.getControlScheme()) {
                         if (value == 9) { // X键映射到A键(8)
                             mappedValue = 8;
                         } else if (value == 1) { // Y键映射到B键(0)
                             mappedValue = 0;
                         }
                     }
-                    emulator.gameManager.simulateInput(0, mappedValue, downValue);
+                    this.gameManager.simulateInput(0, mappedValue, downValue);
 
                     // 如果是NES的X或Y键，启动连发功能
-                    if ("nes" === emulator.getControlScheme() && (value == 9 || value == 1)) {
+                    if ("nes" === this.getControlScheme() && (value == 9 || value == 1)) {
                         // 清除可能存在的旧定时器
                         if (e.target.nesRapidFireInterval) {
                             clearInterval(e.target.nesRapidFireInterval);
@@ -913,10 +913,10 @@
 
                         // 设置连发定时器 (每100ms触发一次)
                         e.target.nesRapidFireInterval = setInterval(() => {
-                            emulator.gameManager.simulateInput(0, mappedValue, downValue);
+                            this.gameManager.simulateInput(0, mappedValue, downValue);
                             // 短暂延迟后释放按键，模拟按键点击效果
                             setTimeout(() => {
-                                emulator.gameManager.simulateInput(0, mappedValue, 0);
+                                this.gameManager.simulateInput(0, mappedValue, 0);
                             }, 30);
                         }, 100);
                     }
@@ -928,15 +928,15 @@
     const createDPad = (opts) => {
         const container = opts.container;
         const callback = opts.event;
-        const dpadMain = emulator.createElement("div");
+        const dpadMain = this.createElement("div");
         dpadMain.classList.add("ejs_dpad_main");
-        const vertical = emulator.createElement("div");
+        const vertical = this.createElement("div");
         vertical.classList.add("ejs_dpad_vertical");
-        const horizontal = emulator.createElement("div");
+        const horizontal = this.createElement("div");
         horizontal.classList.add("ejs_dpad_horizontal");
-        const bar1 = emulator.createElement("div");
+        const bar1 = this.createElement("div");
         bar1.classList.add("ejs_dpad_bar");
-        const bar2 = emulator.createElement("div");
+        const bar2 = this.createElement("div");
         bar2.classList.add("ejs_dpad_bar");
 
         horizontal.appendChild(bar1);
@@ -1001,8 +1001,8 @@
             callback(0, 0, 0, 0);
         }
 
-        emulator.addEventListener(dpadMain, "touchstart touchmove", updateCb);
-        emulator.addEventListener(dpadMain, "touchend touchcancel", cancelCb);
+        this.addEventListener(dpadMain, "touchstart touchmove", updateCb);
+        this.addEventListener(dpadMain, "touchend touchcancel", cancelCb);
 
 
         container.appendChild(dpadMain);
@@ -1020,7 +1020,7 @@
                 dpad.left = amnt.right;
             }
         }
-        const elem = emulator.createElement("div");
+        const elem = this.createElement("div");
         let style = "";
         if (dpad.left) {
             style += "left:" + dpad.left + ";";
@@ -1046,10 +1046,10 @@
                     if (left === 1) left = 0x7fff;
                     if (right === 1) right = 0x7fff;
                 }
-                emulator.gameManager.simulateInput(0, dpad.inputValues[0], up);
-                emulator.gameManager.simulateInput(0, dpad.inputValues[1], down);
-                emulator.gameManager.simulateInput(0, dpad.inputValues[2], left);
-                emulator.gameManager.simulateInput(0, dpad.inputValues[3], right);
+                this.gameManager.simulateInput(0, dpad.inputValues[0], up);
+                this.gameManager.simulateInput(0, dpad.inputValues[1], down);
+                this.gameManager.simulateInput(0, dpad.inputValues[2], left);
+                this.gameManager.simulateInput(0, dpad.inputValues[3], right);
             }
         });
     })
@@ -1066,8 +1066,8 @@
                 zone.left = amnt.right;
             }
         }
-        const elem = emulator.createElement("div");
-        emulator.addEventListener(elem, "touchstart touchmove touchend touchcancel", (e) => {
+        const elem = this.createElement("div");
+        this.addEventListener(elem, "touchstart touchmove touchend touchcancel", (e) => {
             e.preventDefault();
         });
         elem.classList.add(controlSchemeCls);
@@ -1085,10 +1085,10 @@
             "color": zone.color || "red"
         });
         zoneObj.on("end", () => {
-            emulator.gameManager.simulateInput(0, zone.inputValues[0], 0);
-            emulator.gameManager.simulateInput(0, zone.inputValues[1], 0);
-            emulator.gameManager.simulateInput(0, zone.inputValues[2], 0);
-            emulator.gameManager.simulateInput(0, zone.inputValues[3], 0);
+            this.gameManager.simulateInput(0, zone.inputValues[0], 0);
+            this.gameManager.simulateInput(0, zone.inputValues[1], 0);
+            this.gameManager.simulateInput(0, zone.inputValues[2], 0);
+            this.gameManager.simulateInput(0, zone.inputValues[3], 0);
         });
         zoneObj.on("move", (e, info) => {
             const degree = info.angle.degree;
@@ -1128,69 +1128,69 @@
                     y = 0.022222222222222223 * (360 - degree) * distance / 50;
                 }
                 if (x > 0) {
-                    emulator.gameManager.simulateInput(0, zone.inputValues[0], 0x7fff * x);
-                    emulator.gameManager.simulateInput(0, zone.inputValues[1], 0);
+                    this.gameManager.simulateInput(0, zone.inputValues[0], 0x7fff * x);
+                    this.gameManager.simulateInput(0, zone.inputValues[1], 0);
                 } else {
-                    emulator.gameManager.simulateInput(0, zone.inputValues[1], 0x7fff * -x);
-                    emulator.gameManager.simulateInput(0, zone.inputValues[0], 0);
+                    this.gameManager.simulateInput(0, zone.inputValues[1], 0x7fff * -x);
+                    this.gameManager.simulateInput(0, zone.inputValues[0], 0);
                 }
                 if (y > 0) {
-                    emulator.gameManager.simulateInput(0, zone.inputValues[2], 0x7fff * y);
-                    emulator.gameManager.simulateInput(0, zone.inputValues[3], 0);
+                    this.gameManager.simulateInput(0, zone.inputValues[2], 0x7fff * y);
+                    this.gameManager.simulateInput(0, zone.inputValues[3], 0);
                 } else {
-                    emulator.gameManager.simulateInput(0, zone.inputValues[3], 0x7fff * -y);
-                    emulator.gameManager.simulateInput(0, zone.inputValues[2], 0);
+                    this.gameManager.simulateInput(0, zone.inputValues[3], 0x7fff * -y);
+                    this.gameManager.simulateInput(0, zone.inputValues[2], 0);
                 }
 
             } else {
                 if (degree >= 30 && degree < 150) {
-                    emulator.gameManager.simulateInput(0, zone.inputValues[0], 1);
+                    this.gameManager.simulateInput(0, zone.inputValues[0], 1);
                 } else {
                     window.setTimeout(() => {
-                        emulator.gameManager.simulateInput(0, zone.inputValues[0], 0);
+                        this.gameManager.simulateInput(0, zone.inputValues[0], 0);
                     }, 30);
                 }
                 if (degree >= 210 && degree < 330) {
-                    emulator.gameManager.simulateInput(0, zone.inputValues[1], 1);
+                    this.gameManager.simulateInput(0, zone.inputValues[1], 1);
                 } else {
                     window.setTimeout(() => {
-                        emulator.gameManager.simulateInput(0, zone.inputValues[1], 0);
+                        this.gameManager.simulateInput(0, zone.inputValues[1], 0);
                     }, 30);
                 }
                 if (degree >= 120 && degree < 240) {
-                    emulator.gameManager.simulateInput(0, zone.inputValues[2], 1);
+                    this.gameManager.simulateInput(0, zone.inputValues[2], 1);
                 } else {
                     window.setTimeout(() => {
-                        emulator.gameManager.simulateInput(0, zone.inputValues[2], 0);
+                        this.gameManager.simulateInput(0, zone.inputValues[2], 0);
                     }, 30);
                 }
                 if (degree >= 300 || degree >= 0 && degree < 60) {
-                    emulator.gameManager.simulateInput(0, zone.inputValues[3], 1);
+                    this.gameManager.simulateInput(0, zone.inputValues[3], 1);
                 } else {
                     window.setTimeout(() => {
-                        emulator.gameManager.simulateInput(0, zone.inputValues[3], 0);
+                        this.gameManager.simulateInput(0, zone.inputValues[3], 0);
                     }, 30);
                 }
             }
         });
     })
 
-    if (emulator.touch || emulator.hasTouchScreen) {
-        const menuButton = emulator.createElement("div");
+    if (this.touch || this.hasTouchScreen) {
+        const menuButton = this.createElement("div");
         menuButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/></svg>';
         menuButton.classList.add("ejs_virtualGamepad_open");
         menuButton.style.display = "none";
-        emulator.on("start", () => {
+        this.on("start", () => {
             menuButton.style.display = "";
-            if (matchMedia('(pointer:fine)').matches && emulator.getSettingValue("menu-bar-button") !== "visible") {
+            if (matchMedia('(pointer:fine)').matches && this.getSettingValue("menu-bar-button") !== "visible") {
                 menuButton.style.opacity = 0;
-                emulator.changeSettingOption('menu-bar-button', 'hidden', true);
+                this.changeSettingOption('menu-bar-button', 'hidden', true);
             }
         });
-        emulator.elements.parent.appendChild(menuButton);
+        this.elements.parent.appendChild(menuButton);
         let timeout;
         let ready = true;
-        emulator.addEventListener(menuButton, "touchstart touchend mousedown mouseup click", (e) => {
+        this.addEventListener(menuButton, "touchstart touchend mousedown mouseup click", (e) => {
             if (!ready) return;
             clearTimeout(timeout);
             timeout = setTimeout(() => {
@@ -1198,10 +1198,10 @@
             }, 2000)
             ready = false;
             e.preventDefault();
-            emulator.menu.toggle();
+            this.menu.toggle();
         })
-        emulator.elements.menuToggle = menuButton;
+        this.elements.menuToggle = menuButton;
     }
 
-    emulator.virtualGamepad.style.display = "none";
+    this.virtualGamepad.style.display = "none";
 }

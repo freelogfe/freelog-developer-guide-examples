@@ -1,25 +1,48 @@
-import { isSafari, isMobile, localization, checkCompression, checkCoreCompatibility, getBaseFileName, createLink } from "./utils";
-import { getCores, downloadGameCore, initGameCore } from "./core";
-import { getDefaultControllers, getKeyMap, createContextMenu, defaultButtonOptions, defaultButtonAliases } from "./controller.js"
-import { createBottomMenuBar, createControlSettingMenu, createCheatsMenu, createStartButton } from "./ui.js"
+import { isSafari, isMobile, localization, checkCompression, checkCoreCompatibility, getBaseFileName, createLink } from "./utils.js";
+import { getCores, getCore, downloadGameCore, initGameCore } from "./core.js";
+import {
+    getDefaultControllers, getKeyMap, createControlSettingMenu,
+    defaultButtonOptions, defaultButtonAliases, keyLookup, keyChange, setupKeys
+} from "./controller.js"
+import { createBottomMenuBar, createContextMenu, 
+    createCheatsMenu, createStartButton } from "./ui.js"
 import { setVirtualGamepad } from "./virtualGamepad.js"
 import { bindListeners, addEventListener, removeEventListener, on, callEvent } from "./event.js"
-import { createNetplayMenu } from "./netPlay.js"
-import { screenRecord } from "./screenRecord.js"
+import { createNetplayMenu,defineNetplayFunctions } from "./netPlay.js"
+import { screenRecord, screenshot, takeScreenshot, collectScreenRecordingMediaTracks } from "./screenRecord.js"
 import { closePopup, createPopup, displayMessage } from "./popMessage.js"
 import { createText, setElements, setColor } from "./baseUI.js"
 import { setupAds, adBlocked } from "./ads.js"
+import { buildButtonOptions } from "./configs.js"
 import { openCacheMenu, setupDisksMenu } from "./cacheDisk.js";
-import { createElement, versionAsInt, toData, requiresThreads, requiresWebGL2 } from "./utils.js"
+import { createElement, versionAsInt, toData, requiresThreads, requiresWebGL2, saveInBrowserSupported } from "./utils.js"
 import { getSettingValue, setupSettingsMenu, loadSettings, getCoreSettings, preGetSetting, saveSettings, getLocalStorageKey } from "./settings.js";
 import { downloadFiles, downloadFile, downloadRom, downloadBios, downloadGameParent, downloadGamePatch, downloadGameFile, downloadStartState } from "./download.js"
 export class EmulatorJS {
     constructor(element, config) {
+        this.createBottomMenuBar = createBottomMenuBar.bind(this);
+        this.createContextMenu = createContextMenu.bind(this);
+        this.createCheatsMenu = createCheatsMenu.bind(this);
+        this.createStartButton = createStartButton.bind(this);
+        this.createNetplayMenu = createNetplayMenu.bind(this);
+        this.defineNetplayFunctions = defineNetplayFunctions.bind(this);
+        this.setElements = setElements.bind(this);
+        this.setColor = setColor.bind(this);
+        this.createText = createText.bind(this);
+        this.setVirtualGamepad = setVirtualGamepad.bind(this);
+        this.bindListeners = bindListeners.bind(this);
+        this.addEventListener = addEventListener.bind(this);
+        this.removeEventListener = removeEventListener.bind(this);
+        this.on = on.bind(this);
+        this.callEvent = callEvent.bind(this);
+        this.keyLookup = keyLookup.bind(this);
+        this.keyChange = keyChange.bind(this);
+        this.setupKeys = setupKeys.bind(this);
+        this.saveInBrowserSupported = saveInBrowserSupported.bind(this);
+        this.screenshot = screenshot.bind(this);
+        this.takeScreenshot = takeScreenshot.bind(this);
+        this.collectScreenRecordingMediaTracks = collectScreenRecordingMediaTracks.bind(this);
         this.getCores = getCores.bind(this);
-        this.defaultControllers = getDefaultControllers();
-        this.keyMap = getKeyMap();
-        this.addEventListener = addEventListener;
-        this.removeEventListener = removeEventListener;
         this.requiresWebGL2 = requiresWebGL2.bind(this);
         this.requiresThreads = requiresThreads.bind(this);
         this.localization = localization.bind(this);
@@ -54,10 +77,13 @@ export class EmulatorJS {
         this.setupDisksMenu = setupDisksMenu.bind(this);
         this.createElement = createElement.bind(this);
         this.versionAsInt = versionAsInt.bind(this);
+        this.createControlSettingMenu = createControlSettingMenu.bind(this);
         this.getCore = getCore.bind(this);
         this.toData = toData.bind(this);
-        this.on = on.bind(this);
-        this.callEvent = callEvent.bind(this);
+        this.getKeyMap = getKeyMap
+        this.buildButtonOptions = buildButtonOptions.bind(this);
+        this.defaultControllers = getDefaultControllers();
+        this.keyMap = this.getKeyMap();
         this.ejs_version = "4.2.3";
         this.extensions = [];
         this.debug = (window.EJS_DEBUG_XX === true);
@@ -78,8 +104,8 @@ export class EmulatorJS {
         this.muted = false;
         this.paused = true;
         this.missingLang = [];
-        setElements(element, this);
-        setColor(this.config.color || "", this);
+        this.setElements(element);
+        this.setColor(this.config.color || "");
         this.config.alignStartButton = (typeof this.config.alignStartButton === "string") ? this.config.alignStartButton : "bottom";
         this.config.backgroundColor = (typeof this.config.backgroundColor === "string") ? this.config.backgroundColor : "rgb(51, 51, 51)";
         if (this.config.adUrl) {
@@ -116,13 +142,13 @@ export class EmulatorJS {
         this.capture.video.fps = (typeof this.capture.video.fps === "number") ? this.capture.video.fps : 30;
         this.capture.video.videoBitrate = (typeof this.capture.video.videoBitrate === "number") ? this.capture.video.videoBitrate : 2.5 * 1024 * 1024;
         this.capture.video.audioBitrate = (typeof this.capture.video.audioBitrate === "number") ? this.capture.video.audioBitrate : 192 * 1024;
-        createContextMenu(this);
-        createBottomMenuBar(this);
-        createControlSettingMenu(this);
-        createCheatsMenu(this);
-        createNetplayMenu(this);
-        setVirtualGamepad(this);
-        bindListeners(this);
+        this.createContextMenu();
+        this.createBottomMenuBar();
+        this.createControlSettingMenu();
+        this.createCheatsMenu();
+        this.createNetplayMenu();
+        this.setVirtualGamepad();
+        this.bindListeners();
         this.config.netplayUrl = this.config.netplayUrl || "https://netplay.emulatorjs.org";
         this.fullscreen = false;
         this.enableMouseLock = false;
@@ -179,7 +205,7 @@ export class EmulatorJS {
             }
         }
 
-        createStartButton(this);
+        const button = createStartButton(this);
         if (this.config.startOnLoad === true) {
             this.startButtonClicked(button);
         }
@@ -188,13 +214,7 @@ export class EmulatorJS {
         }, 20);
         this.handleResize();
     }
-
-
-
-
-
     // Start button
-
     startButtonClicked(e) {
         this.callEvent("start-clicked");
         if (e.pointerType === "touch") {
@@ -206,12 +226,9 @@ export class EmulatorJS {
         } else {
             e.remove();
         }
-        createText(this);
+        this.createText();
         this.downloadGameCore();
     }
-
-
-
     startGameError(message) {
         console.log(message);
         this.textElem.innerText = message;
@@ -224,12 +241,6 @@ export class EmulatorJS {
         this.handleResize();
         this.failedToStart = true;
     }
-
-
-    saveInBrowserSupported() {
-        return !!window.indexedDB && (typeof this.config.gameName === "string" || !this.config.gameUrl.startsWith("blob:"));
-    }
-
 
     initModule(wasmData, threadData) {
         if (typeof window.EJS_Runtime !== "function") {
@@ -363,7 +374,6 @@ export class EmulatorJS {
             if (popup) this.closePopup();
         })();
     }
-
     checkSupportedOpts() {
         if (!this.gameManager.supportsStates()) {
             this.elements.bottomBar.saveState[0].style.display = "none";
@@ -392,11 +402,6 @@ export class EmulatorJS {
             this.gamepadLabels[i].value = this.gamepadSelection[i] || "notconnected";
         }
     }
-
-
-
-
-
     selectFile() {
         return new Promise((resolve, reject) => {
             const file = this.createElement("input");
@@ -422,8 +427,6 @@ export class EmulatorJS {
 
         return first.compareDocumentPosition && first.compareDocumentPosition(second) & 16;
     }
-
-
     getControlScheme() {
         if (this.config.controlScheme && typeof this.config.controlScheme === "string") {
             return this.config.controlScheme;
@@ -431,10 +434,6 @@ export class EmulatorJS {
             return this.getCore(true);
         }
     }
-
-
-
-
     gamepadEvent(e) {
         if (!this.started) return;
         const gamepadIndex = this.gamepadSelection.indexOf(this.gamepad.gamepads[e.gamepadIndex].id + "_" + this.gamepad.gamepads[e.gamepadIndex].index);
@@ -576,7 +575,6 @@ export class EmulatorJS {
             }
         }
     }
-
     handleResize() {
         if (!this.game.parentElement) {
             return false;
@@ -612,9 +610,6 @@ export class EmulatorJS {
             "height": res.height
         };
     }
-
-
-
     handleSpecialOptions(option, value) {
         if (option === "shader") {
             this.enableShader(value);
@@ -706,9 +701,6 @@ export class EmulatorJS {
         this.gameManager.setVariable(option, value);
         this.saveSettings();
     }
-
-
-
     createSubPopup(hidden) {
         const popup = this.createElement("div");
         popup.classList.add("ejs_popup_container");
@@ -719,9 +711,6 @@ export class EmulatorJS {
         popup.appendChild(popupMsg);
         return [popup, popupMsg];
     }
-
-
-
     updateCheatUI() {
         if (!this.gameManager) return;
         this.elements.cheatRows.innerHTML = "";
@@ -797,149 +786,6 @@ export class EmulatorJS {
 
         this.gameManager.toggleShader(1);
     }
-
-    screenshot(callback, source, format, upscale) {
-        const imageFormat = format || this.getSettingValue("screenshotFormat") || this.capture.photo.format;
-        const imageUpscale = upscale || parseInt(this.getSettingValue("screenshotUpscale") || this.capture.photo.upscale);
-        const screenshotSource = source || this.getSettingValue("screenshotSource") || this.capture.photo.source;
-        const videoRotation = parseInt(this.getSettingValue("videoRotation") || 0);
-        const aspectRatio = this.gameManager.getVideoDimensions("aspect") || 1.333333;
-        const gameWidth = this.gameManager.getVideoDimensions("width") || 256;
-        const gameHeight = this.gameManager.getVideoDimensions("height") || 224;
-        const videoTurned = (videoRotation === 1 || videoRotation === 3);
-        let width = this.canvas.width;
-        let height = this.canvas.height;
-        let scaleHeight = imageUpscale;
-        let scaleWidth = imageUpscale;
-        let scale = 1;
-
-        if (screenshotSource === "retroarch") {
-            if (width >= height) {
-                width = height * aspectRatio;
-            } else if (width < height) {
-                height = width / aspectRatio;
-            }
-            this.gameManager.screenshot().then(screenshot => {
-                const blob = new Blob([screenshot], { type: "image/png" });
-                if (imageUpscale === 0) {
-                    callback(blob, "png");
-                } else if (imageUpscale > 1) {
-                    scale = imageUpscale;
-                    const img = new Image();
-                    const screenshotUrl = URL.createObjectURL(blob);
-                    img.src = screenshotUrl;
-                    img.onload = () => {
-                        const canvas = document.createElement("canvas");
-                        canvas.width = width * scale;
-                        canvas.height = height * scale;
-                        const ctx = canvas.getContext("2d", { alpha: false });
-                        ctx.imageSmoothingEnabled = false;
-                        ctx.scale(scaleWidth, scaleHeight);
-                        ctx.drawImage(img, 0, 0, width, height);
-                        canvas.toBlob((blob) => {
-                            callback(blob, imageFormat);
-                            img.remove();
-                            URL.revokeObjectURL(screenshotUrl);
-                            canvas.remove();
-                        }, "image/" + imageFormat, 1);
-                    }
-                }
-            });
-        } else if (screenshotSource === "canvas") {
-            if (width >= height && !videoTurned) {
-                width = height * aspectRatio;
-            } else if (width < height && !videoTurned) {
-                height = width / aspectRatio;
-            } else if (width >= height && videoTurned) {
-                width = height * (1 / aspectRatio);
-            } else if (width < height && videoTurned) {
-                width = height / (1 / aspectRatio);
-            }
-            if (imageUpscale === 0) {
-                scale = gameHeight / height;
-                scaleHeight = scale;
-                scaleWidth = scale;
-            } else if (imageUpscale > 1) {
-                scale = imageUpscale;
-            }
-            const captureCanvas = document.createElement("canvas");
-            captureCanvas.width = width * scale;
-            captureCanvas.height = height * scale;
-            captureCanvas.style.display = "none";
-            const captureCtx = captureCanvas.getContext("2d", { alpha: false });
-            captureCtx.imageSmoothingEnabled = false;
-            captureCtx.scale(scale, scale);
-            const imageAspect = this.canvas.width / this.canvas.height;
-            const canvasAspect = width / height;
-            let offsetX = 0;
-            let offsetY = 0;
-
-            if (imageAspect > canvasAspect) {
-                offsetX = (this.canvas.width - width) / -2;
-            } else if (imageAspect < canvasAspect) {
-                offsetY = (this.canvas.height - height) / -2;
-            }
-            const drawNextFrame = () => {
-                captureCtx.drawImage(this.canvas, offsetX, offsetY, this.canvas.width, this.canvas.height);
-                captureCanvas.toBlob((blob) => {
-                    callback(blob, imageFormat);
-                    captureCanvas.remove();
-                }, "image/" + imageFormat, 1);
-            };
-            requestAnimationFrame(drawNextFrame);
-        }
-    }
-
-    async takeScreenshot(source, format, upscale) {
-        return new Promise((resolve) => {
-            this.screenshot((blob, format) => {
-                resolve({ blob, format });
-            }, source, format, upscale);
-        });
-    }
-
-    collectScreenRecordingMediaTracks(canvasEl, fps) {
-        let videoTrack = null;
-        const videoTracks = canvasEl.captureStream(fps).getVideoTracks();
-        if (videoTracks.length !== 0) {
-            videoTrack = videoTracks[0];
-        } else {
-            console.error("Unable to capture video stream");
-            return null;
-        }
-
-        let audioTrack = null;
-        if (this.Module.AL && this.Module.AL.currentCtx && this.Module.AL.currentCtx.audioCtx) {
-            const alContext = this.Module.AL.currentCtx;
-            const audioContext = alContext.audioCtx;
-
-            const gainNodes = [];
-            for (let sourceIdx in alContext.sources) {
-                gainNodes.push(alContext.sources[sourceIdx].gain);
-            }
-
-            const merger = audioContext.createChannelMerger(gainNodes.length);
-            gainNodes.forEach(node => node.connect(merger));
-
-            const destination = audioContext.createMediaStreamDestination();
-            merger.connect(destination);
-
-            const audioTracks = destination.stream.getAudioTracks();
-            if (audioTracks.length !== 0) {
-                audioTrack = audioTracks[0];
-            }
-        }
-
-        const stream = new MediaStream();
-        if (videoTrack && videoTrack.readyState === "live") {
-            stream.addTrack(videoTrack);
-        }
-        if (audioTrack && audioTrack.readyState === "live") {
-            stream.addTrack(audioTrack);
-        }
-        return stream;
-    }
-
     /**
      * Load a new ROM without destroying the emulator instance
      * @param {string} romPath - Path to the ROM file

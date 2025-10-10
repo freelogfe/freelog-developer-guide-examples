@@ -345,456 +345,456 @@ export const defaultButtonOptions = {
 export const defaultButtonAliases = {
     volume: "volumeSlider"
 };
-export function keyLookup(controllerkey, emulator) {
+export function keyLookup(controllerkey) {
     if (controllerkey === undefined) return 0;
     if (typeof controllerkey === "number") return controllerkey;
     controllerkey = controllerkey.toString().toLowerCase()
-    const values = Object.values(emulator.keyMap);
+    const values = Object.values(this.keyMap);
     if (values.includes(controllerkey)) {
         const index = values.indexOf(controllerkey);
-        return Object.keys(emulator.keyMap)[index];
+        return Object.keys(this.keyMap)[index];
     }
     return -1;
 }
    
-export function keyChange(e, emulator) {
+export function keyChange(e) {
     if (e.repeat) return;
-    if (!emulator.started) return;
-    if (emulator.controlPopup.parentElement.parentElement.getAttribute("hidden") === null) {
-        const num = emulator.controlPopup.getAttribute("button-num");
-        const player = emulator.controlPopup.getAttribute("player-num");
-        if (!emulator.controls[player][num]) {
-            emulator.controls[player][num] = {};
+    if (!this.started) return;
+    if (this.controlPopup.parentElement.parentElement.getAttribute("hidden") === null) {
+        const num = this.controlPopup.getAttribute("button-num");
+        const player = this.controlPopup.getAttribute("player-num");
+        if (!this.controls[player][num]) {
+            this.controls[player][num] = {};
         }
-        emulator.controls[player][num].value = e.keyCode;
-        emulator.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
-        emulator.checkGamepadInputs();
-        emulator.saveSettings();
+        this.controls[player][num].value = e.keyCode;
+        this.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
+        this.checkGamepadInputs();
+        this.saveSettings();
         return;
     }
-    if (emulator.settingsMenu.style.display !== "none" || emulator.isPopupOpen() || emulator.getSettingValue("keyboardInput") === "enabled") return;
+    if (this.settingsMenu.style.display !== "none" || this.isPopupOpen() || this.getSettingValue("keyboardInput") === "enabled") return;
     e.preventDefault();
     const special = [16, 17, 18, 19, 20, 21, 22, 23];
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 30; j++) {
-            if (emulator.controls[i][j] && emulator.controls[i][j].value === e.keyCode) {
+            if (this.controls[i][j] && this.controls[i][j].value === e.keyCode) {
                 // NES特殊处理：将X键映射到A键，Y键映射到B键
                 let mappedButton = j;
-                if ("nes" === emulator.getControlScheme()) {
+                if ("nes" === this.getControlScheme()) {
                     if (j === 9) { // X键映射到A键(8)
                         mappedButton = 8;
                     } else if (j === 1) { // Y键映射到B键(0)
                         mappedButton = 0;
                     }
                 }
-                emulator.gameManager.simulateInput(i, mappedButton, (e.type === "keyup" ? 0 : (special.includes(mappedButton) ? 0x7fff : 1)));
+                this.gameManager.simulateInput(i, mappedButton, (e.type === "keyup" ? 0 : (special.includes(mappedButton) ? 0x7fff : 1)));
             }
         }
     }
 }
-export function setupKeys(emulator) {
+export function setupKeys() {
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 30; j++) {
-            if (emulator.controls[i][j]) {
-                emulator.controls[i][j].value = parseInt(keyLookup(emulator.controls[i][j].value, emulator));
-                if (emulator.controls[i][j].value === -1 && emulator.debug) {
-                    delete emulator.controls[i][j].value;
+            if (this.controls[i][j]) {
+                this.controls[i][j].value = parseInt(this.keyLookup(this.controls[i][j].value));
+                if (this.controls[i][j].value === -1 && this.debug) {
+                    delete this.controls[i][j].value;
                     console.warn("Invalid key for control " + j + " player " + i);
                 }
             }
         }
     }
 }
-export function createControlSettingMenu(emulator) {
+export function createControlSettingMenu() {
     let buttonListeners = [];
-    emulator.checkGamepadInputs = () => buttonListeners.forEach(elem => elem());
-    emulator.gamepadLabels = [];
-    emulator.gamepadSelection = [];
-    emulator.controls = JSON.parse(JSON.stringify(emulator.defaultControllers));
-    const body = emulator.createPopup("Control Settings", {
+    this.checkGamepadInputs = () => buttonListeners.forEach(elem => elem());
+    this.gamepadLabels = [];
+    this.gamepadSelection = [];
+    this.controls = JSON.parse(JSON.stringify(this.defaultControllers));
+    const body = this.createPopup("Control Settings", {
         "Reset": () => {
-            emulator.controls = JSON.parse(JSON.stringify(emulator.defaultControllers));
-            setupKeys(emulator);
-            emulator.checkGamepadInputs();
-            emulator.saveSettings();
+            this.controls = JSON.parse(JSON.stringify(this.defaultControllers));
+            this.setupKeys();
+            this.checkGamepadInputs();
+            this.saveSettings();
         },
         "Clear": () => {
-            emulator.controls = { 0: {}, 1: {}, 2: {}, 3: {} };
-            setupKeys(emulator);
-            emulator.checkGamepadInputs();
-            emulator.saveSettings();
+            this.controls = { 0: {}, 1: {}, 2: {}, 3: {} };
+            this.setupKeys();
+            this.checkGamepadInputs();
+            this.saveSettings();
         },
         "Close": () => {
-            emulator.controlMenu.style.display = "none";
+            this.controlMenu.style.display = "none";
         }
     }, true);
-    setupKeys(emulator);
-    emulator.controlMenu = body.parentElement;
+    this.setupKeys();
+    this.controlMenu = body.parentElement;
     body.classList.add("ejs_control_body");
 
     let buttons;
-    if ("gb" === emulator.getControlScheme()) {
+    if ("gb" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("nes" === emulator.getControlScheme()) {
+    } else if ("nes" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 9, label: emulator.localization("X") },
-            { id: 1, label: emulator.localization("Y") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 9, label: this.localization("X") },
+            { id: 1, label: this.localization("Y") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-        if (emulator.getCore() === "nestopia") {
-            buttons.push({ id: 10, label: emulator.localization("SWAP DISKS") });
+        if (this.getCore() === "nestopia") {
+            buttons.push({ id: 10, label: this.localization("SWAP DISKS") });
         } else {
-            buttons.push({ id: 10, label: emulator.localization("SWAP DISKS") });
-            buttons.push({ id: 11, label: emulator.localization("EJECT/INSERT DISK") });
+            buttons.push({ id: 10, label: this.localization("SWAP DISKS") });
+            buttons.push({ id: 11, label: this.localization("EJECT/INSERT DISK") });
         }
-    } else if ("snes" === emulator.getControlScheme()) {
+    } else if ("snes" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 9, label: emulator.localization("X") },
-            { id: 1, label: emulator.localization("Y") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
-            { id: 10, label: emulator.localization("L") },
-            { id: 11, label: emulator.localization("R") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 9, label: this.localization("X") },
+            { id: 1, label: this.localization("Y") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
+            { id: 10, label: this.localization("L") },
+            { id: 11, label: this.localization("R") },
         ];
-    } else if ("n64" === emulator.getControlScheme()) {
+    } else if ("n64" === this.getControlScheme()) {
         buttons = [
-            { id: 0, label: emulator.localization("A") },
-            { id: 1, label: emulator.localization("B") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("D-PAD UP") },
-            { id: 5, label: emulator.localization("D-PAD DOWN") },
-            { id: 6, label: emulator.localization("D-PAD LEFT") },
-            { id: 7, label: emulator.localization("D-PAD RIGHT") },
-            { id: 10, label: emulator.localization("L") },
-            { id: 11, label: emulator.localization("R") },
-            { id: 12, label: emulator.localization("Z") },
-            { id: 19, label: emulator.localization("STICK UP") },
-            { id: 18, label: emulator.localization("STICK DOWN") },
-            { id: 17, label: emulator.localization("STICK LEFT") },
-            { id: 16, label: emulator.localization("STICK RIGHT") },
-            { id: 23, label: emulator.localization("C-PAD UP") },
-            { id: 22, label: emulator.localization("C-PAD DOWN") },
-            { id: 21, label: emulator.localization("C-PAD LEFT") },
-            { id: 20, label: emulator.localization("C-PAD RIGHT") },
+            { id: 0, label: this.localization("A") },
+            { id: 1, label: this.localization("B") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("D-PAD UP") },
+            { id: 5, label: this.localization("D-PAD DOWN") },
+            { id: 6, label: this.localization("D-PAD LEFT") },
+            { id: 7, label: this.localization("D-PAD RIGHT") },
+            { id: 10, label: this.localization("L") },
+            { id: 11, label: this.localization("R") },
+            { id: 12, label: this.localization("Z") },
+            { id: 19, label: this.localization("STICK UP") },
+            { id: 18, label: this.localization("STICK DOWN") },
+            { id: 17, label: this.localization("STICK LEFT") },
+            { id: 16, label: this.localization("STICK RIGHT") },
+            { id: 23, label: this.localization("C-PAD UP") },
+            { id: 22, label: this.localization("C-PAD DOWN") },
+            { id: 21, label: this.localization("C-PAD LEFT") },
+            { id: 20, label: this.localization("C-PAD RIGHT") },
         ];
-    } else if ("gba" === emulator.getControlScheme()) {
+    } else if ("gba" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 10, label: emulator.localization("L") },
-            { id: 11, label: emulator.localization("R") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 10, label: this.localization("L") },
+            { id: 11, label: this.localization("R") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("nds" === emulator.getControlScheme()) {
+    } else if ("nds" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 9, label: emulator.localization("X") },
-            { id: 1, label: emulator.localization("Y") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
-            { id: 10, label: emulator.localization("L") },
-            { id: 11, label: emulator.localization("R") },
-            { id: 14, label: emulator.localization("Microphone") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 9, label: this.localization("X") },
+            { id: 1, label: this.localization("Y") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
+            { id: 10, label: this.localization("L") },
+            { id: 11, label: this.localization("R") },
+            { id: 14, label: this.localization("Microphone") },
         ];
-    } else if ("vb" === emulator.getControlScheme()) {
+    } else if ("vb" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 10, label: emulator.localization("L") },
-            { id: 11, label: emulator.localization("R") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("LEFT D-PAD UP") },
-            { id: 5, label: emulator.localization("LEFT D-PAD DOWN") },
-            { id: 6, label: emulator.localization("LEFT D-PAD LEFT") },
-            { id: 7, label: emulator.localization("LEFT D-PAD RIGHT") },
-            { id: 19, label: emulator.localization("RIGHT D-PAD UP") },
-            { id: 18, label: emulator.localization("RIGHT D-PAD DOWN") },
-            { id: 17, label: emulator.localization("RIGHT D-PAD LEFT") },
-            { id: 16, label: emulator.localization("RIGHT D-PAD RIGHT") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 10, label: this.localization("L") },
+            { id: 11, label: this.localization("R") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("LEFT D-PAD UP") },
+            { id: 5, label: this.localization("LEFT D-PAD DOWN") },
+            { id: 6, label: this.localization("LEFT D-PAD LEFT") },
+            { id: 7, label: this.localization("LEFT D-PAD RIGHT") },
+            { id: 19, label: this.localization("RIGHT D-PAD UP") },
+            { id: 18, label: this.localization("RIGHT D-PAD DOWN") },
+            { id: 17, label: this.localization("RIGHT D-PAD LEFT") },
+            { id: 16, label: this.localization("RIGHT D-PAD RIGHT") },
         ];
-    } else if (["segaCD", "sega32x"].includes(emulator.getControlScheme())) {
+    } else if (["segaCD", "sega32x"].includes(this.getControlScheme())) {
         buttons = [
-            { id: 1, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 8, label: emulator.localization("C") },
-            { id: 10, label: emulator.localization("X") },
-            { id: 9, label: emulator.localization("Y") },
-            { id: 11, label: emulator.localization("Z") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 2, label: emulator.localization("MODE") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 1, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 8, label: this.localization("C") },
+            { id: 10, label: this.localization("X") },
+            { id: 9, label: this.localization("Y") },
+            { id: 11, label: this.localization("Z") },
+            { id: 3, label: this.localization("START") },
+            { id: 2, label: this.localization("MODE") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("segaMS" === emulator.getControlScheme()) {
+    } else if ("segaMS" === this.getControlScheme()) {
         buttons = [
-            { id: 0, label: emulator.localization("BUTTON 1 / START") },
-            { id: 8, label: emulator.localization("BUTTON 2") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 0, label: this.localization("BUTTON 1 / START") },
+            { id: 8, label: this.localization("BUTTON 2") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("segaGG" === emulator.getControlScheme()) {
+    } else if ("segaGG" === this.getControlScheme()) {
         buttons = [
-            { id: 0, label: emulator.localization("BUTTON 1") },
-            { id: 8, label: emulator.localization("BUTTON 2") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 0, label: this.localization("BUTTON 1") },
+            { id: 8, label: this.localization("BUTTON 2") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("segaSaturn" === emulator.getControlScheme()) {
+    } else if ("segaSaturn" === this.getControlScheme()) {
         buttons = [
-            { id: 1, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 8, label: emulator.localization("C") },
-            { id: 9, label: emulator.localization("X") },
-            { id: 10, label: emulator.localization("Y") },
-            { id: 11, label: emulator.localization("Z") },
-            { id: 12, label: emulator.localization("L") },
-            { id: 13, label: emulator.localization("R") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 1, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 8, label: this.localization("C") },
+            { id: 9, label: this.localization("X") },
+            { id: 10, label: this.localization("Y") },
+            { id: 11, label: this.localization("Z") },
+            { id: 12, label: this.localization("L") },
+            { id: 13, label: this.localization("R") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("3do" === emulator.getControlScheme()) {
+    } else if ("3do" === this.getControlScheme()) {
         buttons = [
-            { id: 1, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 8, label: emulator.localization("C") },
-            { id: 10, label: emulator.localization("L") },
-            { id: 11, label: emulator.localization("R") },
-            { id: 2, label: emulator.localization("X") },
-            { id: 3, label: emulator.localization("P") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 1, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 8, label: this.localization("C") },
+            { id: 10, label: this.localization("L") },
+            { id: 11, label: this.localization("R") },
+            { id: 2, label: this.localization("X") },
+            { id: 3, label: this.localization("P") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("atari2600" === emulator.getControlScheme()) {
+    } else if ("atari2600" === this.getControlScheme()) {
         buttons = [
-            { id: 0, label: emulator.localization("FIRE") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("RESET") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
-            { id: 10, label: emulator.localization("LEFT DIFFICULTY A") },
-            { id: 12, label: emulator.localization("LEFT DIFFICULTY B") },
-            { id: 11, label: emulator.localization("RIGHT DIFFICULTY A") },
-            { id: 13, label: emulator.localization("RIGHT DIFFICULTY B") },
-            { id: 14, label: emulator.localization("COLOR") },
-            { id: 15, label: emulator.localization("B/W") },
+            { id: 0, label: this.localization("FIRE") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("RESET") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
+            { id: 10, label: this.localization("LEFT DIFFICULTY A") },
+            { id: 12, label: this.localization("LEFT DIFFICULTY B") },
+            { id: 11, label: this.localization("RIGHT DIFFICULTY A") },
+            { id: 13, label: this.localization("RIGHT DIFFICULTY B") },
+            { id: 14, label: this.localization("COLOR") },
+            { id: 15, label: this.localization("B/W") },
         ];
-    } else if ("atari7800" === emulator.getControlScheme()) {
+    } else if ("atari7800" === this.getControlScheme()) {
         buttons = [
-            { id: 0, label: emulator.localization("BUTTON 1") },
-            { id: 8, label: emulator.localization("BUTTON 2") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("PAUSE") },
-            { id: 9, label: emulator.localization("RESET") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
-            { id: 10, label: emulator.localization("LEFT DIFFICULTY") },
-            { id: 11, label: emulator.localization("RIGHT DIFFICULTY") },
+            { id: 0, label: this.localization("BUTTON 1") },
+            { id: 8, label: this.localization("BUTTON 2") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("PAUSE") },
+            { id: 9, label: this.localization("RESET") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
+            { id: 10, label: this.localization("LEFT DIFFICULTY") },
+            { id: 11, label: this.localization("RIGHT DIFFICULTY") },
         ];
-    } else if ("lynx" === emulator.getControlScheme()) {
+    } else if ("lynx" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 10, label: emulator.localization("OPTION 1") },
-            { id: 11, label: emulator.localization("OPTION 2") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 10, label: this.localization("OPTION 1") },
+            { id: 11, label: this.localization("OPTION 2") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("jaguar" === emulator.getControlScheme()) {
+    } else if ("jaguar" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 1, label: emulator.localization("C") },
-            { id: 2, label: emulator.localization("PAUSE") },
-            { id: 3, label: emulator.localization("OPTION") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 1, label: this.localization("C") },
+            { id: 2, label: this.localization("PAUSE") },
+            { id: 3, label: this.localization("OPTION") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("pce" === emulator.getControlScheme()) {
+    } else if ("pce" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("I") },
-            { id: 0, label: emulator.localization("II") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("RUN") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 8, label: this.localization("I") },
+            { id: 0, label: this.localization("II") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("RUN") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("ngp" === emulator.getControlScheme()) {
+    } else if ("ngp" === this.getControlScheme()) {
         buttons = [
-            { id: 0, label: emulator.localization("A") },
-            { id: 8, label: emulator.localization("B") },
-            { id: 3, label: emulator.localization("OPTION") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 0, label: this.localization("A") },
+            { id: 8, label: this.localization("B") },
+            { id: 3, label: this.localization("OPTION") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("ws" === emulator.getControlScheme()) {
+    } else if ("ws" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("A") },
-            { id: 0, label: emulator.localization("B") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("X UP") },
-            { id: 5, label: emulator.localization("X DOWN") },
-            { id: 6, label: emulator.localization("X LEFT") },
-            { id: 7, label: emulator.localization("X RIGHT") },
-            { id: 13, label: emulator.localization("Y UP") },
-            { id: 12, label: emulator.localization("Y DOWN") },
-            { id: 10, label: emulator.localization("Y LEFT") },
-            { id: 11, label: emulator.localization("Y RIGHT") },
+            { id: 8, label: this.localization("A") },
+            { id: 0, label: this.localization("B") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("X UP") },
+            { id: 5, label: this.localization("X DOWN") },
+            { id: 6, label: this.localization("X LEFT") },
+            { id: 7, label: this.localization("X RIGHT") },
+            { id: 13, label: this.localization("Y UP") },
+            { id: 12, label: this.localization("Y DOWN") },
+            { id: 10, label: this.localization("Y LEFT") },
+            { id: 11, label: this.localization("Y RIGHT") },
         ];
-    } else if ("coleco" === emulator.getControlScheme()) {
+    } else if ("coleco" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("LEFT BUTTON") },
-            { id: 0, label: emulator.localization("RIGHT BUTTON") },
-            { id: 9, label: emulator.localization("1") },
-            { id: 1, label: emulator.localization("2") },
-            { id: 11, label: emulator.localization("3") },
-            { id: 10, label: emulator.localization("4") },
-            { id: 13, label: emulator.localization("5") },
-            { id: 12, label: emulator.localization("6") },
-            { id: 15, label: emulator.localization("7") },
-            { id: 14, label: emulator.localization("8") },
-            { id: 2, label: emulator.localization("*") },
-            { id: 3, label: emulator.localization("#") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 8, label: this.localization("LEFT BUTTON") },
+            { id: 0, label: this.localization("RIGHT BUTTON") },
+            { id: 9, label: this.localization("1") },
+            { id: 1, label: this.localization("2") },
+            { id: 11, label: this.localization("3") },
+            { id: 10, label: this.localization("4") },
+            { id: 13, label: this.localization("5") },
+            { id: 12, label: this.localization("6") },
+            { id: 15, label: this.localization("7") },
+            { id: 14, label: this.localization("8") },
+            { id: 2, label: this.localization("*") },
+            { id: 3, label: this.localization("#") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("pcfx" === emulator.getControlScheme()) {
+    } else if ("pcfx" === this.getControlScheme()) {
         buttons = [
-            { id: 8, label: emulator.localization("I") },
-            { id: 0, label: emulator.localization("II") },
-            { id: 9, label: emulator.localization("III") },
-            { id: 1, label: emulator.localization("IV") },
-            { id: 10, label: emulator.localization("V") },
-            { id: 11, label: emulator.localization("VI") },
-            { id: 3, label: emulator.localization("RUN") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 12, label: emulator.localization("MODE1") },
-            { id: 13, label: emulator.localization("MODE2") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
+            { id: 8, label: this.localization("I") },
+            { id: 0, label: this.localization("II") },
+            { id: 9, label: this.localization("III") },
+            { id: 1, label: this.localization("IV") },
+            { id: 10, label: this.localization("V") },
+            { id: 11, label: this.localization("VI") },
+            { id: 3, label: this.localization("RUN") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 12, label: this.localization("MODE1") },
+            { id: 13, label: this.localization("MODE2") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
         ];
-    } else if ("psp" === emulator.getControlScheme()) {
+    } else if ("psp" === this.getControlScheme()) {
         buttons = [
-            { id: 9, label: emulator.localization("\u25B3") }, // △
-            { id: 1, label: emulator.localization("\u25A1") }, // □
-            { id: 0, label: emulator.localization("\uFF58") }, // ｘ
-            { id: 8, label: emulator.localization("\u25CB") }, // ○
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
-            { id: 10, label: emulator.localization("L") },
-            { id: 11, label: emulator.localization("R") },
-            { id: 19, label: emulator.localization("STICK UP") },
-            { id: 18, label: emulator.localization("STICK DOWN") },
-            { id: 17, label: emulator.localization("STICK LEFT") },
-            { id: 16, label: emulator.localization("STICK RIGHT") },
+            { id: 9, label: this.localization("\u25B3") }, // △
+            { id: 1, label: this.localization("\u25A1") }, // □
+            { id: 0, label: this.localization("\uFF58") }, // ｘ
+            { id: 8, label: this.localization("\u25CB") }, // ○
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
+            { id: 10, label: this.localization("L") },
+            { id: 11, label: this.localization("R") },
+            { id: 19, label: this.localization("STICK UP") },
+            { id: 18, label: this.localization("STICK DOWN") },
+            { id: 17, label: this.localization("STICK LEFT") },
+            { id: 16, label: this.localization("STICK RIGHT") },
         ];
     } else {
         buttons = [
-            { id: 0, label: emulator.localization("B") },
-            { id: 1, label: emulator.localization("Y") },
-            { id: 2, label: emulator.localization("SELECT") },
-            { id: 3, label: emulator.localization("START") },
-            { id: 4, label: emulator.localization("UP") },
-            { id: 5, label: emulator.localization("DOWN") },
-            { id: 6, label: emulator.localization("LEFT") },
-            { id: 7, label: emulator.localization("RIGHT") },
-            { id: 8, label: emulator.localization("A") },
-            { id: 9, label: emulator.localization("X") },
-            { id: 10, label: emulator.localization("L") },
-            { id: 11, label: emulator.localization("R") },
-            { id: 12, label: emulator.localization("L2") },
-            { id: 13, label: emulator.localization("R2") },
-            { id: 14, label: emulator.localization("L3") },
-            { id: 15, label: emulator.localization("R3") },
-            { id: 19, label: emulator.localization("L STICK UP") },
-            { id: 18, label: emulator.localization("L STICK DOWN") },
-            { id: 17, label: emulator.localization("L STICK LEFT") },
-            { id: 16, label: emulator.localization("L STICK RIGHT") },
-            { id: 23, label: emulator.localization("R STICK UP") },
-            { id: 22, label: emulator.localization("R STICK DOWN") },
-            { id: 21, label: emulator.localization("R STICK LEFT") },
-            { id: 20, label: emulator.localization("R STICK RIGHT") },
+            { id: 0, label: this.localization("B") },
+            { id: 1, label: this.localization("Y") },
+            { id: 2, label: this.localization("SELECT") },
+            { id: 3, label: this.localization("START") },
+            { id: 4, label: this.localization("UP") },
+            { id: 5, label: this.localization("DOWN") },
+            { id: 6, label: this.localization("LEFT") },
+            { id: 7, label: this.localization("RIGHT") },
+            { id: 8, label: this.localization("A") },
+            { id: 9, label: this.localization("X") },
+            { id: 10, label: this.localization("L") },
+            { id: 11, label: this.localization("R") },
+            { id: 12, label: this.localization("L2") },
+            { id: 13, label: this.localization("R2") },
+            { id: 14, label: this.localization("L3") },
+            { id: 15, label: this.localization("R3") },
+            { id: 19, label: this.localization("L STICK UP") },
+            { id: 18, label: this.localization("L STICK DOWN") },
+            { id: 17, label: this.localization("L STICK LEFT") },
+            { id: 16, label: this.localization("L STICK RIGHT") },
+            { id: 23, label: this.localization("R STICK UP") },
+            { id: 22, label: this.localization("R STICK DOWN") },
+            { id: 21, label: this.localization("R STICK LEFT") },
+            { id: 20, label: this.localization("R STICK RIGHT") },
         ];
     }
-    if (["arcade", "mame"].includes(emulator.getControlScheme())) {
+    if (["arcade", "mame"].includes(this.getControlScheme())) {
         for (const buttonIdx in buttons) {
             if (buttons[buttonIdx].id === 2) {
-                buttons[buttonIdx].label = emulator.localization("INSERT COIN");
+                buttons[buttonIdx].label = this.localization("INSERT COIN");
             }
         }
     }
     buttons.push(
-        { id: 24, label: emulator.localization("QUICK SAVE STATE") },
-        { id: 25, label: emulator.localization("QUICK LOAD STATE") },
-        { id: 26, label: emulator.localization("CHANGE STATE SLOT") },
-        { id: 27, label: emulator.localization("FAST FORWARD") },
-        { id: 29, label: emulator.localization("SLOW MOTION") },
-        { id: 28, label: emulator.localization("REWIND") }
+        { id: 24, label: this.localization("QUICK SAVE STATE") },
+        { id: 25, label: this.localization("QUICK LOAD STATE") },
+        { id: 26, label: this.localization("CHANGE STATE SLOT") },
+        { id: 27, label: this.localization("FAST FORWARD") },
+        { id: 29, label: this.localization("SLOW MOTION") },
+        { id: 28, label: this.localization("REWIND") }
     );
     let nums = [];
     for (let i = 0; i < buttons.length; i++) {
@@ -802,14 +802,14 @@ export function createControlSettingMenu(emulator) {
     }
     for (let i = 0; i < 30; i++) {
         if (!nums.includes(i)) {
-            delete emulator.defaultControllers[0][i];
-            delete emulator.defaultControllers[1][i];
-            delete emulator.defaultControllers[2][i];
-            delete emulator.defaultControllers[3][i];
-            delete emulator.controls[0][i];
-            delete emulator.controls[1][i];
-            delete emulator.controls[2][i];
-            delete emulator.controls[3][i];
+            delete this.defaultControllers[0][i];
+            delete this.defaultControllers[1][i];
+            delete this.defaultControllers[2][i];
+            delete this.defaultControllers[3][i];
+            delete this.controls[0][i];
+            delete this.controls[1][i];
+            delete this.controls[2][i];
+            delete this.controls[3][i];
         }
     }
 
@@ -822,19 +822,19 @@ export function createControlSettingMenu(emulator) {
     let players = [];
     let playerDivs = [];
 
-    const playerSelect = emulator.createElement("ul");
+    const playerSelect = this.createElement("ul");
     playerSelect.classList.add("ejs_control_player_bar");
     for (let i = 1; i < 5; i++) {
-        const playerContainer = emulator.createElement("li");
+        const playerContainer = this.createElement("li");
         playerContainer.classList.add("tabs-title");
         playerContainer.setAttribute("role", "presentation");
-        const player = emulator.createElement("a");
-        player.innerText = emulator.localization("Player") + " " + i;
+        const player = this.createElement("a");
+        player.innerText = this.localization("Player") + " " + i;
         player.setAttribute("role", "tab");
         player.setAttribute("aria-controls", "controls-" + (i - 1));
         player.setAttribute("aria-selected", "false");
         player.id = "controls-" + (i - 1) + "-label";
-        emulator.addEventListener(player, "click", (e) => {
+        this.addEventListener(player, "click", (e) => {
             e.preventDefault();
             players[selectedPlayer].classList.remove("ejs_control_selected");
             playerDivs[selectedPlayer].setAttribute("hidden", "");
@@ -848,87 +848,87 @@ export function createControlSettingMenu(emulator) {
     }
     body.appendChild(playerSelect);
 
-    const controls = emulator.createElement("div");
+    const controls = this.createElement("div");
     for (let i = 0; i < 4; i++) {
-        if (!emulator.controls[i]) emulator.controls[i] = {};
-        const player = emulator.createElement("div");
-        const playerTitle = emulator.createElement("div");
+        if (!this.controls[i]) this.controls[i] = {};
+        const player = this.createElement("div");
+        const playerTitle = this.createElement("div");
 
-        const gamepadTitle = emulator.createElement("div");
-        gamepadTitle.innerText = emulator.localization("Connected Gamepad") + ": ";
+        const gamepadTitle = this.createElement("div");
+        gamepadTitle.innerText = this.localization("Connected Gamepad") + ": ";
 
-        const gamepadName = emulator.createElement("select");
+        const gamepadName = this.createElement("select");
         gamepadName.classList.add("ejs_gamepad_dropdown");
         gamepadName.setAttribute("title", "gamepad-" + i);
         gamepadName.setAttribute("index", i);
-        emulator.gamepadLabels.push(gamepadName);
-        emulator.gamepadSelection.push("");
-        emulator.addEventListener(gamepadName, "change", e => {
+        this.gamepadLabels.push(gamepadName);
+        this.gamepadSelection.push("");
+        this.addEventListener(gamepadName, "change", e => {
             const controller = e.target.value;
             const player = parseInt(e.target.getAttribute("index"));
             if (controller === "notconnected") {
-                emulator.gamepadSelection[player] = "";
+                this.gamepadSelection[player] = "";
             } else {
-                for (let i = 0; i < emulator.gamepadSelection.length; i++) {
+                for (let i = 0; i < this.gamepadSelection.length; i++) {
                     if (player === i) continue;
-                    if (emulator.gamepadSelection[i] === controller) {
-                        emulator.gamepadSelection[i] = "";
+                    if (this.gamepadSelection[i] === controller) {
+                        this.gamepadSelection[i] = "";
                     }
                 }
-                emulator.gamepadSelection[player] = controller;
-                emulator.updateGamepadLabels();
+                this.gamepadSelection[player] = controller;
+                this.updateGamepadLabels();
             }
         });
-        const def = emulator.createElement("option");
+        const def = this.createElement("option");
         def.setAttribute("value", "notconnected");
         def.innerText = "Not Connected";
         gamepadName.appendChild(def);
         gamepadTitle.appendChild(gamepadName);
         gamepadTitle.classList.add("ejs_gamepad_section");
 
-        const leftPadding = emulator.createElement("div");
+        const leftPadding = this.createElement("div");
         leftPadding.style = "width:25%;float:left;";
         leftPadding.innerHTML = "&nbsp;";
 
-        const aboutParent = emulator.createElement("div");
+        const aboutParent = this.createElement("div");
         aboutParent.style = "font-size:12px;width:50%;float:left;";
-        const gamepad = emulator.createElement("div");
+        const gamepad = this.createElement("div");
         gamepad.style = "text-align:center;width:50%;float:left;";
-        gamepad.innerText = emulator.localization("Gamepad");
+        gamepad.innerText = this.localization("Gamepad");
         aboutParent.appendChild(gamepad);
-        const keyboard = emulator.createElement("div");
+        const keyboard = this.createElement("div");
         keyboard.style = "text-align:center;width:50%;float:left;";
-        keyboard.innerText = emulator.localization("Keyboard");
+        keyboard.innerText = this.localization("Keyboard");
         aboutParent.appendChild(keyboard);
 
-        const headingPadding = emulator.createElement("div");
+        const headingPadding = this.createElement("div");
         headingPadding.style = "clear:both;";
 
         playerTitle.appendChild(gamepadTitle);
         playerTitle.appendChild(leftPadding);
         playerTitle.appendChild(aboutParent);
 
-        if ((emulator.touch || emulator.hasTouchScreen) && i === 0) {
-            const vgp = emulator.createElement("div");
+        if ((this.touch || this.hasTouchScreen) && i === 0) {
+            const vgp = this.createElement("div");
             vgp.style = "width:25%;float:right;clear:none;padding:0;font-size: 11px;padding-left: 2.25rem;";
             vgp.classList.add("ejs_control_row");
             vgp.classList.add("ejs_cheat_row");
-            const input = emulator.createElement("input");
+            const input = this.createElement("input");
             input.type = "checkbox";
             input.checked = true;
             input.value = "o";
             input.id = "ejs_vp";
             vgp.appendChild(input);
-            const label = emulator.createElement("label");
+            const label = this.createElement("label");
             label.for = "ejs_vp";
             label.innerText = "Virtual Gamepad";
             vgp.appendChild(label);
             label.addEventListener("click", (e) => {
                 input.checked = !input.checked;
-                emulator.changeSettingOption("virtual-gamepad", input.checked ? "enabled" : "disabled");
+                this.changeSettingOption("virtual-gamepad", input.checked ? "enabled" : "disabled");
             })
-            emulator.on("start", (e) => {
-                if (emulator.getSettingValue("virtual-gamepad") === "disabled") {
+            this.on("start", (e) => {
+                if (this.getSettingValue("virtual-gamepad") === "disabled") {
                     input.checked = false;
                 }
             })
@@ -943,34 +943,34 @@ export function createControlSettingMenu(emulator) {
             const k = buttons[buttonIdx].id;
             const controlLabel = buttons[buttonIdx].label;
 
-            const buttonText = emulator.createElement("div");
+            const buttonText = this.createElement("div");
             buttonText.setAttribute("data-id", k);
             buttonText.setAttribute("data-index", i);
             buttonText.setAttribute("data-label", controlLabel);
             buttonText.style = "margin-bottom:10px;";
             buttonText.classList.add("ejs_control_bar");
 
-            const title = emulator.createElement("div");
+            const title = this.createElement("div");
             title.style = "width:25%;float:left;font-size:12px;";
-            const label = emulator.createElement("label");
+            const label = this.createElement("label");
             label.innerText = controlLabel + ":";
             title.appendChild(label);
 
-            const textBoxes = emulator.createElement("div");
+            const textBoxes = this.createElement("div");
             textBoxes.style = "width:50%;float:left;";
 
-            const textBox1Parent = emulator.createElement("div");
+            const textBox1Parent = this.createElement("div");
             textBox1Parent.style = "width:50%;float:left;padding: 0 5px;";
-            const textBox1 = emulator.createElement("input");
+            const textBox1 = this.createElement("input");
             textBox1.style = "text-align:center;height:25px;width: 100%;";
             textBox1.type = "text";
             textBox1.setAttribute("readonly", "");
             textBox1.setAttribute("placeholder", "");
             textBox1Parent.appendChild(textBox1);
 
-            const textBox2Parent = emulator.createElement("div");
+            const textBox2Parent = this.createElement("div");
             textBox2Parent.style = "width:50%;float:left;padding: 0 5px;";
-            const textBox2 = emulator.createElement("input");
+            const textBox2 = this.createElement("input");
             textBox2.style = "text-align:center;height:25px;width: 100%;";
             textBox2.type = "text";
             textBox2.setAttribute("readonly", "");
@@ -980,39 +980,39 @@ export function createControlSettingMenu(emulator) {
             buttonListeners.push(() => {
                 textBox2.value = "";
                 textBox1.value = "";
-                if (emulator.controls[i][k] && emulator.controls[i][k].value !== undefined) {
-                    let value = emulator.keyMap[emulator.controls[i][k].value];
-                    value = emulator.localization(value);
+                if (this.controls[i][k] && this.controls[i][k].value !== undefined) {
+                    let value = this.keyMap[this.controls[i][k].value];
+                    value = this.localization(value);
                     textBox2.value = value;
                 }
-                if (emulator.controls[i][k] && emulator.controls[i][k].value2 !== undefined && emulator.controls[i][k].value2 !== "") {
-                    let value2 = emulator.controls[i][k].value2.toString();
+                if (this.controls[i][k] && this.controls[i][k].value2 !== undefined && this.controls[i][k].value2 !== "") {
+                    let value2 = this.controls[i][k].value2.toString();
                     if (value2.includes(":")) {
                         value2 = value2.split(":");
-                        value2 = emulator.localization(value2[0]) + ":" + emulator.localization(value2[1])
+                        value2 = this.localization(value2[0]) + ":" + this.localization(value2[1])
                     } else if (!isNaN(value2)) {
-                        value2 = emulator.localization("BUTTON") + " " + emulator.localization(value2);
+                        value2 = this.localization("BUTTON") + " " + this.localization(value2);
                     } else {
-                        value2 = emulator.localization(value2);
+                        value2 = this.localization(value2);
                     }
                     textBox1.value = value2;
                 }
             })
 
-            if (emulator.controls[i][k] && emulator.controls[i][k].value) {
-                let value = emulator.keyMap[emulator.controls[i][k].value];
-                value = emulator.localization(value);
+            if (this.controls[i][k] && this.controls[i][k].value) {
+                let value = this.keyMap[this.controls[i][k].value];
+                value = this.localization(value);
                 textBox2.value = value;
             }
-            if (emulator.controls[i][k] && emulator.controls[i][k].value2) {
-                let value2 = emulator.controls[i][k].value2.toString();
+            if (this.controls[i][k] && this.controls[i][k].value2) {
+                let value2 = this.controls[i][k].value2.toString();
                 if (value2.includes(":")) {
                     value2 = value2.split(":");
-                    value2 = emulator.localization(value2[0]) + ":" + emulator.localization(value2[1])
+                    value2 = this.localization(value2[0]) + ":" + this.localization(value2[1])
                 } else if (!isNaN(value2)) {
-                    value2 = emulator.localization("BUTTON") + " " + emulator.localization(value2);
+                    value2 = this.localization("BUTTON") + " " + this.localization(value2);
                 } else {
-                    value2 = emulator.localization(value2);
+                    value2 = this.localization(value2);
                 }
                 textBox1.value = value2;
             }
@@ -1020,18 +1020,18 @@ export function createControlSettingMenu(emulator) {
             textBoxes.appendChild(textBox1Parent);
             textBoxes.appendChild(textBox2Parent);
 
-            const padding = emulator.createElement("div");
+            const padding = this.createElement("div");
             padding.style = "clear:both;";
             textBoxes.appendChild(padding);
 
-            const setButton = emulator.createElement("div");
+            const setButton = this.createElement("div");
             setButton.style = "width:25%;float:left;";
-            const button = emulator.createElement("a");
+            const button = this.createElement("a");
             button.classList.add("ejs_control_set_button");
-            button.innerText = emulator.localization("Set");
+            button.innerText = this.localization("Set");
             setButton.appendChild(button);
 
-            const padding2 = emulator.createElement("div");
+            const padding2 = this.createElement("div");
             padding2.style = "clear:both;";
 
             buttonText.appendChild(title);
@@ -1041,12 +1041,12 @@ export function createControlSettingMenu(emulator) {
 
             player.appendChild(buttonText);
 
-            emulator.addEventListener(buttonText, "mousedown", (e) => {
+            this.addEventListener(buttonText, "mousedown", (e) => {
                 e.preventDefault();
-                emulator.controlPopup.parentElement.parentElement.removeAttribute("hidden");
-                emulator.controlPopup.innerText = "[ " + controlLabel + " ]\n" + emulator.localization("Press Keyboard");
-                emulator.controlPopup.setAttribute("button-num", k);
-                emulator.controlPopup.setAttribute("player-num", i);
+                this.controlPopup.parentElement.parentElement.removeAttribute("hidden");
+                this.controlPopup.innerText = "[ " + controlLabel + " ]\n" + this.localization("Press Keyboard");
+                this.controlPopup.setAttribute("button-num", k);
+                this.controlPopup.setAttribute("player-num", i);
             })
         }
         controls.appendChild(player);
@@ -1059,36 +1059,36 @@ export function createControlSettingMenu(emulator) {
     players[0].classList.add("ejs_control_selected");
     playerDivs[0].removeAttribute("hidden");
 
-    const popup = emulator.createElement("div");
+    const popup = this.createElement("div");
     popup.classList.add("ejs_popup_container");
-    const popupMsg = emulator.createElement("div");
-    emulator.addEventListener(popup, "mousedown click touchstart", (e) => {
-        if (emulator.isChild(popupMsg, e.target)) return;
-        emulator.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
+    const popupMsg = this.createElement("div");
+    this.addEventListener(popup, "mousedown click touchstart", (e) => {
+        if (this.isChild(popupMsg, e.target)) return;
+        this.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
     })
-    const btn = emulator.createElement("a");
+    const btn = this.createElement("a");
     btn.classList.add("ejs_control_set_button");
-    btn.innerText = emulator.localization("Clear");
-    emulator.addEventListener(btn, "mousedown click touchstart", (e) => {
-        const num = emulator.controlPopup.getAttribute("button-num");
-        const player = emulator.controlPopup.getAttribute("player-num");
-        if (!emulator.controls[player][num]) {
-            emulator.controls[player][num] = {};
+    btn.innerText = this.localization("Clear");
+    this.addEventListener(btn, "mousedown click touchstart", (e) => {
+        const num = this.controlPopup.getAttribute("button-num");
+        const player = this.controlPopup.getAttribute("player-num");
+        if (!this.controls[player][num]) {
+            this.controls[player][num] = {};
         }
-        emulator.controls[player][num].value = 0;
-        emulator.controls[player][num].value2 = "";
-        emulator.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
-        emulator.checkGamepadInputs();
-        emulator.saveSettings();
+        this.controls[player][num].value = 0;
+        this.controls[player][num].value2 = "";
+        this.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
+        this.checkGamepadInputs();
+        this.saveSettings();
     })
     popupMsg.classList.add("ejs_popup_box");
     popupMsg.innerText = "";
     popup.setAttribute("hidden", "");
-    const popMsg = emulator.createElement("div");
-    emulator.controlPopup = popMsg;
+    const popMsg = this.createElement("div");
+    this.controlPopup = popMsg;
     popup.appendChild(popupMsg);
     popupMsg.appendChild(popMsg);
-    popupMsg.appendChild(emulator.createElement("br"));
+    popupMsg.appendChild(this.createElement("br"));
     popupMsg.appendChild(btn);
-    emulator.controlMenu.appendChild(popup);
+    this.controlMenu.appendChild(popup);
 }

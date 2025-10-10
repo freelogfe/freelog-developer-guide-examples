@@ -1,20 +1,20 @@
-﻿export function openCacheMenu(emulator) {
+﻿export function openCacheMenu() {
     (async () => {
-        const list = emulator.createElement("table");
-        const tbody = emulator.createElement("tbody");
-        const body = emulator.createPopup("Cache Manager", {
+        const list = this.createElement("table");
+        const tbody = this.createElement("tbody");
+        const body = this.createPopup("Cache Manager", {
             "Clear All": async () => {
-                const roms = await emulator.storage.rom.getSizes();
+                const roms = await this.storage.rom.getSizes();
                 for (const k in roms) {
-                    await emulator.storage.rom.remove(k);
+                    await this.storage.rom.remove(k);
                 }
                 tbody.innerHTML = "";
             },
             "Close": () => {
-                emulator.closePopup();
+                this.closePopup();
             }
         });
-        const roms = await emulator.storage.rom.getSizes();
+        const roms = await this.storage.rom.getSizes();
         list.style.width = "100%";
         list.style["padding-left"] = "10px";
         list.style["text-align"] = "left";
@@ -28,18 +28,18 @@
             return Math.max(size, 0.1).toFixed(1) + [" kB", " MB", " GB", " TB", "PB", "EB", "ZB", "YB"][i];
         }
         for (const k in roms) {
-            const line = emulator.createElement("tr");
-            const name = emulator.createElement("td");
-            const size = emulator.createElement("td");
-            const remove = emulator.createElement("td");
+            const line = this.createElement("tr");
+            const name = this.createElement("td");
+            const size = this.createElement("td");
+            const remove = this.createElement("td");
             remove.style.cursor = "pointer";
             name.innerText = k;
             size.innerText = getSize(roms[k]);
 
-            const a = emulator.createElement("a");
-            a.innerText = emulator.localization("Remove");
-            emulator.addEventListener(remove, "click", () => {
-                emulator.storage.rom.remove(k);
+            const a = this.createElement("a");
+            a.innerText = this.localization("Remove");
+            this.addEventListener(remove, "click", () => {
+                this.storage.rom.remove(k);
                 line.remove();
             })
             remove.appendChild(a);

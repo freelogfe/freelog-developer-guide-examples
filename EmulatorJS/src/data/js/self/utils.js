@@ -106,3 +106,7 @@ export function requiresWebGL2(core) {
     const requiresWebGL2 = ["ppsspp"];
     return requiresWebGL2.includes(core);
 }
+
+export function saveInBrowserSupported() {
+    return !!window.indexedDB && (typeof this.config.gameName === "string" || !this.config.gameUrl.startsWith("blob:"));
+}

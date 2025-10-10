@@ -1,4 +1,6 @@
-﻿export function getSettingValue(id) {
+﻿import { isSafari, isMobile } from "./utils.js";
+
+export function getSettingValue(id) {
     return this.allSettings[id] || this.settings[id] || null;
 }
 export function saveSettings() {
@@ -373,7 +375,7 @@ export function setupSettingsMenu() {
         menu.appendChild(menuChild);
         nested.appendChild(menu);
     }
-    const cores = getCores();
+    const cores = this.getCores();
     const core = cores[this.getCore(true)];
     if (core && core.length > 1) {
         addToMenu(this.localization("Core" + " (" + this.localization("Requires restart") + ")"), "retroarch_core", core, this.getCore(), home);

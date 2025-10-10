@@ -4,7 +4,7 @@
  */
 
 // 导入模块化的 EmulatorJS
-import { EmulatorJS } from './js/emulator.js';
+import { EmulatorJS } from './js/self/emulator.js';
 import './js/GameManager.js';
 import './js/compression.js';
 import './js/gamepad.js';

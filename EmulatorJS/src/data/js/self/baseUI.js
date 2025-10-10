@@ -1,27 +1,27 @@
 ﻿
  // End start button
-export function createText(emulator) {
-    emulator.textElem = emulator.createElement("div");
-    emulator.textElem.classList.add("ejs_loading_text");
-    if (typeof emulator.config.backgroundImg === "string") emulator.textElem.classList.add("ejs_loading_text_glow");
-    emulator.textElem.innerText = emulator.localization("Loading...");
-    emulator.elements.parent.appendChild(emulator.textElem);
+export function createText() {
+    this.textElem = this.createElement("div");
+    this.textElem.classList.add("ejs_loading_text");
+    if (typeof this.config.backgroundImg === "string") this.textElem.classList.add("ejs_loading_text_glow");
+    this.textElem.innerText = this.localization("Loading...");
+    this.elements.parent.appendChild(this.textElem);
 }
-export function setElements(element, emulator) {
-    const game = emulator.createElement("div");
+export function setElements(element) {
+    const game = this.createElement("div");
     const elem = document.querySelector(element);
     elem.innerHTML = "";
     elem.appendChild(game);
-    emulator.game = game;
+    this.game = game;
 
-    emulator.elements = {
-        main: emulator.game,
+    this.elements = {
+        main: this.game,
         parent: elem
     }
-    emulator.elements.parent.classList.add("ejs_parent");
-    emulator.elements.parent.setAttribute("tabindex", -1);
+    this.elements.parent.classList.add("ejs_parent");
+    this.elements.parent.setAttribute("tabindex", -1);
 }
-export function setColor(color, emulator) {
+export function setColor(color) {
     if (typeof color !== "string") color = "";
     let getColor = function (color) {
         color = color.toLowerCase();
@@ -42,8 +42,8 @@ export function setColor(color, emulator) {
         return null;
     }
     if (!color || getColor(color) === null) {
-        emulator.elements.parent.setAttribute("style", "--ejs-primary-color: 26,175,255;");
+        this.elements.parent.setAttribute("style", "--ejs-primary-color: 26,175,255;");
         return;
     }
-    emulator.elements.parent.setAttribute("style", "--ejs-primary-color:" + getColor(color) + ";");
+    this.elements.parent.setAttribute("style", "--ejs-primary-color:" + getColor(color) + ";");
 }

@@ -1,5 +1,4 @@
-﻿import { keyChange } from "./controller";
-export function on(event, func) {
+﻿export function on(event, func) {
     if (!this.functions) this.functions = {};
     if (!Array.isArray(this.functions[event])) this.functions[event] = [];
     this.functions[event].push(func);
@@ -10,59 +9,59 @@ export function callEvent(event, data) {
     this.functions[event].forEach(e => e(data));
     return this.functions[event].length;
 }
-export function bindListeners(emulator) {
-    addEventListener(emulator.elements.parent, "keydown keyup", keyChange.bind(emulator));
-    addEventListener(emulator.elements.parent, "mousedown touchstart", (e) => {
-        if (document.activeElement !== emulator.elements.parent && emulator.config.noAutoFocus !== true) emulator.elements.parent.focus();
+export function bindListeners() {
+    addEventListener(this.elements.parent, "keydown keyup", this.keyChange);
+    addEventListener(this.elements.parent, "mousedown touchstart", (e) => {
+        if (document.activeElement !== this.elements.parent && this.config.noAutoFocus !== true) this.elements.parent.focus();
     })
-    addEventListener(window, "resize", emulator.handleResize.bind(emulator));
+    addEventListener(window, "resize", this.handleResize.bind(this));
     //addEventListener(window, "blur", e => console.log(e), true); //TODO - add "click to make keyboard keys work" message?
 
     let counter = 0;
-    emulator.elements.statePopupPanel = emulator.createPopup("", {}, true);
-    emulator.elements.statePopupPanel.innerText = emulator.localization("Drop save state here to load");
-    emulator.elements.statePopupPanel.style["text-align"] = "center";
-    emulator.elements.statePopupPanel.style["font-size"] = "28px";
+    this.elements.statePopupPanel = this.createPopup("", {}, true);
+    this.elements.statePopupPanel.innerText = this.localization("Drop save state here to load");
+    this.elements.statePopupPanel.style["text-align"] = "center";
+    this.elements.statePopupPanel.style["font-size"] = "28px";
 
     //to fix a funny apple bug
     addEventListener(window, "webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange", () => {
         setTimeout(() => {
-            emulator.handleResize.bind(emulator);
-            if (emulator.config.noAutoFocus !== true) emulator.elements.parent.focus();
+            this.handleResize.bind(this);
+            if (this.config.noAutoFocus !== true) this.elements.parent.focus();
         }, 0);
     });
     addEventListener(window, "beforeunload", (e) => {
-        if (!emulator.started) return;
-        emulator.callEvent("exit");
+        if (!this.started) return;
+        this.callEvent("exit");
     });
-    addEventListener(emulator.elements.parent, "dragenter", (e) => {
+    addEventListener(this.elements.parent, "dragenter", (e) => {
         e.preventDefault();
-        if (!emulator.started) return;
+        if (!this.started) return;
         counter++;
-        emulator.elements.statePopupPanel.parentElement.style.display = "block";
+        this.elements.statePopupPanel.parentElement.style.display = "block";
     });
-    addEventListener(emulator.elements.parent, "dragover", (e) => {
+    addEventListener(this.elements.parent, "dragover", (e) => {
         e.preventDefault();
     });
-    addEventListener(emulator.elements.parent, "dragleave", (e) => {
+    addEventListener(this.elements.parent, "dragleave", (e) => {
         e.preventDefault();
-        if (!emulator.started) return;
+        if (!this.started) return;
         counter--;
         if (counter === 0) {
-            emulator.elements.statePopupPanel.parentElement.style.display = "none";
+            this.elements.statePopupPanel.parentElement.style.display = "none";
         }
     });
-    addEventListener(emulator.elements.parent, "dragend", (e) => {
+    addEventListener(this.elements.parent, "dragend", (e) => {
         e.preventDefault();
-        if (!emulator.started) return;
+        if (!this.started) return;
         counter = 0;
-        emulator.elements.statePopupPanel.parentElement.style.display = "none";
+        this.elements.statePopupPanel.parentElement.style.display = "none";
     });
 
-    addEventListener(emulator.elements.parent, "drop", (e) => {
+    addEventListener(this.elements.parent, "drop", (e) => {
         e.preventDefault();
-        if (!emulator.started) return;
-        emulator.elements.statePopupPanel.parentElement.style.display = "none";
+        if (!this.started) return;
+        this.elements.statePopupPanel.parentElement.style.display = "none";
         counter = 0;
         const items = e.dataTransfer.items;
         let file;
@@ -74,34 +73,34 @@ export function bindListeners(emulator) {
         if (!file) return;
         const fileHandle = file.getAsFile();
         fileHandle.arrayBuffer().then(data => {
-            emulator.gameManager.loadState(new Uint8Array(data));
+            this.gameManager.loadState(new Uint8Array(data));
         })
     });
 
-    emulator.gamepad = new GamepadHandler(); //https://github.com/ethanaobrien/Gamepad
-    emulator.gamepad.on("connected", (e) => {
-        if (!emulator.gamepadLabels) return;
-        for (let i = 0; i < emulator.gamepadSelection.length; i++) {
-            if (emulator.gamepadSelection[i] === "") {
-                emulator.gamepadSelection[i] = emulator.gamepad.gamepads[e.gamepadIndex].id + "_" + emulator.gamepad.gamepads[e.gamepadIndex].index;
+    this.gamepad = new GamepadHandler(); //https://github.com/ethanaobrien/Gamepad
+    this.gamepad.on("connected", (e) => {
+        if (!this.gamepadLabels) return;
+        for (let i = 0; i < this.gamepadSelection.length; i++) {
+            if (this.gamepadSelection[i] === "") {
+                this.gamepadSelection[i] = this.gamepad.gamepads[e.gamepadIndex].id + "_" + this.gamepad.gamepads[e.gamepadIndex].index;
                 break;
             }
         }
-        emulator.updateGamepadLabels();
+        this.updateGamepadLabels();
     })
-    emulator.gamepad.on("disconnected", (e) => {
-        const gamepadIndex = emulator.gamepad.gamepads.indexOf(emulator.gamepad.gamepads.find(f => f.index == e.gamepadIndex));
-        const gamepadSelection = emulator.gamepad.gamepads[gamepadIndex].id + "_" + emulator.gamepad.gamepads[gamepadIndex].index;
-        for (let i = 0; i < emulator.gamepadSelection.length; i++) {
-            if (emulator.gamepadSelection[i] === gamepadSelection) {
-                emulator.gamepadSelection[i] = "";
+    this.gamepad.on("disconnected", (e) => {
+        const gamepadIndex = this.gamepad.gamepads.indexOf(this.gamepad.gamepads.find(f => f.index == e.gamepadIndex));
+        const gamepadSelection = this.gamepad.gamepads[gamepadIndex].id + "_" + this.gamepad.gamepads[gamepadIndex].index;
+        for (let i = 0; i < this.gamepadSelection.length; i++) {
+            if (this.gamepadSelection[i] === gamepadSelection) {
+                this.gamepadSelection[i] = "";
             }
         }
-        setTimeout(emulator.updateGamepadLabels.bind(emulator), 10);
+        setTimeout(this.updateGamepadLabels.bind(this), 10);
     })
-    emulator.gamepad.on("axischanged", emulator.gamepadEvent.bind(emulator));
-    emulator.gamepad.on("buttondown", emulator.gamepadEvent.bind(emulator));
-    emulator.gamepad.on("buttonup", emulator.gamepadEvent.bind(emulator));
+    this.gamepad.on("axischanged", this.gamepadEvent.bind(this));
+    this.gamepad.on("buttondown", this.gamepadEvent.bind(this));
+    this.gamepad.on("buttonup", this.gamepadEvent.bind(this));
 }
 
 
