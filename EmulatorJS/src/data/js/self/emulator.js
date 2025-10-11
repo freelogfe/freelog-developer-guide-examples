@@ -258,6 +258,18 @@ export class EmulatorJS {
             console.log("Game is not running, proceeding directly");
         }
 
+        // 立即清理旧的 textElem，避免快速切换时显示旧的进度
+        if (this.textElem) {
+            console.log("Cleaning up old text element...");
+            try {
+                this.textElem.remove();
+                console.log("✓ Old text element removed");
+            } catch (e) {
+                console.warn("Error removing old text element:", e);
+            }
+            this.textElem = null;
+        }
+        
         // 等待当前游戏完全停止后再启动新游戏
         console.log("Setting timeout for game cleanup...");
         setTimeout(() => {
