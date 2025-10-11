@@ -21,6 +21,7 @@ import { createElement, versionAsInt, toData, requiresThreads, requiresWebGL2, s
 import { getSettingValue, setupSettingsMenu, loadSettings, getCoreSettings, preGetSetting, saveSettings, getLocalStorageKey } from "./settings.js";
 import { downloadFiles, downloadFile, downloadRom, downloadBios, downloadGameParent, downloadGamePatch, downloadGameFile, downloadStartState } from "./download.js"
 import { updateCheatUI, cheatChanged } from "./cheat.js"
+import { gamepadInit } from "./gamepadInit.js";
 export class EmulatorJS {
     constructor(element, config) {
         this.updateCheatUI = updateCheatUI.bind(this);
@@ -86,10 +87,16 @@ export class EmulatorJS {
         this.createControlSettingMenu = createControlSettingMenu.bind(this);
         this.getCore = getCore.bind(this);
         this.toData = toData.bind(this);
-        this.getKeyMap = getKeyMap
         this.buildButtonOptions = buildButtonOptions.bind(this);
+        this.gamepadInit = gamepadInit.bind(this);
         this.defaultControllers = getDefaultControllers();
-        this.keyMap = this.getKeyMap();
+        this.keyMap = getKeyMap();
+        this.element = element;
+        this.gamepadInit();
+        this.init(config)
+    }
+
+    init(config) {
         this.ejs_version = "4.2.3";
         this.extensions = [];
         this.debug = (window.EJS_DEBUG_XX === true);
@@ -110,7 +117,7 @@ export class EmulatorJS {
         this.muted = false;
         this.paused = true;
         this.missingLang = [];
-        this.setElements(element);
+        this.setElements(this.element);
         this.setColor(this.config.color || "");
         this.config.alignStartButton = (typeof this.config.alignStartButton === "string") ? this.config.alignStartButton : "bottom";
         this.config.backgroundColor = (typeof this.config.backgroundColor === "string") ? this.config.backgroundColor : "rgb(51, 51, 51)";
@@ -220,6 +227,295 @@ export class EmulatorJS {
         }, 20);
         this.handleResize();
     }
+    startNewGame(newConfig) {
+        console.log("=== startNewGame called ===");
+        console.log("newConfig:", newConfig);
+        console.log("Current started:", this.started);
+        console.log("Current isSwitching:", this.isSwitching);
+        console.log("Current failedToStart:", this.failedToStart);
+        
+        // 验证新配置
+        if (!newConfig || !newConfig.gameUrl) {
+            console.error('startNewGame: gameUrl is required');
+            return false;
+        }
+
+        // 防止重复切换
+        if (this.isSwitching) {
+            console.log('Game switching already in progress, ignoring request');
+            return false;
+        }
+
+        // 标记正在切换
+        console.log("Setting isSwitching to true");
+        this.isSwitching = true;
+
+        // 如果游戏正在运行，先停止当前游戏
+        if (this.started) {
+            console.log("Game is running, stopping current game");
+            this.stopCurrentGame();
+        } else {
+            console.log("Game is not running, proceeding directly");
+        }
+
+        // 等待当前游戏完全停止后再启动新游戏
+        console.log("Setting timeout for game cleanup...");
+        setTimeout(() => {
+            console.log("=== Timeout callback executed ===");
+            console.log("Game name:", newConfig.gameName);
+            console.log("Game URL:", newConfig.gameUrl);
+            console.log("Current Module exists:", !!this.Module);
+            console.log("Current GameManager exists:", !!this.gameManager);
+            console.log("Current textElem exists:", !!this.textElem);
+            console.log("Current failedToStart:", this.failedToStart);
+            console.log("Current this:", this);
+            console.log("Current this.config:", this.config);
+            console.log("Current this.elements:", this.elements);
+            console.log("Current this.game:", this.game);
+            
+            // 检查关键方法是否存在
+            console.log("this.createText exists:", typeof this.createText);
+            console.log("this.downloadGameCore exists:", typeof this.downloadGameCore);
+            console.log("this.startGameError exists:", typeof this.startGameError);
+            
+            // 更新配置，不重新初始化整个模拟器
+            console.log("Updating configuration...");
+            this.config.gameName = newConfig.gameName || this.getBaseFileName(newConfig.gameUrl);
+            this.config.gameUrl = newConfig.gameUrl;
+            console.log("Updated config.gameName:", this.config.gameName);
+            console.log("Updated config.gameUrl:", this.config.gameUrl);
+            
+            // 重置一些状态
+            console.log("Resetting game states...");
+            this.started = false;
+            this.paused = true;
+            this.failedToStart = false;
+            this.isSwitching = false;
+            console.log("States reset - started:", this.started, "failedToStart:", this.failedToStart, "isSwitching:", this.isSwitching);
+            
+            // 清理可能存在的旧模块引用
+            if (this.Module) {
+                console.log("Cleaning up old module reference");
+                console.log("Module.AL exists:", !!this.Module.AL);
+                console.log("Module.FS exists:", !!this.Module.FS);
+                console.log("Module.callMain exists:", !!this.Module.callMain);
+                // 不强制清理模块，让垃圾回收自然处理
+            } else {
+                console.log("No existing module to clean up");
+            }
+            
+            // 如果设置了自动启动，则直接开始游戏
+            if (newConfig.autoStart !== false) {
+                console.log("Auto-starting new game");
+                try {
+                    console.log("Creating text element...");
+                    this.createText();
+                    console.log("Text element created:", !!this.textElem);
+                    if (this.textElem) {
+                        console.log("Text element content:", this.textElem.innerText);
+                        console.log("Text element classes:", this.textElem.className);
+                    }
+                    console.log("Starting downloadGameCore...");
+                    this.downloadGameCore().then(() => {
+                        console.log("✓ downloadGameCore completed successfully");
+                    }).catch(error => {
+                        console.error("✗ Failed to download game core:", error);
+                        console.error("Error stack:", error.stack);
+                        console.log("Calling startGameError...");
+                        this.startGameError("Failed to download game core: " + error.message);
+                    });
+                } catch (error) {
+                    console.error("✗ Error in downloadGameCore call:", error);
+                    console.error("Error stack:", error.stack);
+                    console.log("Calling startGameError...");
+                    this.startGameError("Error in downloadGameCore: " + error.message);
+                }
+            } else {
+                console.log("Auto-start disabled, waiting for manual start");
+            }
+        }, 800); // 增加等待时间，确保 GameManager 的 exit 事件处理完成
+        
+        return true;
+    }
+
+    stopCurrentGame() {
+        console.log("=== stopCurrentGame called ===");
+        console.log("Current Module exists:", !!this.Module);
+        console.log("Current GameManager exists:", !!this.gameManager);
+        console.log("Current Canvas exists:", !!this.canvas);
+        
+        try {
+            // 触发退出事件
+            console.log("Calling exit event...");
+            this.callEvent("exit");
+            console.log("✓ Exit event called successfully");
+        } catch (e) {
+            console.error("✗ Error calling exit event:", e);
+            console.error("Error stack:", e.stack);
+        }
+        
+        // 重置状态标志，防止重复操作
+        console.log("Resetting game states...");
+        this.started = false;
+        this.paused = true;
+        console.log("✓ Game states reset");
+        
+        // 停止当前游戏模块
+        if (this.Module) {
+            console.log("Stopping module...");
+            try {
+                // 暂停主循环
+                if (this.Module.pauseMainLoop) {
+                    console.log("Pausing main loop...");
+                    this.Module.pauseMainLoop();
+                    console.log("✓ Main loop paused");
+                } else {
+                    console.warn("pauseMainLoop method not found");
+                }
+                
+                // 清理音频上下文
+                if (this.Module.AL && this.Module.AL.currentCtx) {
+                    console.log("Cleaning audio context...");
+                    this.Module.AL.currentCtx.sources.forEach((ctx, index) => {
+                        console.log(`Cleaning audio source ${index}...`);
+                        if (ctx.gain && ctx.gain.context) {
+                            try {
+                                ctx.gain.context.close();
+                                console.log(`✓ Audio source ${index} closed`);
+                            } catch (e) {
+                                console.warn(`Error closing audio source ${index}:`, e);
+                            }
+                        }
+                    });
+                    console.log("✓ Audio context cleaned");
+                } else {
+                    console.warn("No audio context to clean");
+                }
+            } catch (e) {
+                console.error('✗ Error stopping module:', e);
+                console.error("Error stack:", e.stack);
+            }
+        } else {
+            console.log("No module to stop");
+        }
+
+        // 清理游戏管理器
+        if (this.gameManager) {
+            console.log("Cleaning game manager...");
+            try {
+                this.gameManager = null;
+                console.log("✓ Game manager cleaned");
+            } catch (e) {
+                console.error('✗ Error cleaning game manager:', e);
+                console.error("Error stack:", e.stack);
+            }
+        } else {
+            console.log("No game manager to clean");
+        }
+        
+        // 清理画布
+        if (this.canvas && this.canvas.parentNode) {
+            console.log("Removing old canvas...");
+            try {
+                this.canvas.remove();
+                console.log("✓ Old canvas removed");
+            } catch (e) {
+                console.error('✗ Error removing canvas:', e);
+                console.error("Error stack:", e.stack);
+            }
+        } else {
+            console.log("No canvas to remove");
+        }
+        
+        // 重新创建画布
+        console.log("Creating new canvas...");
+        try {
+            this.canvas = this.createElement("canvas");
+            this.canvas.classList.add("ejs_canvas");
+            console.log("✓ New canvas created");
+        } catch (e) {
+            console.error('✗ Error creating canvas:', e);
+            console.error("Error stack:", e.stack);
+        }
+        
+        // 重新初始化手柄相关设置
+        console.log("Resetting gamepad settings...");
+        try {
+            this.resetGamepadSettings();
+            console.log("✓ Gamepad settings reset");
+        } catch (e) {
+            console.error('✗ Error resetting gamepad:', e);
+            console.error("Error stack:", e.stack);
+        }
+        
+        // 保存当前模块引用，避免过早清理
+        const currentModule = this.Module;
+        const currentFileName = this.fileName;
+        console.log("Saved references - Module:", !!currentModule, "FileName:", currentFileName);
+        
+        // 不立即清理模块，让它自然清理，避免影响新游戏的启动
+        console.log("Setting delayed cleanup timeout...");
+        setTimeout(() => {
+            console.log("=== Delayed cleanup timeout executed ===");
+            if (currentModule && currentFileName) {
+                console.log("Cleaning up file system...");
+                try {
+                    // 清理文件系统（如果存在）
+                    if (currentModule.FS) {
+                        try {
+                            // 只清理游戏文件，避免过度清理
+                            currentModule.FS.unlink("/" + currentFileName);
+                            console.log("✓ Game file unlinked");
+                        } catch (e) {
+                            console.warn("Error unlinking game file:", e);
+                        }
+                    } else {
+                        console.log("No file system to clean");
+                    }
+                } catch (e) {
+                    console.warn('Error cleaning up file system:', e);
+                }
+            } else {
+                console.log("No cleanup needed");
+            }
+        }, 1500); // 大幅增加延迟，避免影响新游戏启动
+        
+        console.log("=== stopCurrentGame completed ===");
+    }
+
+    resetGamepadSettings() {
+        // 重新初始化手柄选择
+        this.gamepadSelection = this.gamepadSelection || [];
+        this.controls = this.controls || [];
+        
+        // 重新初始化手柄标签
+        this.gamepadLabels = this.gamepadLabels || [];
+        
+        // 重新初始化手柄系统
+        this.reinitGamepad();
+        
+        // 更新手柄标签显示
+        this.updateGamepadLabels();
+    }
+
+    reinitGamepad() {
+        // 清理旧的手柄系统
+        if (this.gamepad) {
+            try {
+                // 移除所有事件监听器
+                this.gamepad._events = {};
+                // 停止手柄轮询
+                if (this.gamepad.stop) {
+                    this.gamepad.stop();
+                }
+            } catch (e) {
+                console.warn('Error cleaning up gamepad:', e);
+            }
+        }
+        
+        // 重新初始化手柄
+        this.gamepadInit();
+    }
     // Start button
     startButtonClicked(e) {
         this.callEvent("start-clicked");
@@ -237,13 +533,17 @@ export class EmulatorJS {
     }
     startGameError(message) {
         console.log(message);
-        this.textElem.innerText = message;
-        this.textElem.classList.add("ejs_error_text");
+        if (this.textElem) {
+            this.textElem.innerText = message;
+            this.textElem.classList.add("ejs_error_text");
+        }
 
         this.setupSettingsMenu();
         this.loadSettings();
 
-        this.menu.failedToStart();
+        if (this.menu) {
+            this.menu.failedToStart();
+        }
         this.handleResize();
         this.failedToStart = true;
     }
@@ -321,8 +621,10 @@ export class EmulatorJS {
             this.updateGamepadLabels();
             if (!this.muted) this.setVolume(this.volume);
             if (this.config.noAutoFocus !== true) this.elements.parent.focus();
-            this.textElem.remove();
-            this.textElem = null;
+            if (this.textElem) {
+                this.textElem.remove();
+                this.textElem = null;
+            }
             this.game.classList.remove("ejs_game");
             this.game.classList.add("ejs_canvas_parent");
             this.game.appendChild(this.canvas);
@@ -744,11 +1046,7 @@ export class EmulatorJS {
 
         this.gameManager.toggleShader(1);
     }
-    /**
-     * Load a new ROM without destroying the emulator instance
-     * @param {string} romPath - Path to the ROM file
-     */
-    
+
 }
 
 window.EmulatorJS = EmulatorJS;

@@ -172,12 +172,26 @@
         <div class="game-item" data-rom="F-1赛车.nes" data-core="nes">
           F-1赛车
         </div>
+        
+        <h3 style="margin-top: 30px; margin-bottom: 10px; font-size: 16px;">测试控制</h3>
+        <button id="test-switch-no-auto" style="width: 100%; margin: 5px 0; padding: 8px; font-size: 12px;">
+          切换但不自动启动
+        </button>
+        <button id="test-get-info" style="width: 100%; margin: 5px 0; padding: 8px; font-size: 12px;">
+          获取当前信息
+        </button>
+        <button id="test-clear-console" style="width: 100%; margin: 5px 0; padding: 8px; font-size: 12px;">
+          清空控制台
+        </button>
       </div>
 
       <!-- 右侧模拟器区域 -->
       <div id="emulator-area">
         <div id="game-info">
           <h2>请选择一个游戏</h2>
+          <div id="status-info" style="font-size: 12px; color: #aaa; margin-top: 5px;">
+            状态: 未初始化 | 手柄: 未检测
+          </div>
         </div>
         <div id="emulator-container">
           <div id="display">
@@ -232,6 +246,30 @@
         console.log("Threads are disabled");
       }
       let controller = null;
+      
+      // 状态更新函数
+      function updateStatus(emulatorStatus, gamepadStatus) {
+        const statusInfo = document.getElementById("status-info");
+        if (statusInfo) {
+          statusInfo.textContent = `状态: ${emulatorStatus} | 手柄: ${gamepadStatus}`;
+        }
+      }
+
+      // 手柄状态监控
+      function startGamepadMonitoring() {
+        setInterval(() => {
+          if (controller && controller.gamepad) {
+            const gamepads = controller.gamepad.gamepads || [];
+            const connectedCount = gamepads.length;
+            const gamepadStatus = connectedCount > 0 ? `已连接 (${connectedCount})` : '未检测';
+            const emulatorStatus = controller.started ? '运行中' : '已停止';
+            updateStatus(emulatorStatus, gamepadStatus);
+          } else {
+            updateStatus('未初始化', '未检测');
+          }
+        }, 2000);
+      }
+
       // 为游戏列表项添加点击事件
       document.querySelectorAll(".game-item").forEach((item) => {
         item.addEventListener("click", async () => {
@@ -253,13 +291,23 @@
 
           // 添加加载状态
           item.classList.add("loading");
+          updateStatus('切换游戏中...', '检测中');
 
           try {
             // 加载游戏
-
-            if (false) {
-              controller.loadROM(rom);
+            if (controller) {
+              console.log(`切换到游戏: ${name} (${rom})`);
+              const success = controller.startNewGame({ gameUrl: rom, gameName: name });
+              if (success) {
+                console.log(`成功启动游戏切换: ${name}`);
+                updateStatus('游戏已切换', '检测中');
+              } else {
+                console.error(`游戏切换失败: ${name}`);
+                updateStatus('切换失败', '未检测');
+              }
             } else {
+              console.log(`首次加载游戏: ${name} (${rom})`);
+              updateStatus('首次加载...', '检测中');
               controller = await loadGame({
                 rom: rom,
                 name: name,
@@ -269,6 +317,7 @@
           } catch (error) {
             console.error("Failed to load game:", error);
             showError("Failed to load game: " + error.message);
+            updateStatus('加载失败', '未检测');
           } finally {
             // 移除加载状态
             item.classList.remove("loading");
@@ -310,12 +359,36 @@
             if (loadingMessage) {
               loadingMessage.remove();
             }
+            updateStatus('游戏已启动', '检测中');
+            console.log(`游戏 ${game.name} 启动成功`);
           },
         });
+
+        // 监听模拟器事件
+        if (emulator) {
+          emulator.on('ready', function() {
+            console.log('模拟器已准备就绪');
+            updateStatus('已准备', '检测中');
+          });
+
+          emulator.on('start', function() {
+            console.log('游戏已启动');
+            updateStatus('运行中', '检测中');
+          });
+
+          emulator.on('exit', function() {
+            console.log('游戏已退出');
+            updateStatus('已退出', '检测中');
+          });
+
+          // 启动手柄监控
+          startGamepadMonitoring();
+        }
+
         return emulator;
       }
 
-      // 在页面加载时确保初始屏幕存在
+      // 测试按钮事件处理
       document.addEventListener("DOMContentLoaded", () => {
         // 确保初始屏幕存在
         const gameElement = document.getElementById("game");
@@ -330,6 +403,98 @@
                           `;
           gameElement.innerHTML = initialScreenHTML;
         }
+
+        // 切换但不自动启动按钮
+        document.getElementById('test-switch-no-auto').addEventListener('click', () => {
+          if (!controller) {
+            console.log('请先选择一个游戏启动模拟器');
+            return;
+          }
+
+          // 获取当前游戏之外的游戏
+          const activeItem = document.querySelector('.game-item.active');
+          if (!activeItem) return;
+
+          const allGames = Array.from(document.querySelectorAll('.game-item'));
+          const otherGames = allGames.filter(item => !item.classList.contains('active'));
+          
+          if (otherGames.length === 0) {
+            console.log('没有其他游戏可以切换');
+            return;
+          }
+
+          // 随机选择一个其他游戏
+          const randomGame = otherGames[Math.floor(Math.random() * otherGames.length)];
+          const rom = randomGame.getAttribute('data-rom');
+          const name = randomGame.textContent.trim();
+
+          console.log(`测试切换到游戏: ${name} (不自动启动)`);
+          updateStatus('测试切换中...', '检测中');
+
+          try {
+            const success = controller.startNewGame({ 
+              gameUrl: rom, 
+              gameName: name,
+              autoStart: false
+            });
+            
+            if (success) {
+              console.log(`成功切换到: ${name}，等待手动启动`);
+              updateStatus('已切换，等待启动', '检测中');
+              
+              // 更新激活状态
+              document.querySelectorAll('.game-item').forEach(i => i.classList.remove('active'));
+              randomGame.classList.add('active');
+              document.querySelector("#game-info h2").textContent = name + ' (等待启动)';
+            } else {
+              console.error(`切换失败: ${name}`);
+              updateStatus('切换失败', '未检测');
+            }
+          } catch (error) {
+            console.error('切换测试失败:', error);
+            updateStatus('测试失败', '未检测');
+          }
+        });
+
+        // 获取当前信息按钮
+        document.getElementById('test-get-info').addEventListener('click', () => {
+          if (!controller) {
+            console.log('模拟器未初始化');
+            return;
+          }
+
+          const info = {
+            currentGame: currentGame ? currentGame.name : '未知',
+            gameUrl: currentGame ? currentGame.rom : '未知',
+            started: controller.started,
+            paused: controller.paused,
+            version: controller.ejs_version || '未知',
+            gamepadConnected: controller.gamepad && controller.gamepad.gamepads ? controller.gamepad.gamepads.length : 0,
+            hasTextElement: !!controller.textElem,
+            hasModule: !!controller.Module,
+            hasGameManager: !!controller.gameManager
+          };
+
+          console.log('=== 当前模拟器信息 ===');
+          console.log('当前游戏:', info.currentGame);
+          console.log('游戏URL:', info.gameUrl);
+          console.log('运行状态:', info.started ? '运行中' : '已停止');
+          console.log('暂停状态:', info.paused ? '已暂停' : '正常运行');
+          console.log('版本:', info.version);
+          console.log('连接手柄数:', info.gamepadConnected);
+          console.log('文本元素:', info.hasTextElement ? '存在' : '不存在');
+          console.log('模块:', info.hasModule ? '存在' : '不存在');
+          console.log('游戏管理器:', info.hasGameManager ? '存在' : '不存在');
+          console.log('========================');
+          
+          updateStatus(info.started ? '运行中' : '已停止', `${info.gamepadConnected} 个手柄`);
+        });
+
+        // 清空控制台按钮
+        document.getElementById('test-clear-console').addEventListener('click', () => {
+          console.clear();
+          console.log('控制台已清空 - EmulatorJS startNewGame 测试');
+        });
       });
 
       function showError(message) {

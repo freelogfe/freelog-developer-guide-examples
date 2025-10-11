@@ -1,192 +1,531 @@
 class EmulatorJS {
-    destroy() {
-        console.log("Destroying emulator instance");
+    destory() {
         if (!this.started) return;
         this.callEvent("exit");
-        
-        // 清理资源
-        if (this.Module) {
-            // 暂停主循环
-            if (this.Module.pauseMainLoop) {
-                this.Module.pauseMainLoop();
-            }
-            
-            // 清理游戏管理器资源
-            if (this.gameManager) {
-                try {
-                    // 退出文件系统
-                    if (this.gameManager.FS) {
-                        this.gameManager.FS.quit();
-                    }
-                } catch (e) {
-                    console.warn("Error unmounting file systems:", e);
-                }
-            }
-        }
-        
-        // 停止正在进行的录制
-        if (this.recorder && this.recorder.state === "recording") {
-            this.recorder.stop();
-        }
-        
-        // 清理事件监听器
-        if (this.listeners) {
-            for (let i = 0; i < this.listeners.length; i++) {
-                this.removeEventListener(this.listeners[i]);
-            }
-        }
-        
-        // 移除创建的元素
-        if (this.game) {
-            this.game.innerHTML = "";
-        }
-        
-        // 重置状态变量
-        this.started = false;
-        this.fileName = null;
     }
-    
-    startGame() {
-        try {
-            // 如果已有画布，先移除
-            if (this.canvas && this.canvas.parentNode) {
-                this.canvas.parentNode.removeChild(this.canvas);
-            }
-            
-            // 为新游戏创建新画布
-            this.canvas = this.createElement("canvas");
-            this.canvas.classList.add("ejs_canvas");
-            
-            const args = [];
-            if (this.debug) args.push("-v");
-            args.push("/" + this.fileName);
-            if (this.debug) console.log("Starting game with args:", args);
-            
-            // 如果游戏已启动，重启游戏管理器
-            if (this.started) {
-                console.log("Restarting game for switch");
-                // 重启游戏管理器以准备新游戏
-                if (this.gameManager && this.gameManager.restart) {
-                    this.gameManager.restart();
+    getCores() {
+        let rv = {
+            "atari5200": ["a5200"],
+            "vb": ["beetle_vb"],
+            "nds": ["melonds", "desmume", "desmume2015"],
+            "arcade": ["fbneo", "fbalpha2012_cps1", "fbalpha2012_cps2"],
+            "nes": ["fceumm", "nestopia"],
+            "gb": ["gambatte"],
+            "coleco": ["gearcoleco"],
+            "segaMS": ["smsplus", "genesis_plus_gx", "picodrive"],
+            "segaMD": ["genesis_plus_gx", "picodrive"],
+            "segaGG": ["genesis_plus_gx"],
+            "segaCD": ["genesis_plus_gx", "picodrive"],
+            "sega32x": ["picodrive"],
+            "sega": ["genesis_plus_gx", "picodrive"],
+            "lynx": ["handy"],
+            "mame": ["mame2003_plus", "mame2003"],
+            "ngp": ["mednafen_ngp"],
+            "pce": ["mednafen_pce"],
+            "pcfx": ["mednafen_pcfx"],
+            "psx": ["pcsx_rearmed", "mednafen_psx_hw"],
+            "ws": ["mednafen_wswan"],
+            "gba": ["mgba"],
+            "n64": ["mupen64plus_next", "parallel_n64"],
+            "3do": ["opera"],
+            "psp": ["ppsspp"],
+            "atari7800": ["prosystem"],
+            "snes": ["snes9x"],
+            "atari2600": ["stella2014"],
+            "jaguar": ["virtualjaguar"],
+            "segaSaturn": ["yabause"],
+            "amiga": ["puae"],
+            "c64": ["vice_x64sc"],
+            "c128": ["vice_x128"],
+            "pet": ["vice_xpet"],
+            "plus4": ["vice_xplus4"],
+            "vic20": ["vice_xvic"],
+            "dos": ["dosbox_pure"]
+        };
+        if (this.isSafari && this.isMobile) {
+            rv.n64 = rv.n64.reverse();
+        }
+        return rv;
+    }
+    requiresThreads(core) {
+        const requiresThreads = ["ppsspp", "dosbox_pure"];
+        return requiresThreads.includes(core);
+    }
+    requiresWebGL2(core) {
+        const requiresWebGL2 = ["ppsspp"];
+        return requiresWebGL2.includes(core);
+    }
+    getCore(generic) {
+        const cores = this.getCores();
+        const core = this.config.system;
+        if (generic) {
+            for (const k in cores) {
+                if (cores[k].includes(core)) {
+                    return k;
                 }
-            } else {
-                // 首次启动游戏
-                this.Module.callMain(args);
             }
-            
-            if (typeof this.config.softLoad === "number" && this.config.softLoad > 0) {
-                // 清除任何现有的重置超时
-                if (this.resetTimeout) {
-                    clearTimeout(this.resetTimeout);
+            return core;
+        }
+        const gen = this.getCore(true);
+        if (cores[gen] && cores[gen].includes(this.preGetSetting("retroarch_core"))) {
+            return this.preGetSetting("retroarch_core");
+        }
+        if (cores[core]) {
+            return cores[core][0];
+        }
+        return core;
+    }
+    createElement(type) {
+        return document.createElement(type);
+    }
+    addEventListener(element, listener, callback) {
+        const listeners = listener.split(" ");
+        let rv = [];
+        for (let i = 0; i < listeners.length; i++) {
+            element.addEventListener(listeners[i], callback);
+            const data = { cb: callback, elem: element, listener: listeners[i] };
+            rv.push(data);
+        }
+        return rv;
+    }
+    removeEventListener(data) {
+        for (let i = 0; i < data.length; i++) {
+            data[i].elem.removeEventListener(data[i].listener, data[i].cb);
+        }
+    }
+    downloadFile(path, progressCB, notWithPath, opts) {
+        return new Promise(async cb => {
+            const data = this.toData(path); //check other data types
+            if (data) {
+                data.then((game) => {
+                    if (opts.method === "HEAD") {
+                        cb({ headers: {} });
+                    } else {
+                        cb({ headers: {}, data: game });
+                    }
+                })
+                return;
+            }
+            const basePath = notWithPath ? "" : this.config.dataPath;
+            path = basePath + path;
+            if (!notWithPath && this.config.filePaths && typeof this.config.filePaths[path.split("/").pop()] === "string") {
+                path = this.config.filePaths[path.split("/").pop()];
+            }
+            let url;
+            try { url = new URL(path) } catch (e) { };
+            if (url && !["http:", "https:"].includes(url.protocol)) {
+                //Most commonly blob: urls. Not sure what else it could be
+                if (opts.method === "HEAD") {
+                    cb({ headers: {} });
+                    return;
                 }
-                this.resetTimeout = setTimeout(() => {
-                    this.gameManager.restart();
-                }, this.config.softLoad * 1000);
-            }
-            
-            // 恢复主循环
-            if (this.Module && this.Module.resumeMainLoop) {
-                this.Module.resumeMainLoop();
-            }
-            
-            this.checkSupportedOpts();
-            this.setupDisksMenu();
-            // 如果磁盘数量不大于1，则隐藏磁盘菜单
-            if (!(this.gameManager.getDiskCount() > 1)) {
-                this.diskParent.style.display = "none";
-            }
-            this.setupSettingsMenu();
-            this.loadSettings();
-            this.updateCheatUI();
-            this.updateGamepadLabels();
-            if (!this.muted) this.setVolume(this.volume);
-            if (this.config.noAutoFocus !== true) this.elements.parent.focus();
-            if (this.textElem) {
-                this.textElem.remove();
-                this.textElem = null;
-            }
-            this.game.classList.remove("ejs_game");
-            this.game.classList.add("ejs_canvas_parent");
-            this.game.appendChild(this.canvas);
-            this.handleResize();
-            this.started = true;
-            this.paused = false;
-            if (this.touch) {
-                this.virtualGamepad.style.display = "";
-            }
-            this.handleResize();
-            if (this.config.fullscreenOnLoad) {
                 try {
-                    this.toggleFullscreen(true);
+                    let res = await fetch(path)
+                    if ((opts.type && opts.type.toLowerCase() === "arraybuffer") || !opts.type) {
+                        res = await res.arrayBuffer();
+                    } else {
+                        res = await res.text();
+                        try { res = JSON.parse(res) } catch (e) { }
+                    }
+                    if (path.startsWith("blob:")) URL.revokeObjectURL(path);
+                    cb({ data: res, headers: {} });
                 } catch (e) {
-                    if (this.debug) console.warn("Could not fullscreen on load");
+                    cb(-1);
+                }
+                return;
+            }
+            const xhr = new XMLHttpRequest();
+            if (progressCB instanceof Function) {
+                xhr.addEventListener("progress", (e) => {
+                    const progress = e.total ? " " + Math.floor(e.loaded / e.total * 100).toString() + "%" : " " + (e.loaded / 1048576).toFixed(2) + "MB";
+                    progressCB(progress);
+                });
+            }
+            xhr.onload = function () {
+                if (xhr.readyState === xhr.DONE) {
+                    let data = xhr.response;
+                    if (xhr.status.toString().startsWith("4") || xhr.status.toString().startsWith("5")) {
+                        cb(-1);
+                        return;
+                    }
+                    try { data = JSON.parse(data) } catch (e) { }
+                    cb({
+                        data: data,
+                        headers: {
+                            "content-length": xhr.getResponseHeader("content-length")
+                        }
+                    });
                 }
             }
-            this.menu.open();
-            if (this.isSafari && this.isMobile) {
-                //Safari is --- funny
-                this.checkStarted();
+            if (opts.responseType) xhr.responseType = opts.responseType;
+            xhr.onerror = () => cb(-1);
+            xhr.open(opts.method, path, true);
+            xhr.send();
+        })
+    }
+    toData(data, rv) {
+        if (!(data instanceof ArrayBuffer) && !(data instanceof Uint8Array) && !(data instanceof Blob)) return null;
+        if (rv) return true;
+        return new Promise(async (resolve) => {
+            if (data instanceof ArrayBuffer) {
+                resolve(new Uint8Array(data));
+            } else if (data instanceof Uint8Array) {
+                resolve(data);
+            } else if (data instanceof Blob) {
+                resolve(new Uint8Array(await data.arrayBuffer()));
             }
-        } catch (e) {
-            console.warn("Failed to start game", e);
-            this.startGameError(this.localization("Failed to start game"));
-            this.callEvent("exit");
+            resolve();
+        })
+    }
+    checkForUpdates() {
+        if (this.ejs_version.endsWith("-beta")) {
+            console.warn("Using EmulatorJS beta. Not checking for updates. This instance may be out of date. Using stable is highly recommended unless you build and ship your own cores.");
             return;
         }
-        this.callEvent("start");
-    }
-    
-    // 添加切换游戏的方法，支持完整的游戏切换流程
-    async switchGame(config) {
-        console.log("Switching game with config:", config);
-        
-        // 确保模拟器已初始化
-        if (!this.Module) {
-            console.error("Cannot switch game: Emulator core not initialized");
-            return Promise.reject("Emulator core not initialized");
-        }
-        
-        try {
-            // 暂停当前游戏
-            if (this.Module && this.Module.pauseMainLoop) {
-                this.Module.pauseMainLoop();
+        fetch("https://cdn.emulatorjs.org/stable/data/version.json").then(response => {
+            if (response.ok) {
+                response.text().then(body => {
+                    let version = JSON.parse(body);
+                    if (this.versionAsInt(this.ejs_version) < this.versionAsInt(version.version)) {
+                        console.log(`Using EmulatorJS version ${this.ejs_version} but the newest version is ${version.current_version}\nopen https://github.com/EmulatorJS/EmulatorJS to update`);
+                    }
+                })
             }
-            
-            // 更新配置参数
-            if (config.gameUrl) this.config.gameUrl = config.gameUrl;
-            if (config.gameName) this.config.gameName = config.gameName;
-            if (config.biosUrl) this.config.biosUrl = config.biosUrl;
-            if (config.gamePatchUrl) this.config.gamePatchUrl = config.gamePatchUrl;
-            if (config.gameParentUrl) this.config.gameParentUrl = config.gameParentUrl;
-            
-            // 显示加载界面
-            if (this.textElem) {
-                this.textElem.innerText = this.localization("Loading new game...");
+        })
+    }
+    versionAsInt(ver) {
+        if (ver.endsWith("-beta")) {
+            return 99999999;
+        }
+        let rv = ver.split(".");
+        if (rv[rv.length - 1].length === 1) {
+            rv[rv.length - 1] = "0" + rv[rv.length - 1];
+        }
+        return parseInt(rv.join(""));
+    }
+    constructor(element, config) {
+        this.ejs_version = "4.2.3";
+        this.extensions = [];
+        this.initControlVars();
+        this.debug = (window.EJS_DEBUG_XX === true);
+        if (this.debug || (window.location && ["localhost", "127.0.0.1"].includes(location.hostname))) this.checkForUpdates();
+        this.netplayEnabled = (window.EJS_DEBUG_XX === true) && (window.EJS_EXPERIMENTAL_NETPLAY === true);
+        this.config = config;
+        this.config.buttonOpts = this.buildButtonOptions(this.config.buttonOpts);
+        this.config.settingsLanguage = window.EJS_settingsLanguage || false;
+        this.currentPopup = null;
+        this.isFastForward = false;
+        this.isSlowMotion = false;
+        this.failedToStart = false;
+        this.rewindEnabled = this.preGetSetting("rewindEnabled") === "enabled";
+        this.touch = false;
+        this.cheats = [];
+        this.started = false;
+        this.volume = (typeof this.config.volume === "number") ? this.config.volume : 0.5;
+        if (this.config.defaultControllers) this.defaultControllers = this.config.defaultControllers;
+        this.muted = false;
+        this.paused = true;
+        this.missingLang = [];
+        this.setElements(element);
+        this.setColor(this.config.color || "");
+        this.config.alignStartButton = (typeof this.config.alignStartButton === "string") ? this.config.alignStartButton : "bottom";
+        this.config.backgroundColor = (typeof this.config.backgroundColor === "string") ? this.config.backgroundColor : "rgb(51, 51, 51)";
+        if (this.config.adUrl) {
+            this.config.adSize = (Array.isArray(this.config.adSize)) ? this.config.adSize : ["300px", "250px"];
+            this.setupAds(this.config.adUrl, this.config.adSize[0], this.config.adSize[1]);
+        }
+        this.isMobile = (function () {
+            let check = false;
+            (function (a) { if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true; })(navigator.userAgent || navigator.vendor || window.opera);
+            return check;
+        })();
+        this.hasTouchScreen = (function () {
+            if (window.PointerEvent && ("maxTouchPoints" in navigator)) {
+                if (navigator.maxTouchPoints > 0) {
+                    return true;
+                }
             } else {
-                this.createText();
-                this.textElem.innerText = this.localization("Loading new game...");
+                if (window.matchMedia && window.matchMedia("(any-pointer:coarse)").matches) {
+                    return true;
+                } else if (window.TouchEvent || ("ontouchstart" in window)) {
+                    return true;
+                }
             }
-            
-            // 清理当前游戏状态
-            if (this.gameManager) {
-                // 重启游戏管理器以清理旧游戏状态
-                this.gameManager.restart();
-                
-                // 清理可能存在的旧游戏文件
-                this.gameManager.cleanupGameFiles();
+            return false;
+        })();
+        this.canvas = this.createElement("canvas");
+        this.canvas.classList.add("ejs_canvas");
+        this.videoRotation = ([0, 1, 2, 3].includes(this.config.videoRotation)) ? this.config.videoRotation : this.preGetSetting("videoRotation") || 0;
+        this.videoRotationChanged = false;
+        this.capture = this.capture || {};
+        this.capture.photo = this.capture.photo || {};
+        this.capture.photo.source = ["canvas", "retroarch"].includes(this.capture.photo.source) ? this.capture.photo.source : "canvas";
+        this.capture.photo.format = (typeof this.capture.photo.format === "string") ? this.capture.photo.format : "png";
+        this.capture.photo.upscale = (typeof this.capture.photo.upscale === "number") ? this.capture.photo.upscale : 1;
+        this.capture.video = this.capture.video || {};
+        this.capture.video.format = (typeof this.capture.video.format === "string") ? this.capture.video.format : "detect";
+        this.capture.video.upscale = (typeof this.capture.video.upscale === "number") ? this.capture.video.upscale : 1;
+        this.capture.video.fps = (typeof this.capture.video.fps === "number") ? this.capture.video.fps : 30;
+        this.capture.video.videoBitrate = (typeof this.capture.video.videoBitrate === "number") ? this.capture.video.videoBitrate : 2.5 * 1024 * 1024;
+        this.capture.video.audioBitrate = (typeof this.capture.video.audioBitrate === "number") ? this.capture.video.audioBitrate : 192 * 1024;
+        this.bindListeners();
+        this.config.netplayUrl = this.config.netplayUrl || "https://netplay.emulatorjs.org";
+        this.fullscreen = false;
+        this.enableMouseLock = false;
+        this.supportsWebgl2 = !!document.createElement("canvas").getContext("webgl2") && (this.config.forceLegacyCores !== true);
+        this.webgl2Enabled = (() => {
+            let setting = this.preGetSetting("webgl2Enabled");
+            if (setting === "disabled" || !this.supportsWebgl2) {
+                return false;
+            } else if (setting === "enabled") {
+                return true;
             }
-            
-            // 重新下载游戏文件并启动
-            await this.downloadFiles();
-            
-            return Promise.resolve();
-        } catch (error) {
-            console.error("Error switching game:", error);
-            this.startGameError(this.localization("Failed to switch game"));
-            return Promise.reject(error);
+            return null;
+        })();
+        this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        if (this.config.disableDatabases) {
+            this.storage = {
+                rom: new window.EJS_DUMMYSTORAGE(),
+                bios: new window.EJS_DUMMYSTORAGE(),
+                core: new window.EJS_DUMMYSTORAGE()
+            }
+        } else {
+            this.storage = {
+                rom: new window.EJS_STORAGE("EmulatorJS-roms", "rom"),
+                bios: new window.EJS_STORAGE("EmulatorJS-bios", "bios"),
+                core: new window.EJS_STORAGE("EmulatorJS-core", "core")
+            }
+        }
+        // This is not cache. This is save data
+        this.storage.states = new window.EJS_STORAGE("EmulatorJS-states", "states");
+
+        this.game.classList.add("ejs_game");
+        if (typeof this.config.backgroundImg === "string") {
+            this.game.classList.add("ejs_game_background");
+            if (this.config.backgroundBlur) this.game.classList.add("ejs_game_background_blur");
+            this.game.setAttribute("style", `--ejs-background-image: url("${this.config.backgroundImg}"); --ejs-background-color: ${this.config.backgroundColor};`);
+            this.on("start", () => {
+                this.game.classList.remove("ejs_game_background");
+                if (this.config.backgroundBlur) this.game.classList.remove("ejs_game_background_blur");
+            })
+        } else {
+            this.game.setAttribute("style", "--ejs-background-color: " + this.config.backgroundColor + ";");
+        }
+
+        if (Array.isArray(this.config.cheats)) {
+            for (let i = 0; i < this.config.cheats.length; i++) {
+                const cheat = this.config.cheats[i];
+                if (Array.isArray(cheat) && cheat[0] && cheat[1]) {
+                    this.cheats.push({
+                        desc: cheat[0],
+                        checked: false,
+                        code: cheat[1],
+                        is_permanent: true
+                    })
+                }
+            }
+        }
+
+        this.createStartButton();
+        this.handleResize();
+    }
+    setColor(color) {
+        if (typeof color !== "string") color = "";
+        let getColor = function (color) {
+            color = color.toLowerCase();
+            if (color && /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/.test(color)) {
+                if (color.length === 4) {
+                    let rv = "#";
+                    for (let i = 1; i < 4; i++) {
+                        rv += color.slice(i, i + 1) + color.slice(i, i + 1);
+                    }
+                    color = rv;
+                }
+                let rv = [];
+                for (let i = 1; i < 7; i += 2) {
+                    rv.push(parseInt("0x" + color.slice(i, i + 2), 16));
+                }
+                return rv.join(", ");
+            }
+            return null;
+        }
+        if (!color || getColor(color) === null) {
+            this.elements.parent.setAttribute("style", "--ejs-primary-color: 26,175,255;");
+            return;
+        }
+        this.elements.parent.setAttribute("style", "--ejs-primary-color:" + getColor(color) + ";");
+    }
+    setupAds(ads, width, height) {
+        const div = this.createElement("div");
+        const time = (typeof this.config.adMode === "number" && this.config.adMode > -1 && this.config.adMode < 3) ? this.config.adMode : 2;
+        div.classList.add("ejs_ad_iframe");
+        const frame = this.createElement("iframe");
+        frame.src = ads;
+        frame.setAttribute("scrolling", "no");
+        frame.setAttribute("frameborder", "no");
+        frame.style.width = width;
+        frame.style.height = height;
+        const closeParent = this.createElement("div");
+        closeParent.classList.add("ejs_ad_close");
+        const closeButton = this.createElement("a");
+        closeParent.appendChild(closeButton);
+        closeParent.setAttribute("hidden", "");
+        div.appendChild(closeParent);
+        div.appendChild(frame);
+        if (this.config.adMode !== 1) {
+            this.elements.parent.appendChild(div);
+        }
+        this.addEventListener(closeButton, "click", () => {
+            div.remove();
+        })
+
+        this.on("start-clicked", () => {
+            if (this.config.adMode === 0) div.remove();
+            if (this.config.adMode === 1) {
+                this.elements.parent.appendChild(div);
+            }
+        })
+
+        this.on("start", () => {
+            closeParent.removeAttribute("hidden");
+            const time = (typeof this.config.adTimer === "number" && this.config.adTimer > 0) ? this.config.adTimer : 10000;
+            if (this.config.adTimer === -1) div.remove();
+            if (this.config.adTimer === 0) return;
+            setTimeout(() => {
+                div.remove();
+            }, time);
+        })
+
+    }
+    adBlocked(url, del) {
+        if (del) {
+            document.querySelector('div[class="ejs_ad_iframe"]').remove();
+        } else {
+            try {
+                document.querySelector('div[class="ejs_ad_iframe"]').remove();
+            } catch (e) { }
+            this.config.adUrl = url;
+            this.setupAds(this.config.adUrl, this.config.adSize[0], this.config.adSize[1]);
         }
     }
-    
+    on(event, func) {
+        if (!this.functions) this.functions = {};
+        if (!Array.isArray(this.functions[event])) this.functions[event] = [];
+        this.functions[event].push(func);
+    }
+    callEvent(event, data) {
+        if (!this.functions) this.functions = {};
+        if (!Array.isArray(this.functions[event])) return 0;
+        this.functions[event].forEach(e => e(data));
+        return this.functions[event].length;
+    }
+    setElements(element) {
+        const game = this.createElement("div");
+        const elem = document.querySelector(element);
+        elem.innerHTML = "";
+        elem.appendChild(game);
+        this.game = game;
+
+        this.elements = {
+            main: this.game,
+            parent: elem
+        }
+        this.elements.parent.classList.add("ejs_parent");
+        this.elements.parent.setAttribute("tabindex", -1);
+    }
+    // Start button
+    createStartButton() {
+        const button = this.createElement("div");
+        button.classList.add("ejs_start_button");
+        let border = 0;
+        if (typeof this.config.backgroundImg === "string") {
+            button.classList.add("ejs_start_button_border");
+            border = 1;
+        }
+        button.innerText = (typeof this.config.startBtnName === "string") ? this.config.startBtnName : this.localization("Start Game");
+        if (this.config.alignStartButton == "top") {
+            button.style.bottom = "calc(100% - 20px)";
+        } else if (this.config.alignStartButton == "center") {
+            button.style.bottom = "calc(50% + 22.5px + " + border + "px)";
+        }
+        this.elements.parent.appendChild(button);
+        this.addEventListener(button, "touchstart", () => {
+            this.touch = true;
+        })
+        this.addEventListener(button, "click", this.startButtonClicked.bind(this));
+        if (this.config.startOnLoad === true) {
+            this.startButtonClicked(button);
+        }
+        setTimeout(() => {
+            this.callEvent("ready");
+        }, 20);
+    }
+    startButtonClicked(e) {
+        this.callEvent("start-clicked");
+        if (e.pointerType === "touch") {
+            this.touch = true;
+        }
+        if (e.preventDefault) {
+            e.preventDefault();
+            e.target.remove();
+        } else {
+            e.remove();
+        }
+        this.createText();
+        this.downloadGameCore();
+    }
+    // End start button
+    createText() {
+        this.textElem = this.createElement("div");
+        this.textElem.classList.add("ejs_loading_text");
+        if (typeof this.config.backgroundImg === "string") this.textElem.classList.add("ejs_loading_text_glow");
+        this.textElem.innerText = this.localization("Loading...");
+        this.elements.parent.appendChild(this.textElem);
+    }
+    localization(text, log) {
+        if (typeof text === "undefined" || text.length === 0) return;
+        text = text.toString();
+        if (text.includes("EmulatorJS v")) return text;
+        if (this.config.langJson) {
+            if (typeof log === "undefined") log = true;
+            if (!this.config.langJson[text] && log) {
+                if (!this.missingLang.includes(text)) this.missingLang.push(text);
+                console.log(`Translation not found for '${text}'. Language set to '${this.config.language}'`);
+            }
+            return this.config.langJson[text] || text;
+        }
+        return text;
+    }
+    checkCompression(data, msg, fileCbFunc) {
+        if (!this.compression) {
+            this.compression = new window.EJS_COMPRESSION(this);
+        }
+        if (msg) {
+            this.textElem.innerText = msg;
+        }
+        return this.compression.decompress(data, (m, appendMsg) => {
+            this.textElem.innerText = appendMsg ? (msg + m) : m;
+        }, fileCbFunc);
+    }
+    checkCoreCompatibility(version) {
+        if (this.versionAsInt(version.minimumEJSVersion) > this.versionAsInt(this.ejs_version)) {
+            this.startGameError(this.localization("Outdated EmulatorJS version"));
+            throw new Error("Core requires minimum EmulatorJS version of " + version.minimumEJSVersion);
+        }
+    }
+    startGameError(message) {
+        console.log(message);
+        this.textElem.innerText = message;
+        this.textElem.classList.add("ejs_error_text");
+
+        this.setupSettingsMenu();
+        this.loadSettings();
+
+        this.menu.failedToStart();
+        this.handleResize();
+        this.failedToStart = true;
+    }
+    downloadGameCore() {
         this.textElem.innerText = this.localization("Download Game Core");
         if (!this.config.threads && this.requiresThreads(this.getCore())) {
             this.startGameError(this.localization("Error for site owner") + "\n" + this.localization("Check console"));
@@ -399,19 +738,7 @@ class EmulatorJS {
             }
             const gotData = async (input) => {
                 if (this.config.dontExtractBIOS === true) {
-                    try {
-                        this.gameManager.FS.writeFile(assetUrl, new Uint8Array(input));
-                    } catch (e) {
-                        if (e.errno === 10) { // EEXIST
-                            this.gameManager.FS.unlink(assetUrl);
-                            this.gameManager.FS.writeFile(assetUrl, new Uint8Array(input));
-                        } else if (e.errno === 20) { // EISDIR
-                            const newFileName = assetUrl + "_file";
-                            this.gameManager.FS.writeFile(newFileName, new Uint8Array(input));
-                        } else {
-                            throw e;
-                        }
-                    }
+                    this.gameManager.FS.writeFile(assetUrl, new Uint8Array(input));
                     return resolve(assetUrl);
                 }
                 const data = await this.checkCompression(new Uint8Array(input), decompressProgressMessage);
@@ -419,37 +746,11 @@ class EmulatorJS {
                     const coreFilename = "/" + this.fileName;
                     const coreFilePath = coreFilename.substring(0, coreFilename.length - coreFilename.split("/").pop().length);
                     if (k === "!!notCompressedData") {
-                        const targetPath = coreFilePath + assetUrl.split("/").pop().split("#")[0].split("?")[0];
-                        try {
-                            this.gameManager.FS.writeFile(targetPath, data[k]);
-                        } catch (e) {
-                            if (e.errno === 10) { // EEXIST
-                                this.gameManager.FS.unlink(targetPath);
-                                this.gameManager.FS.writeFile(targetPath, data[k]);
-                            } else if (e.errno === 20) { // EISDIR
-                                const newTargetPath = targetPath + "_file";
-                                this.gameManager.FS.writeFile(newTargetPath, data[k]);
-                            } else {
-                                throw e;
-                            }
-                        }
+                        this.gameManager.FS.writeFile(coreFilePath + assetUrl.split("/").pop().split("#")[0].split("?")[0], data[k]);
                         break;
                     }
                     if (k.endsWith("/")) continue;
-                    const targetPath = coreFilePath + k.split("/").pop();
-                    try {
-                        this.gameManager.FS.writeFile(targetPath, data[k]);
-                    } catch (e) {
-                        if (e.errno === 10) { // EEXIST
-                            this.gameManager.FS.unlink(targetPath);
-                            this.gameManager.FS.writeFile(targetPath, data[k]);
-                        } else if (e.errno === 20) { // EISDIR
-                            const newTargetPath = targetPath + "_file";
-                            this.gameManager.FS.writeFile(newTargetPath, data[k]);
-                        } else {
-                            throw e;
-                        }
-                    }
+                    this.gameManager.FS.writeFile(coreFilePath + k.split("/").pop(), data[k]);
                 }
             }
 
@@ -518,21 +819,7 @@ class EmulatorJS {
             const gotGameData = (data) => {
                 if (["arcade", "mame"].includes(this.getCore(true))) {
                     this.fileName = this.getBaseFileName(true);
-                    try {
-                        this.gameManager.FS.writeFile(this.fileName, new Uint8Array(data));
-                    } catch (e) {
-                        if (e.errno === 10) { // EEXIST
-                            this.gameManager.FS.unlink(this.fileName);
-                            this.gameManager.FS.writeFile(this.fileName, new Uint8Array(data));
-                        } else if (e.errno === 20) { // EISDIR
-                            // 如果目标路径是一个目录，我们需要选择一个不同的文件名
-                            const newFileName = this.fileName + "_game";
-                            this.gameManager.FS.writeFile(newFileName, new Uint8Array(data));
-                            this.fileName = newFileName;
-                        } else {
-                            throw e;
-                        }
-                    }
+                    this.gameManager.FS.writeFile(this.fileName, new Uint8Array(data));
                     resolve();
                     return;
                 }
@@ -555,59 +842,19 @@ class EmulatorJS {
                             if (paths[i] === "") continue;
                             cp += `/${paths[i]}`;
                             if (!this.gameManager.FS.analyzePath(cp).exists) {
-                                try {
-                                    this.gameManager.FS.mkdir(cp);
-                                } catch (e) {
-                                    // 忽略已存在的目录错误
-                                    if (e.errno !== 10) {
-                                        throw e;
-                                    }
-                                }
+                                this.gameManager.FS.mkdir(cp);
                             }
                         }
                     }
                     if (fileName.endsWith("/")) {
-                        try {
-                            this.gameManager.FS.mkdir(fileName);
-                        } catch (e) {
-                            // 忽略已存在的目录错误
-                            if (e.errno !== 10) {
-                                throw e;
-                            }
-                        }
+                        this.gameManager.FS.mkdir(fileName);
                         return;
                     }
                     if (fileName === "!!notCompressedData") {
-                        try {
-                            this.gameManager.FS.writeFile(altName, fileData);
-                        } catch (e) {
-                            if (e.errno === 10) { // EEXIST
-                                this.gameManager.FS.unlink(altName);
-                                this.gameManager.FS.writeFile(altName, fileData);
-                            } else if (e.errno === 20) { // EISDIR
-                                const newFileName = altName + "_game";
-                                this.gameManager.FS.writeFile(newFileName, fileData);
-                            } else {
-                                throw e;
-                            }
-                        }
+                        this.gameManager.FS.writeFile(altName, fileData);
                         fileNames.push(altName);
                     } else {
-                        try {
-                            this.gameManager.FS.writeFile(`/${fileName}`, fileData);
-                        } catch (e) {
-                            if (e.errno === 10) { // EEXIST
-                                this.gameManager.FS.unlink(`/${fileName}`);
-                                this.gameManager.FS.writeFile(`/${fileName}`, fileData);
-                            } else if (e.errno === 20) { // EISDIR
-                                const newFileName = fileName + "_game";
-                                this.gameManager.FS.writeFile(`/${newFileName}`, fileData);
-                                fileNames.push(newFileName);
-                                return;
-                            } else {
-                                throw e;
-                            }
-                        }
+                        this.gameManager.FS.writeFile(`/${fileName}`, fileData);
                         fileNames.push(fileName);
                     }
                 }).then(() => {
@@ -658,12 +905,8 @@ class EmulatorJS {
                         }
                     }
                     resolve();
-                }).catch(e => {
-                    console.error("Error processing game data:", e);
-                    this.startGameError(this.localization("Error processing game data"));
                 });
-            };
-            
+            }
             const downloadFile = async () => {
                 const res = await this.downloadFile(this.config.gameUrl, (progress) => {
                     this.textElem.innerText = this.localization("Download Game Data") + progress;
@@ -683,9 +926,9 @@ class EmulatorJS {
                     this.storage.rom.put(this.config.gameUrl.split("/").pop(), {
                         "content-length": res.headers["content-length"],
                         data: res.data
-                    });
+                    })
                 }
-            };
+            }
 
             if (!this.debug) {
                 this.downloadFile(this.config.gameUrl, null, true, { method: "HEAD" }).then(async (res) => {
@@ -696,58 +939,186 @@ class EmulatorJS {
                         return;
                     }
                     downloadFile();
-                }).catch(e => {
-                    console.error("Error downloading game:", e);
-                    this.startGameError(this.localization("Network Error"));
-                });
+                })
             } else {
                 downloadFile();
             }
-        });
+        })
     }
-
     downloadFiles() {
-        return new Promise(async (resolve) => {
-            if (this.debug) console.log("Downloading game files");
-            
-            // 检查是否是游戏切换场景
-            const isGameSwitch = this.started && this.gameManager;
-            
-            if (isGameSwitch) {
-                // 如果是游戏切换，显示相应提示
-                if (this.textElem) {
-                    this.textElem.innerText = this.localization("Loading new game files...");
-                }
+        (async () => {
+            this.gameManager = new window.EJS_GameManager(this.Module, this);
+            await this.gameManager.loadExternalFiles();
+            await this.gameManager.mountFileSystems();
+            this.callEvent("saveDatabaseLoaded", this.gameManager.FS);
+            if (this.getCore() === "ppsspp") {
+                await this.gameManager.loadPpssppAssets();
             }
-            
-            try {
-                await this.gameManager.loadExternalFiles();
-                await this.gameManager.mountFileSystems();
-                this.callEvent("saveDatabaseLoaded", this.gameManager.FS);
-                if (this.getCore() === "ppsspp") {
-                    await this.gameManager.loadPpssppAssets();
+            await this.downloadRom();
+            await this.downloadBios();
+            await this.downloadStartState();
+            await this.downloadGameParent();
+            await this.downloadGamePatch();
+            this.startGame();
+        })();
+    }
+    initModule(wasmData, threadData) {
+        if (typeof window.EJS_Runtime !== "function") {
+            console.warn("EJS_Runtime is not defined!");
+            this.startGameError(this.localization("Error loading EmulatorJS runtime"));
+            throw new Error("EJS_Runtime is not defined!");
+        }
+        window.EJS_Runtime({
+            noInitialRun: true,
+            onRuntimeInitialized: null,
+            arguments: [],
+            preRun: [],
+            postRun: [],
+            canvas: this.canvas,
+            callbacks: {},
+            parent: this.elements.parent,
+            print: (msg) => {
+                if (this.debug) {
+                    console.log(msg);
                 }
-                await this.downloadRom();
-                await this.downloadBios();
-                await this.downloadStartState();
-                await this.downloadGameParent();
-                await this.downloadGamePatch();
-                
-                if (isGameSwitch) {
-                    // 如果是游戏切换，重启游戏管理器
-                    this.gameManager.restart();
+            },
+            printErr: (msg) => {
+                if (this.debug) {
+                    console.log(msg);
                 }
-                
-                this.startGame();
-                resolve();
-            } catch (error) {
-                console.error("Error downloading files:", error);
-                this.startGameError(this.localization("Error downloading game files"));
-                resolve();
+            },
+            totalDependencies: 0,
+            locateFile: function (fileName) {
+                if (this.debug) console.log(fileName);
+                if (fileName.endsWith(".wasm")) {
+                    return URL.createObjectURL(new Blob([wasmData], { type: "application/wasm" }));
+                } else if (fileName.endsWith(".worker.js")) {
+                    return URL.createObjectURL(new Blob([threadData], { type: "application/javascript" }));
+                }
+            },
+            getSavExt: () => {
+                if (this.saveFileExt) {
+                    return "." + this.saveFileExt;
+                }
+                return ".srm";
             }
+        }).then(module => {
+            this.Module = module;
+            this.downloadFiles();
+        }).catch(e => {
+            console.warn(e);
+            this.startGameError(this.localization("Failed to start game"));
         });
     }
+    startGame() {
+        try {
+            const args = [];
+            if (this.debug) args.push("-v");
+            args.push("/" + this.fileName);
+            if (this.debug) console.log(args);
+            this.Module.callMain(args);
+            if (typeof this.config.softLoad === "number" && this.config.softLoad > 0) {
+                this.resetTimeout = setTimeout(() => {
+                    this.gameManager.restart();
+                }, this.config.softLoad * 1000);
+            }
+            this.Module.resumeMainLoop();
+            this.checkSupportedOpts();
+            this.setupDisksMenu();
+            // hide the disks menu if the disk count is not greater than 1
+            if (!(this.gameManager.getDiskCount() > 1)) {
+                this.diskParent.style.display = "none";
+            }
+            this.setupSettingsMenu();
+            this.loadSettings();
+            this.updateCheatUI();
+            this.updateGamepadLabels();
+            if (!this.muted) this.setVolume(this.volume);
+            if (this.config.noAutoFocus !== true) this.elements.parent.focus();
+            this.textElem.remove();
+            this.textElem = null;
+            this.game.classList.remove("ejs_game");
+            this.game.classList.add("ejs_canvas_parent");
+            this.game.appendChild(this.canvas);
+            this.handleResize();
+            this.started = true;
+            this.paused = false;
+            if (this.touch) {
+                this.virtualGamepad.style.display = "";
+            }
+            this.handleResize();
+            if (this.config.fullscreenOnLoad) {
+                try {
+                    this.toggleFullscreen(true);
+                } catch (e) {
+                    if (this.debug) console.warn("Could not fullscreen on load");
+                }
+            }
+            this.menu.open();
+            if (this.isSafari && this.isMobile) {
+                //Safari is --- funny
+                this.checkStarted();
+            }
+        } catch (e) {
+            console.warn("Failed to start game", e);
+            this.startGameError(this.localization("Failed to start game"));
+            this.callEvent("exit");
+            return;
+        }
+        this.callEvent("start");
+    }
+    checkStarted() {
+        (async () => {
+            let sleep = (ms) => new Promise(r => setTimeout(r, ms));
+            let state = "suspended";
+            let popup;
+            while (state === "suspended") {
+                if (!this.Module.AL) return;
+                this.Module.AL.currentCtx.sources.forEach(ctx => {
+                    state = ctx.gain.context.state;
+                });
+                if (state !== "suspended") break;
+                if (!popup) {
+                    popup = this.createPopup("", {});
+                    const button = this.createElement("button");
+                    button.innerText = this.localization("Click to resume Emulator");
+                    button.classList.add("ejs_menu_button");
+                    button.style.width = "25%";
+                    button.style.height = "25%";
+                    popup.appendChild(button);
+                    popup.style["text-align"] = "center";
+                    popup.style["font-size"] = "28px";
+                }
+                await sleep(10);
+            }
+            if (popup) this.closePopup();
+        })();
+    }
+    bindListeners() {
+        this.createContextMenu();
+        this.createBottomMenuBar();
+        this.createControlSettingMenu();
+        this.createCheatsMenu()
+        this.createNetplayMenu();
+        this.setVirtualGamepad();
+        this.addEventListener(this.elements.parent, "keydown keyup", this.keyChange.bind(this));
+        this.addEventListener(this.elements.parent, "mousedown touchstart", (e) => {
+            if (document.activeElement !== this.elements.parent && this.config.noAutoFocus !== true) this.elements.parent.focus();
+        })
+        this.addEventListener(window, "resize", this.handleResize.bind(this));
+        //this.addEventListener(window, "blur", e => console.log(e), true); //TODO - add "click to make keyboard keys work" message?
 
+        let counter = 0;
+        this.elements.statePopupPanel = this.createPopup("", {}, true);
+        this.elements.statePopupPanel.innerText = this.localization("Drop save state here to load");
+        this.elements.statePopupPanel.style["text-align"] = "center";
+        this.elements.statePopupPanel.style["font-size"] = "28px";
+
+        //to fix a funny apple bug
+        this.addEventListener(window, "webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange", () => {
+            setTimeout(() => {
+                this.handleResize.bind(this);
+                if (this.config.noAutoFocus !== true) this.elements.parent.focus();
             }, 0);
         });
         this.addEventListener(window, "beforeunload", (e) => {
@@ -6345,54 +6716,6 @@ class EmulatorJS {
         }
         return stream;
     }
-
-    /**
-     * Load a new ROM without destroying the emulator instance
-     * @param {string} romPath - Path to the ROM file
-     */
-    async loadROM(romPath) {
-        try {
-            // Reset game state
-            this.reset();
-
-            // Load new ROM
-            const gameData = await this.downloadFile(romPath);
-            if (gameData === -1) {
-                throw new Error("Failed to download ROM file");
-            }
-
-            // Update game manager with new ROM
-            if (this.gameManager) {
-                this.gameManager.loadROM(romPath);
-            }
-
-            console.log("ROM loaded successfully:", romPath);
-        } catch (error) {
-            console.error("Error loading ROM:", error);
-            throw error;
-        }
-    }
-
-    /**
-     * Reset the emulator state
-     */
-    reset() {
-        // Reset internal state variables
-        this.started = false;
-        this.paused = true;
-
-        // Clear any existing game data if needed
-        if (this.gameManager) {
-            // Perform any necessary cleanup in the game manager
-            if (this.gameManager.reset) {
-                this.gameManager.reset();
-            }
-        }
-
-        console.log("Emulator state reset");
-    }
-
- 
 
     /**
      * Enhanced screen recording method

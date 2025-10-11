@@ -36,11 +36,13 @@ export function checkCompression(data, msg, fileCbFunc) {
     if (!this.compression) {
         this.compression = new window.EJS_COMPRESSION(this);
     }
-    if (msg) {
+    if (msg && this.textElem) {
         this.textElem.innerText = msg;
     }
     return this.compression.decompress(data, (m, appendMsg) => {
-        this.textElem.innerText = appendMsg ? (msg + m) : m;
+        if (this.textElem) {
+            this.textElem.innerText = appendMsg ? (msg + m) : m;
+        }
     }, fileCbFunc);
 }
 export function checkCoreCompatibility(version) {

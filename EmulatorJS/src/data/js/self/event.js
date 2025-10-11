@@ -77,30 +77,7 @@ export function bindListeners() {
         })
     });
 
-    this.gamepad = new GamepadHandler(); //https://github.com/ethanaobrien/Gamepad
-    this.gamepad.on("connected", (e) => {
-        if (!this.gamepadLabels) return;
-        for (let i = 0; i < this.gamepadSelection.length; i++) {
-            if (this.gamepadSelection[i] === "") {
-                this.gamepadSelection[i] = this.gamepad.gamepads[e.gamepadIndex].id + "_" + this.gamepad.gamepads[e.gamepadIndex].index;
-                break;
-            }
-        }
-        this.updateGamepadLabels();
-    })
-    this.gamepad.on("disconnected", (e) => {
-        const gamepadIndex = this.gamepad.gamepads.indexOf(this.gamepad.gamepads.find(f => f.index == e.gamepadIndex));
-        const gamepadSelection = this.gamepad.gamepads[gamepadIndex].id + "_" + this.gamepad.gamepads[gamepadIndex].index;
-        for (let i = 0; i < this.gamepadSelection.length; i++) {
-            if (this.gamepadSelection[i] === gamepadSelection) {
-                this.gamepadSelection[i] = "";
-            }
-        }
-        setTimeout(this.updateGamepadLabels.bind(this), 10);
-    })
-    this.gamepad.on("axischanged", this.gamepadEvent.bind(this));
-    this.gamepad.on("buttondown", this.gamepadEvent.bind(this));
-    this.gamepad.on("buttonup", this.gamepadEvent.bind(this));
+    
 }
 export function addEventListener(element, listener, callback) {
     const listeners = listener.split(" ");

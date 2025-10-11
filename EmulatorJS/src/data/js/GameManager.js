@@ -49,29 +49,36 @@ class EJS_GameManager {
             }
             this.toggleMainLoop(0);
             this.FS.unmount("/data/saves");
-            
             // 处理音频上下文，防止切换游戏后还有上一个游戏的声音
             try {
-                if (this.Module && this.Module.AL && this.Module.AL.currentCtx && this.Module.AL.currentCtx.audioCtx) {
+                if (this.Module && this.Module.AL && this.Module.AL.currentCtx) {
                     const audioContext = this.Module.AL.currentCtx.audioCtx;
-                    if (audioContext.state !== 'closed') {
-                        // 暂停音频上下文
-                        audioContext.suspend();
-                        // 或者直接关闭音频上下文
-                        // audioContext.close();
+                    if (audioContext && audioContext.state !== 'closed') {
+                        // 暂停音频上下文，不关闭它，避免重复关闭错误
+                        audioContext.suspend().catch(e => {
+                            console.warn("Failed to suspend audio context:", e);
+                        });
                     }
                 }
             } catch(e) {
-                console.warn("Failed to suspend audio context:", e);
+                console.warn("Failed to handle audio context:", e);
             }
             
+            // 不调用 abort，而是让模块自然清理，避免终止 WebAssembly 模块
             setTimeout(() => {
                 try {
-                    this.Module.abort();
+                    // 停止主循环
+                    if (this.Module && this.Module.pauseMainLoop) {
+                        this.Module.pauseMainLoop();
+                    }
+                    
+                    // 不清理音频上下文，让浏览器自动管理
+                    // 避免重复关闭导致 DOMException
+                    console.log("Game module cleaned up safely");
                 } catch(e) {
-                    console.warn(e);
+                    console.warn("Error cleaning up module:", e);
                 };
-            }, 1000);
+            }, 2000); // 增加延迟时间
         })
     }
     setupPreLoadSettings() {

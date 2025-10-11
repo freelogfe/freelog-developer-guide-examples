@@ -4,10 +4,14 @@
             resolve();
             return;
         }
-        this.textElem.innerText = this.localization("Download Game State");
+        if (this.textElem) {
+            this.textElem.innerText = this.localization("Download Game State");
+        }
 
         this.downloadFile(this.config.loadState, (progress) => {
-            this.textElem.innerText = this.localization("Download Game State") + progress;
+            if (this.textElem) {
+                this.textElem.innerText = this.localization("Download Game State") + progress;
+            }
         }, true, { responseType: "arraybuffer", method: "GET" }).then((res) => {
             if (res === -1) {
                 this.startGameError(this.localization("Error downloading game state"));
@@ -45,7 +49,9 @@ export function downloadGameFile(assetUrl, type, progressMessage, decompressProg
             }
         }
 
-        this.textElem.innerText = progressMessage;
+        if (this.textElem) {
+            this.textElem.innerText = progressMessage;
+        }
         if (!this.debug) {
             const res = await this.downloadFile(assetUrl, null, true, { method: "HEAD" });
             const result = await this.storage.rom.get(assetUrl.split("/").pop());
@@ -55,7 +61,9 @@ export function downloadGameFile(assetUrl, type, progressMessage, decompressProg
             }
         }
         const res = await this.downloadFile(assetUrl, (progress) => {
-            this.textElem.innerText = progressMessage + progress;
+            if (this.textElem) {
+                this.textElem.innerText = progressMessage + progress;
+            }
         }, true, { responseType: "arraybuffer", method: "GET" });
         if (res === -1) {
             this.startGameError(this.localization("Network Error"));
@@ -105,7 +113,9 @@ export function downloadRom() {
     };
 
     return new Promise(resolve => {
-        this.textElem.innerText = this.localization("Download Game Data");
+        if (this.textElem) {
+            this.textElem.innerText = this.localization("Download Game Data");
+        }
 
         const gotGameData = (data) => {
             if (["arcade", "mame"].includes(this.getCore(true))) {
@@ -200,7 +210,9 @@ export function downloadRom() {
         }
         const downloadFile = async () => {
             const res = await this.downloadFile(this.config.gameUrl, (progress) => {
-                this.textElem.innerText = this.localization("Download Game Data") + progress;
+                if (this.textElem) {
+                    this.textElem.innerText = this.localization("Download Game Data") + progress;
+                }
             }, true, { responseType: "arraybuffer", method: "GET" });
             if (res === -1) {
                 this.startGameError(this.localization("Network Error"));

@@ -1,9 +1,3 @@
-import { CoreManager } from './modules/Core.js';
-import { Downloader } from './modules/downloader.js';
-import { UIManager } from './modules/UI.js';
-import { InputManager } from './modules/Input.js';
-import { GameManager } from './modules/game.js';
-import { EventManager } from './modules/events.js';
 
 export class EmulatorJS {
     getCores() {
@@ -479,11 +473,21 @@ export class EmulatorJS {
     }
     // End start button
     createText() {
+        // 先移除可能存在的旧文本元素
+        if (this.textElem && this.textElem.parentNode) {
+            this.textElem.parentNode.removeChild(this.textElem);
+            this.textElem = null;
+        }
+        
         this.textElem = this.createElement("div");
         this.textElem.classList.add("ejs_loading_text");
         if (typeof this.config.backgroundImg === "string") this.textElem.classList.add("ejs_loading_text_glow");
         this.textElem.innerText = this.localization("Loading...");
-        this.elements.parent.appendChild(this.textElem);
+        
+        // 确保父元素存在
+        if (this.elements && this.elements.parent) {
+            this.elements.parent.appendChild(this.textElem);
+        }
     }
     localization(text, log) {
         if (typeof text === "undefined" || text.length === 0) return;
@@ -6501,8 +6505,12 @@ export class EmulatorJS {
         this.elements.cheatRows = rows;
     }
     updateCheatUI() {
-        if (!this.gameManager) return;
-        this.elements.cheatRows.innerHTML = "";
+        if (!this.gameManager || !this.elements || !this.elements.cheatRows) return;
+        
+        // 清空现有的cheat行
+        while (this.elements.cheatRows.firstChild) {
+            this.elements.cheatRows.removeChild(this.elements.cheatRows.firstChild);
+        }
 
         const addToMenu = (desc, checked, code, is_permanent, i) => {
             const row = this.createElement("div");
@@ -6538,7 +6546,16 @@ export class EmulatorJS {
             this.elements.cheatRows.appendChild(row);
             this.cheatChanged(checked, code, i);
         }
-        this.gameManager.resetCheat();
+        
+        // 安全地重置cheat并添加
+        try {
+            if (this.gameManager && typeof this.gameManager.resetCheat === 'function') {
+                this.gameManager.resetCheat();
+            }
+        } catch (e) {
+            console.warn("Failed to reset cheats:", e);
+        }
+        
         for (let i = 0; i < this.cheats.length; i++) {
             addToMenu(this.cheats[i].desc, this.cheats[i].checked, this.cheats[i].code, this.cheats[i].is_permanent, i);
         }
@@ -6719,55 +6736,6 @@ export class EmulatorJS {
     }
 
     /**
-     * Load a new ROM without destroying the emulator instance
-     * @param {string} romPath - Path to the ROM file
-     */
-    async loadROM(romPath) {
-        try {
-            // Reset game state
-            this.reset();
-
-            // Load new ROM
-            const gameData = await this.downloadFile(romPath);
-            if (gameData === -1) {
-                throw new Error("Failed to download ROM file");
-            }
-
-            // Update game manager with new ROM
-            if (this.gameManager) {
-                this.gameManager.loadROM(romPath);
-            }
-
-            console.log("ROM loaded successfully:", romPath);
-        } catch (error) {
-            console.error("Error loading ROM:", error);
-            throw error;
-        }
-    }
-
-    /**
-     * Reset the emulator state
-     */
-    reset() {
-        // Reset internal state variables
-        this.started = false;
-        this.paused = true;
-
-        // Clear any existing game data if needed
-        if (this.gameManager) {
-            // Perform any necessary cleanup in the game manager
-            if (this.gameManager.reset) {
-                this.gameManager.reset();
-            }
-        }
-
-        console.log("Emulator state reset");
-    }
-
-
-
-
-    /**
      * Enhanced screen recording method
      */
     screenRecord() {
@@ -6856,6 +6824,352 @@ export class EmulatorJS {
         this.recorder = recorder;
 
         return recorder;
+    }
+
+    /**
+     * Start a new game with the provided configuration
+     * @param {Object} newGameConfig - Configuration for the new game
+     * @param {string} newGameConfig.gameUrl - URL or path to the game ROM/file
+     * @param {string} [newGameConfig.gameName] - Name of the game (optional)
+     * @param {string} [newGameConfig.system] - System/core to use (optional, will auto-detect if not provided)
+     * @param {string} [newGameConfig.biosUrl] - URL to BIOS file if needed (optional)
+     * @param {string} [newGameConfig.gamePatchUrl] - URL to game patch file (optional)
+     * @param {string} [newGameConfig.gameParentUrl] - URL to parent ROM file (optional)
+     * @param {string} [newGameConfig.loadState] - URL to save state to load (optional)
+     * @param {Array} [newGameConfig.cheats] - Array of cheat codes (optional)
+     * @param {Object} [newGameConfig.options] - Additional emulator options (optional)
+     * @returns {Promise} Promise that resolves when the new game starts
+     */
+    startNewGame(newGameConfig) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Validate required parameters
+                if (!newGameConfig || !newGameConfig.gameUrl) {
+                    throw new Error('gameUrl is required in newGameConfig');
+                }
+
+                // Prevent concurrent game switching
+                if (this.isSwitchingGame) {
+                    reject(new Error("Game switch already in progress"));
+                    return;
+                }
+                this.isSwitchingGame = true;
+
+                // Call exit event for current game if it exists
+                if (this.started) {
+                    this.callEvent("exit");
+                    
+                    // Force cleanup of all resources
+                    await this.forceCleanup();
+                }
+
+                // Clear all timeouts and intervals
+                this.clearAllTimers();
+
+                // Reset all state variables
+                this.resetAllState();
+
+                // Merge new config with existing config, giving priority to new config
+                const mergedConfig = Object.assign({}, this.config, newGameConfig);
+                this.config = mergedConfig;
+
+                // Reset button options with new config
+                this.config.buttonOpts = this.buildButtonOptions(this.config.buttonOpts);
+
+                // Reset cheats array if new cheats are provided
+                if (newGameConfig.cheats && Array.isArray(newGameConfig.cheats)) {
+                    this.cheats = [];
+                    for (let i = 0; i < newGameConfig.cheats.length; i++) {
+                        const cheat = newGameConfig.cheats[i];
+                        if (Array.isArray(cheat) && cheat[0] && cheat[1]) {
+                            this.cheats.push({
+                                desc: cheat[0],
+                                checked: false,
+                                code: cheat[1],
+                                is_permanent: true
+                            });
+                        }
+                    }
+                }
+
+                // Reset volume and mute state
+                this.muted = false;
+                this.volume = (typeof this.config.volume === "number") ? this.config.volume : 0.5;
+
+                // Create loading text element
+                try {
+                    this.createText();
+                } catch (e) {
+                    console.warn("Failed to create loading text during game switch:", e);
+                }
+
+                // Clear any existing module reference
+                this.Module = null;
+
+                // Start the game loading process
+                try {
+                    await this.downloadGameCore();
+                } catch (e) {
+                    console.error("Failed to download game core during game switch:", e);
+                    if (e.name === 'ErrnoError' && e.errno === 28) {
+                        this.displayError(this.localization("Storage quota exceeded. Please clear browser cache or try a different game."));
+                        this.isSwitchingGame = false;
+                        reject(new Error("Storage quota exceeded"));
+                        return;
+                    }
+                    this.isSwitchingGame = false;
+                    throw e;
+                }
+
+                // Resolve the promise when the game starts
+                this.once("start", () => {
+                    this.isSwitchingGame = false;
+                    resolve();
+                });
+
+                // Handle potential errors
+                this.once("exit", () => {
+                    this.isSwitchingGame = false;
+                    if (!this.started) {
+                        reject(new Error("Game failed to start"));
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error starting new game:", error);
+                this.isSwitchingGame = false;
+                // Use a safer error display method that doesn't rely on textElem
+                this.displayError(this.localization("Failed to start new game") + ": " + error.message);
+                reject(error);
+            }
+        });
+    }
+
+    /**
+     * Display error message safely, creating text element if needed
+     * @param {string} message - Error message to display
+     */
+    displayError(message) {
+        try {
+            // If textElem doesn't exist, create it
+            if (!this.textElem) {
+                this.createText();
+            }
+            
+            // If textElem still doesn't exist or is not in DOM, create a fallback
+            if (!this.textElem || !this.textElem.parentNode) {
+                const fallbackText = this.createElement("div");
+                fallbackText.classList.add("ejs_loading_text");
+                fallbackText.classList.add("ejs_error_text");
+                fallbackText.style.position = "absolute";
+                fallbackText.style.top = "50%";
+                fallbackText.style.left = "50%";
+                fallbackText.style.transform = "translate(-50%, -50%)";
+                fallbackText.style.zIndex = "9999";
+                fallbackText.style.background = "rgba(0,0,0,0.8)";
+                fallbackText.style.color = "white";
+                fallbackText.style.padding = "20px";
+                fallbackText.style.borderRadius = "8px";
+                fallbackText.style.textAlign = "center";
+                fallbackText.innerText = message;
+                this.elements.parent.appendChild(fallbackText);
+                
+                // Auto-remove after 10 seconds
+                setTimeout(() => {
+                    if (fallbackText.parentNode) {
+                        fallbackText.parentNode.removeChild(fallbackText);
+                    }
+                }, 10000);
+                return;
+            }
+            
+            // Use existing textElem
+            this.textElem.innerText = message;
+            this.textElem.classList.add("ejs_error_text");
+        } catch (e) {
+            console.error("Failed to display error message:", e);
+            // Fallback to console
+            console.error("EmulatorJS Error:", message);
+        }
+    }
+
+    /**
+     * Force cleanup of all resources
+     */
+    async forceCleanup() {
+        try {
+            // Stop game manager
+            if (this.gameManager) {
+            try {
+                this.gameManager.saveSaveFiles();
+            } catch (e) {
+                console.warn("Failed to save save files during cleanup:", e);
+            }
+            try {
+                this.gameManager.restart();
+            } catch (e) {
+                console.warn("Failed to restart game manager during cleanup:", e);
+            }
+            }
+
+            // Clear the canvas and reset UI
+            if (this.game) {
+                this.game.classList.remove("ejs_canvas_parent");
+                this.game.classList.add("ejs_game");
+                this.game.innerHTML = "";
+            }
+
+            // Remove canvas if it exists
+            if (this.canvas && this.canvas.parentNode) {
+                this.canvas.parentNode.removeChild(this.canvas);
+                this.canvas = null;
+            }
+
+            // Clear text element if it exists
+            if (this.textElem && this.textElem.parentNode) {
+                this.textElem.parentNode.removeChild(this.textElem);
+                this.textElem = null;
+            }
+
+            // Clean up WebAssembly module
+            if (this.Module) {
+                try {
+                    // Stop main loop
+                    if (this.Module.pauseMainLoop) {
+                        this.Module.pauseMainLoop();
+                    }
+                    
+                    // Clean up audio context
+                    if (this.Module.AL && this.Module.AL.currentCtx) {
+                        const ctx = this.Module.AL.currentCtx;
+                        if (ctx.audioCtx && ctx.audioCtx.close) {
+                            ctx.audioCtx.close();
+                        }
+                    }
+                    
+                    // Remove all event listeners
+                    if (this.Module.canvas) {
+                        // Note: canvas.removeEventListener requires parameters
+                        // We can't remove all listeners at once, so we'll skip this
+                        // The canvas will be cleaned up when removed from DOM
+                    }
+                    
+                    // Force garbage collection
+                    this.Module = null;
+                } catch (e) {
+                    console.warn("Failed to cleanup WebAssembly module:", e);
+                }
+            }
+
+            // Clear all timeouts and intervals
+            this.clearAllTimers();
+
+            // Reset all state variables
+            this.resetAllState();
+
+            // Force garbage collection if available
+            if (window.gc) {
+                window.gc();
+            }
+
+        } catch (e) {
+            console.error("Error during force cleanup:", e);
+        }
+    }
+
+    /**
+     * Clear all timeouts and intervals
+     */
+    clearAllTimers() {
+        // Clear save state interval
+        if (this.saveSaveInterval) {
+            clearInterval(this.saveSaveInterval);
+            this.saveSaveInterval = null;
+        }
+
+        // Clear any message timeout
+        if (this.msgTimeout) {
+            clearTimeout(this.msgTimeout);
+            this.msgTimeout = null;
+        }
+
+        // Clear any other timeouts
+        if (this.resetTimeout) {
+            clearTimeout(this.resetTimeout);
+            this.resetTimeout = null;
+        }
+
+        // Clear menu timeout
+        if (this.menuTimeout) {
+            clearTimeout(this.menuTimeout);
+            this.menuTimeout = null;
+        }
+    }
+
+    /**
+     * Reset all state variables
+     */
+    resetAllState() {
+        // Reset game state
+        this.started = false;
+        this.paused = true;
+        this.fileName = null;
+        
+        // Reset audio state
+        this.muted = false;
+        this.volume = (typeof this.config.volume === "number") ? this.config.volume : 0.5;
+        
+        // Reset control state
+        this.isNetplay = false;
+        this.isFastForward = false;
+        this.isSlowMotion = false;
+        
+        // Reset UI state
+        this.videoRotationChanged = false;
+        this.videoRotation = ([0, 1, 2, 3].includes(this.config.videoRotation)) ? this.config.videoRotation : 0;
+        
+        // Reset modules and managers
+        this.gameManager = null;
+        this.currentPopup = null;
+        this.functions = {};
+        
+        // Reset arrays
+        this.cheats = [];
+        this.controls = JSON.parse(JSON.stringify(this.defaultControllers));
+        this.gamepadLabels = [];
+        this.gamepadSelection = [];
+        
+        // Reset flags
+        this.failedToStart = false;
+        this.isSwitchingGame = false;
+        this.settingsLoaded = false;
+        this.netplayEnabled = false;
+        
+        // Clear any references to DOM elements
+        if (this.elements) {
+            this.elements.contextMenu = null;
+            this.elements.cheatRows = null;
+        }
+    }
+
+    /**
+     * Helper method to add a one-time event listener
+     * @param {string} event - Event name
+     * @param {Function} callback - Callback function
+     */
+    once(event, callback) {
+        const onceCallback = (data) => {
+            callback(data);
+            // Remove the listener after it's called once
+            if (this.functions && this.functions[event]) {
+                const index = this.functions[event].indexOf(onceCallback);
+                if (index > -1) {
+                    this.functions[event].splice(index, 1);
+                }
+            }
+        };
+        
+        this.on(event, onceCallback);
     }
 }
 

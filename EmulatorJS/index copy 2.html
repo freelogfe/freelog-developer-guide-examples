@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
   <head>
     <title>EmulatorJS</title>
@@ -193,7 +193,7 @@
     </div>
 
     <!-- 加载 EmulatorManager -->
-    <script src="src/index.js" type="module"></script>
+    <!-- <script src="dist/esm/index.js" type="module"></script> -->
     <script type="module">
       import { runGame } from "./src/index.js";
 
@@ -231,7 +231,7 @@
       } else {
         console.log("Threads are disabled");
       }
-
+      let controller = null;
       // 为游戏列表项添加点击事件
       document.querySelectorAll(".game-item").forEach((item) => {
         item.addEventListener("click", async () => {
@@ -256,11 +256,16 @@
 
           try {
             // 加载游戏
-            await loadGame({
-              rom: rom,
-              name: name,
-              core: core,
-            });
+
+            if (controller) {
+              controller.startNewGame({ gameUrl: rom, gameName: name });
+            } else {
+              controller = await loadGame({
+                rom: rom,
+                name: name,
+                core: core,
+              });
+            }
           } catch (error) {
             console.error("Failed to load game:", error);
             showError("Failed to load game: " + error.message);
@@ -273,43 +278,41 @@
 
       // 加载游戏函数
       async function loadGame(game) {
-        try {
-          // 更新当前游戏信息
-          currentGame = game;
+        // 更新当前游戏信息
+        currentGame = game;
 
-          // 更新游戏信息显示
-          document.querySelector("#game-info h2").textContent = game.name;
+        // 更新游戏信息显示
+        document.querySelector("#game-info h2").textContent = game.name;
 
-          // 显示加载状态
-          const gameElement = document.getElementById("game");
-          const initialScreen = document.getElementById("initial-screen");
-          if (initialScreen) {
-            initialScreen.remove();
-          }
-          gameElement.innerHTML =
-            '<div class="loading-message">正在加载游戏...</div>';
-
-          // 使用 EmulatorManager 运行游戏
-          const emulator = await runGame({
-            gameUrl: game.rom,
-            gameName: game.name,
-            core: game.core,
-            pathtodata: "./src/data",
-            debug: enableDebug,
-            threads: enableThreads,
-          });
-
-          // 成功加载后确保保留Emulator容器
-          // 保持gameElement内的内容不变，因为EmulatorJS需要容器元素
-          console.log("Game loaded successfully");
-        } catch (error) {
-          console.error("Failed to load game:", error);
-          showError("Failed to load game: " + error.message);
-          throw error;
-        } finally {
-          // 始终确保有一个干净的游戏容器
-          // 这里不清理innerHTML，因为EmulatorJS需要保持容器
+        // 显示加载状态
+        const gameElement = document.getElementById("game");
+        const initialScreen = document.getElementById("initial-screen");
+        if (initialScreen) {
+          initialScreen.remove();
         }
+        gameElement.innerHTML =
+          '<div class="loading-message">正在加载游戏...</div>';
+
+        // 使用 EmulatorManager 运行游戏
+        const emulator = await runGame({
+          gameUrl: game.rom,
+          container: "#game",
+          gameName: game.name,
+          core: game.core,
+          pathtodata: "./src/data",
+          corePath:
+            "https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@latest/data/cores/",
+          debug: enableDebug,
+          threads: enableThreads,
+          onGameStart: function () {
+            // 游戏成功启动后，清除加载消息
+            const loadingMessage = document.querySelector(".loading-message");
+            if (loadingMessage) {
+              loadingMessage.remove();
+            }
+          },
+        });
+        return emulator;
       }
 
       // 在页面加载时确保初始屏幕存在
@@ -320,11 +323,11 @@
 
         if (gameElement && !initialScreen) {
           const initialScreenHTML = `
-                        <div id="initial-screen">
-                            <img src="docs/Logo-light.png" alt="Logo" class="logo">
-                            <p>请选择左侧游戏列表中的游戏开始游玩</p>
-                        </div>
-                    `;
+                              <div id="initial-screen">
+                                  <img src="docs/Logo-light.png" alt="Logo" class="logo">
+                                  <p>请选择左侧游戏列表中的游戏开始游玩</p>
+                              </div>
+                          `;
           gameElement.innerHTML = initialScreenHTML;
         }
       });
@@ -342,11 +345,11 @@
               // 重新添加初始屏幕
               const gameElement = document.getElementById("game");
               gameElement.innerHTML = `
-                                <div id="initial-screen">
-                                    <img src="docs/Logo-light.png" alt="Logo" class="logo">
-                                    <p>请选择左侧游戏列表中的游戏开始游玩</p>
-                                </div>
-                            `;
+                                      <div id="initial-screen">
+                                          <img src="docs/Logo-light.png" alt="Logo" class="logo">
+                                          <p>请选择左侧游戏列表中的游戏开始游玩</p>
+                                      </div>
+                                  `;
               // 重新激活当前选中项
               document.querySelectorAll(".game-item").forEach((item) => {
                 if (item.textContent.trim() === currentGame.name) {
