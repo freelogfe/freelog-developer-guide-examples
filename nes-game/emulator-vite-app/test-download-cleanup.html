@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试下载清理功能</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        #game-container {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #333;
+            margin: 20px 0;
+            background-color: #000;
+            position: relative;
+        }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EmulatorJS 下载清理功能测试</h1>
+        
+        <div class="test-section">
+            <h3>测试场景</h3>
+            <p>这个测试页面用于验证在调用 startNewGame 时，之前的下载操作是否能够正确终止。</p>
+            
+            <button id="startGame1">启动游戏 1 (小文件)</button>
+            <button id="startGame2">启动游戏 2 (大文件)</button>
+            <button id="switchGame">快速切换游戏</button>
+            <button id="clearLogs">清空日志</button>
+            
+            <div id="status" class="status info">
+                准备就绪，点击按钮开始测试
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>游戏容器</h3>
+            <div id="game-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>控制台日志</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // 模拟 EmulatorJS 的基本功能用于测试
+        let emulator = null;
+        let logContainer = document.getElementById('log');
+        let statusDiv = document.getElementById('status');
+        
+        // 日志函数
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logEntry.style.color = type === 'error' ? '#721c24' : type === 'success' ? '#155724' : '#0c5460';
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(`[Test] ${message}`);
+        }
+        
+        function updateStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            log(message, type);
+        }
+        
+        // 模拟下载管理器
+        class MockDownloadManager {
+            constructor() {
+                this.activeDownloads = [];
+            }
+            
+            addDownload(type, url) {
+                const download = {
+                    type,
+                    url,
+                    startTime: Date.now(),
+                    aborted: false
+                };
+                this.activeDownloads.push(download);
+                log(`开始下载: ${type} - ${url}`);
+                return download;
+            }
+            
+            abortAllDownloads() {
+                if (!this.activeDownloads || this.activeDownloads.length === 0) {
+                    log("没有活动的下载需要终止");
+                    return;
+                }
+                
+                log(`正在终止 ${this.activeDownloads.length} 个活动下载...`);
+                const downloadsToAbort = [...this.activeDownloads];
+                
+                downloadsToAbort.forEach((download, index) => {
+                    try {
+                        download.aborted = true;
+                        log(`✓ 已终止下载 ${index + 1}: ${download.type}`);
+                    } catch (e) {
+                        log(`✗ 终止下载 ${index + 1} 时出错: ${e.message}`, 'error');
+                    }
+                });
+                
+                this.activeDownloads = [];
+                log("✓ 所有下载已终止", 'success');
+            }
+            
+            getActiveDownloadCount() {
+                return this.activeDownloads.length;
+            }
+        }
+        
+        // 模拟 EmulatorJS 类
+        class MockEmulatorJS {
+            constructor(element) {
+                this.element = element;
+                this.downloadManager = new MockDownloadManager();
+                this.isSwitching = false;
+                this.started = false;
+                this.currentGame = null;
+            }
+            
+            async startNewGame(newConfig) {
+                log(`=== startNewGame 被调用 ===`);
+                log(`新配置: ${JSON.stringify(newConfig)}`);
+                
+                if (!newConfig || !newConfig.gameUrl) {
+                    log('错误: gameUrl 是必需的', 'error');
+                    return false;
+                }
+                
+                if (this.isSwitching) {
+                    log('游戏切换已在进行中，忽略请求', 'error');
+                    return false;
+                }
+                
+                this.isSwitching = true;
+                
+                // 终止所有正在进行的下载操作
+                log("正在终止所有活动下载...");
+                try {
+                    this.downloadManager.abortAllDownloads();
+                    log("✓ 所有下载已成功终止", 'success');
+                } catch (e) {
+                    log(`终止下载时出错: ${e.message}`, 'error');
+                }
+                
+                // 模拟游戏切换过程
+                if (this.started) {
+                    log("停止当前游戏...");
+                    this.started = false;
+                }
+                
+                // 模拟下载新游戏
+                log(`开始下载新游戏: ${newConfig.gameName}`);
+                const download = this.downloadManager.addDownload('game', newConfig.gameUrl);
+                
+                // 模拟下载过程
+                setTimeout(() => {
+                    if (!download.aborted) {
+                        log(`✓ 游戏下载完成: ${newConfig.gameName}`, 'success');
+                        this.currentGame = newConfig.gameName;
+                        this.started = true;
+                        this.isSwitching = false;
+                        updateStatus(`游戏 "${newConfig.gameName}" 已启动`, 'success');
+                    } else {
+                        log(`游戏下载被终止: ${newConfig.gameName}`, 'info');
+                        this.isSwitching = false;
+                    }
+                }, 2000);
+                
+                return true;
+            }
+            
+            getActiveDownloadCount() {
+                return this.downloadManager.getActiveDownloadCount();
+            }
+        }
+        
+        // 初始化模拟器
+        function initEmulator() {
+            const container = document.getElementById('game-container');
+            emulator = new MockEmulatorJS(container);
+            log("模拟器已初始化");
+        }
+        
+        // 测试函数
+        async function testStartGame1() {
+            updateStatus("正在启动游戏 1...", 'info');
+            await emulator.startNewGame({
+                gameName: "测试游戏 1",
+                gameUrl: "https://example.com/game1.nes"
+            });
+        }
+        
+        async function testStartGame2() {
+            updateStatus("正在启动游戏 2...", 'info');
+            await emulator.startNewGame({
+                gameName: "测试游戏 2",
+                gameUrl: "https://example.com/large-game2.nes"
+            });
+        }
+        
+        async function testSwitchGame() {
+            updateStatus("正在测试快速切换游戏...", 'info');
+            
+            // 快速连续启动两个游戏，测试下载终止功能
+            log("快速连续启动两个游戏以测试下载终止功能...");
+            
+            // 启动第一个游戏
+            emulator.startNewGame({
+                gameName: "快速切换测试 1",
+                gameUrl: "https://example.com/quick-switch1.nes"
+            });
+            
+            // 500ms 后启动第二个游戏
+            setTimeout(() => {
+                emulator.startNewGame({
+                    gameName: "快速切换测试 2",
+                    gameUrl: "https://example.com/quick-switch2.nes"
+                });
+            }, 500);
+        }
+        
+        function clearLogs() {
+            logContainer.innerHTML = '';
+            log("日志已清空");
+        }
+        
+        // 事件监听器
+        document.getElementById('startGame1').addEventListener('click', testStartGame1);
+        document.getElementById('startGame2').addEventListener('click', testStartGame2);
+        document.getElementById('switchGame').addEventListener('click', testSwitchGame);
+        document.getElementById('clearLogs').addEventListener('click', clearLogs);
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initEmulator();
+            updateStatus("测试环境已准备就绪", 'success');
+        });
+    </script>
+</body>
+</html>

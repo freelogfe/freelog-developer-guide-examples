@@ -50,6 +50,7 @@ onUnmounted(async () => {
 });
 
 const mountArticleWidget = async (url: string, name: string) => {
+    console.log("nes-widget", url); 
   const res = await freelogApp.getSelfDep();
   const subData = res.data.data;
   subData.forEach(async (sub: DependencyNodeInfo) => {

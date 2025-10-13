@@ -19,7 +19,7 @@ import { buildButtonOptions } from "./configs.js"
 import { openCacheMenu, setupDisksMenu } from "./cacheDisk.js";
 import { createElement, versionAsInt, toData, requiresThreads, requiresWebGL2, saveInBrowserSupported } from "./utils.js"
 import { getSettingValue, setupSettingsMenu, loadSettings, getCoreSettings, preGetSetting, saveSettings, getLocalStorageKey } from "./settings.js";
-import { downloadFiles, downloadFile, downloadRom, downloadBios, downloadGameParent, downloadGamePatch, downloadGameFile, downloadStartState } from "./download.js"
+import { downloadFiles, downloadFile, downloadRom, downloadBios, downloadGameParent, downloadGamePatch, downloadGameFile, downloadStartState, abortAllDownloads } from "./download.js"
 import { updateCheatUI, cheatChanged } from "./cheat.js"
 import { gamepadInit } from "./gamepadInit.js";
 export class EmulatorJS {
@@ -70,6 +70,7 @@ export class EmulatorJS {
         this.downloadGamePatch = downloadGamePatch.bind(this);
         this.downloadGameFile = downloadGameFile.bind(this);
         this.downloadStartState = downloadStartState.bind(this);
+        this.abortAllDownloads = abortAllDownloads.bind(this);
         this.getBaseFileName = getBaseFileName.bind(this);
         this.setupSettingsMenu = setupSettingsMenu.bind(this);
         this.loadSettings = loadSettings.bind(this);
@@ -249,6 +250,15 @@ export class EmulatorJS {
         // 标记正在切换
         console.log("Setting isSwitching to true");
         this.isSwitching = true;
+
+        // 终止所有正在进行的下载操作
+        console.log("Aborting all active downloads...");
+        try {
+            this.abortAllDownloads();
+            console.log("✓ All downloads aborted successfully");
+        } catch (e) {
+            console.warn("Error aborting downloads:", e);
+        }
 
         // 如果游戏正在运行，先停止当前游戏
         if (this.started) {

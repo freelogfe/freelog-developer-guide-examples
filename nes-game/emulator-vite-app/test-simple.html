@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单测试 - 下载清理功能</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EmulatorJS 下载清理功能测试</h1>
+        
+        <div>
+            <button id="testDownload">测试下载功能</button>
+            <button id="testAbort">测试下载终止</button>
+            <button id="clearLog">清空日志</button>
+        </div>
+        
+        <div id="status" class="status">准备就绪</div>
+        
+        <div>
+            <h3>测试日志:</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // 简化的测试脚本
+        const logDiv = document.getElementById('log');
+        const statusDiv = document.getElementById('status');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logDiv.textContent += logEntry;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function setStatus(message) {
+            statusDiv.textContent = message;
+            log(message);
+        }
+        
+        // 模拟下载管理器
+        class TestDownloadManager {
+            constructor() {
+                this.activeDownloads = [];
+            }
+            
+            addDownload(url) {
+                const xhr = new XMLHttpRequest();
+                
+                // 添加到活动下载列表
+                if (!this.activeDownloads) {
+                    this.activeDownloads = [];
+                }
+                this.activeDownloads.push(xhr);
+                
+                log(`开始下载: ${url}`);
+                log(`当前活动下载数量: ${this.activeDownloads.length}`);
+                
+                // 模拟下载过程
+                xhr.open('GET', url, true);
+                xhr.onload = () => {
+                    if (xhr.readyState === xhr.DONE) {
+                        // 从活动下载列表中移除
+                        const index = this.activeDownloads.indexOf(xhr);
+                        if (index > -1) {
+                            this.activeDownloads.splice(index, 1);
+                        }
+                        log(`下载完成: ${url}`);
+                        log(`剩余活动下载数量: ${this.activeDownloads.length}`);
+                    }
+                };
+                
+                xhr.onerror = () => {
+                    // 从活动下载列表中移除
+                    const index = this.activeDownloads.indexOf(xhr);
+                    if (index > -1) {
+                        this.activeDownloads.splice(index, 1);
+                    }
+                    log(`下载失败: ${url}`);
+                    log(`剩余活动下载数量: ${this.activeDownloads.length}`);
+                };
+                
+                // 发送请求（可能会失败，但这只是测试）
+                try {
+                    xhr.send();
+                } catch (e) {
+                    log(`发送请求失败: ${e.message}`);
+                }
+                
+                return xhr;
+            }
+            
+            abortAllDownloads() {
+                if (!this.activeDownloads || this.activeDownloads.length === 0) {
+                    log("没有活动的下载需要终止");
+                    return;
+                }
+                
+                log(`正在终止 ${this.activeDownloads.length} 个活动下载...`);
+                const downloadsToAbort = [...this.activeDownloads];
+                
+                downloadsToAbort.forEach((download, index) => {
+                    try {
+                        if (download instanceof XMLHttpRequest) {
+                            download.abort();
+                            log(`✓ 已终止下载 ${index + 1}`);
+                        }
+                    } catch (e) {
+                        log(`✗ 终止下载 ${index + 1} 时出错: ${e.message}`);
+                    }
+                });
+                
+                this.activeDownloads = [];
+                log("✓ 所有下载已终止");
+            }
+            
+            getActiveDownloadCount() {
+                return this.activeDownloads ? this.activeDownloads.length : 0;
+            }
+        }
+        
+        const downloadManager = new TestDownloadManager();
+        
+        // 测试函数
+        function testDownload() {
+            setStatus("测试下载功能...");
+            
+            // 添加几个下载
+            downloadManager.addDownload('https://httpbin.org/delay/1');
+            downloadManager.addDownload('https://httpbin.org/delay/2');
+            downloadManager.addDownload('https://httpbin.org/delay/3');
+            
+            setTimeout(() => {
+                setStatus(`下载测试完成，当前活动下载数量: ${downloadManager.getActiveDownloadCount()}`);
+            }, 1000);
+        }
+        
+        function testAbort() {
+            setStatus("测试下载终止功能...");
+            
+            // 先添加一些下载
+            downloadManager.addDownload('https://httpbin.org/delay/5');
+            downloadManager.addDownload('https://httpbin.org/delay/5');
+            downloadManager.addDownload('https://httpbin.org/delay/5');
+            
+            // 500ms 后终止所有下载
+            setTimeout(() => {
+                log("开始终止下载...");
+                downloadManager.abortAllDownloads();
+                setStatus(`下载终止测试完成，当前活动下载数量: ${downloadManager.getActiveDownloadCount()}`);
+            }, 500);
+        }
+        
+        function clearLog() {
+            logDiv.textContent = '';
+            log("日志已清空");
+        }
+        
+        // 事件监听器
+        document.getElementById('testDownload').addEventListener('click', testDownload);
+        document.getElementById('testAbort').addEventListener('click', testAbort);
+        document.getElementById('clearLog').addEventListener('click', clearLog);
+        
+        // 初始化
+        log("测试环境已准备就绪");
+        log("点击按钮开始测试下载清理功能");
+    </script>
+</body>
+</html>
