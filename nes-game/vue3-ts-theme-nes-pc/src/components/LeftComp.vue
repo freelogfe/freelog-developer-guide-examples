@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100x container text-align-center pt-20">
+  <div class="h-100x container text-align-center pt-20 pb-20">
     <template v-for="item in data" :key="item.exhibitId">
       <div
         @click="select(item.exhibitId)"
@@ -30,14 +30,13 @@ const select = (id: string) => {
 };
 selectId.value = route.params.id as string;
 freelogApp
-  .getExhibitListByPage({
+  .getExhibitListAuthByPage({
     skip: 0,
-    limit: 20,
+    limit: 100,
     articleResourceTypes: "nesrom,红白机",
   })
   .then(async (res: any) => {
     data.value = res.data.data.dataList;
-
     if(data.value.length){
       if(selectId.value){
         return
@@ -51,7 +50,8 @@ freelogApp
 <style scoped>
 .container {
   width: 300px;
-  height: 750px;
+  /* height: 750px; */
+  overflow-y: auto;
   background: #fafbfc;
   box-shadow: 1px 0px 0px 0px rgba(0, 0, 0, 0.1);
 }
