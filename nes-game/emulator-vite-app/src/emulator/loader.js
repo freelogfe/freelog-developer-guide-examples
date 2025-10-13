@@ -2,7 +2,7 @@
  * EmulatorJS Loader Module
  * This module provides functions to load the EmulatorJS emulator
  */
-import EmulatorJS from './emulator-modules/13-emulator-modular.js';
+import { EmulatorJS } from './self/emulator.js';
 
 
 /**

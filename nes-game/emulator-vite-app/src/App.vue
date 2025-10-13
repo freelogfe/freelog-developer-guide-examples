@@ -38,7 +38,7 @@ watch(
     console.log("urlValue", urlValue.value);
     if (value) {
       if (emulator.value) {
-        emulator.value?.emulator?.switchGame({
+        emulator.value?.emulator?.startNewGame({
           gameUrl: urlValue.value,
           gameName: gameName.value,
           // other config options as needed
