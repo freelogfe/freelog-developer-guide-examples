@@ -1,26 +1,19 @@
 <template>
-  <div class="w-100x h-100x flex-column over-h pb-20">
-    <HeaderComp ></HeaderComp>
-    <div class="w-100x flex-1 over-h flex-row r-relative">
-      <div class="shrink-0 h-100x over-h p-relative"><LeftComp /></div>
-      <div class="flex-1 h-100x over-h p-relative">
-      <router-view v-if="!loading"/> 
-      </div>
-    </div>
-  </div>
+  <!-- 根据设备类型选择不同的布局 -->
+  <PCMainLayout v-if="!isMobile" />
+  <MobileMainLayout v-else />
 </template>
 <script lang="ts" setup>
-import LeftComp from "./components/LeftComp.vue";
+import { ref, onMounted } from "vue";
+import PCMainLayout from "./components/PCMainLayout.vue";
+import MobileMainLayout from "./components/MobileMainLayout.vue";
+import { isMobileDevice } from "@/utils/device";
 
-import HeaderComp from "./components/HeaderComp.vue";
-import { freelogApp } from "freelog-runtime";
-import { userStore } from "@/stores/user";
+const isMobile = ref(false);
 
-import { ref } from "vue";
-const loading = ref(true)
-const store = userStore();
-store.setUserInfo(freelogApp.getCurrentUser())
-loading.value = false
+onMounted(() => {
+  isMobile.value = isMobileDevice();
+});
 </script>
 <style lang="scss">
 #app {
