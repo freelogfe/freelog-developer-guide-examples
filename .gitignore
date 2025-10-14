@@ -1,7 +1,11 @@
 .DS_Store
 node_modules
 
-dist
+# Build output directories
+dist/
+**/dist/
+dist*/
+**/dist*/
 # local env files
 .env.local
 .env.*.local
