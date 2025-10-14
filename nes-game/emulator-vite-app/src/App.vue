@@ -1,14 +1,6 @@
 <template>
-  <div class="home">
-    <!-- EmulatorJS 游戏容器 v-if="urlValue" -->
-    <div class="game-wrapper">
-      <div id="display">
-        <div id="game"></div>
-      </div>
-    </div>
-    <!-- <div class="no-game-tip" v-else>
-      <div class="tip-text">暂无游戏数据</div>
-    </div> -->
+  <div class="game-wrapper">
+    <div id="game" class="emulator-container"></div>
   </div>
 </template>
 
@@ -18,7 +10,7 @@ import { useGameUrlStore } from "./stores/game";
 import "./emulator/emulator.css";
 import { runGame } from "./emulator/index.js";
 import { freelogApp } from "freelog-runtime";
-
+import { register } from "./utils.js";
 // 扩展 Window 接口以支持 EmulatorJS 全局变量
 
 const urlStore = useGameUrlStore();
@@ -26,7 +18,13 @@ const urlValue = ref<string>(urlStore.url);
 const gameName = ref<string>(urlStore.gameName);
 
 const emulator = ref<any>(null);
-
+const exit = (callBack: Function) => {
+  if (emulator.value) {
+    emulator.value?.emulator?.stopCurrentGame();
+  }
+  callBack();
+};
+register(exit);
 // 监听urlStore变化
 watch(
   () => urlStore.url,
@@ -52,7 +50,6 @@ onMounted(() => {
   if (urlValue.value) {
     loadEmulator();
   }
-
   // 监听全屏变化事件
 });
 console.log(freelogApp.getStaticPath("/emulator/"), 9999);
@@ -72,68 +69,17 @@ const loadEmulator = async () => {
 </script>
 
 <style scoped>
-.home {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #000;
-  box-sizing: border-box;
-}
-
-.game-title {
-  text-align: center;
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 20px;
-  background-color: #333;
-}
-
 .game-wrapper {
   width: 100%;
   height: 100%;
+  display: block;
+  max-width: 100vw;
+  max-height: 100vh;
   background-color: #333;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-#display {
-  width: 100%;
-  height: 100%;
-}
 
-#game {
-  width: 100%;
-  height: 100%;
-}
-
-.no-game-tip {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.tip-text {
-  font-size: 18px;
-  color: #666;
-  text-align: center;
-}
-
-/* 全屏样式 */
-.ejs-fullscreen {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 99999 !important;
-  background: black !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
 </style>

@@ -22,12 +22,25 @@ a:hover {
   color: #535bf2;
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 h1 {
@@ -57,11 +70,27 @@ button:focus-visible {
 .card {
   padding: 2em;
 }
-
+#game .ejs_loading_text,
+.ejs_parent .ejs_loading_text{
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  -webkit-transform: translate(-50%, -50%) !important;
+  -ms-transform: translate(-50%, -50%) !important;
+}
 #app {
-  max-width: 1280px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   margin: 0 auto;
   text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 @media (prefers-color-scheme: light) {

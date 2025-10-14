@@ -3,7 +3,7 @@ import "./style.css";
 import App from "./App.vue";
 import { createPinia } from "pinia";
 import { useGameUrlStore } from "./stores/game";
-
+import { exit } from "./utils"
 import { widgetApi, initFreelogApp } from "freelog-runtime";
 let pinia: any = null;
 
@@ -22,6 +22,9 @@ window.mount = () => {
     startGame: (url: string, name: string) => {
       const store = useGameUrlStore();
       store.setUrl(url, name);
+    },
+    exit: (callback: Function) => {
+      exit(callback);
     },
   });
 };
