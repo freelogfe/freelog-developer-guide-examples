@@ -1,11 +1,9 @@
 <template>
   <div class="home">
     <!-- EmulatorJS 游戏容器 v-if="urlValue" -->
-    <div class="game-container">
-      <div class="game-wrapper">
-        <div id="display">
-          <div id="game"></div>
-        </div>
+    <div class="game-wrapper">
+      <div id="display">
+        <div id="game"></div>
       </div>
     </div>
     <!-- <div class="no-game-tip" v-else>
@@ -43,7 +41,7 @@ watch(
           gameName: gameName.value,
           // other config options as needed
         });
-      }else {
+      } else {
         loadEmulator();
       }
     }
@@ -80,7 +78,6 @@ const loadEmulator = async () => {
   display: flex;
   flex-direction: column;
   background-color: #000;
-  padding: 20px;
   box-sizing: border-box;
 }
 
@@ -93,19 +90,9 @@ const loadEmulator = async () => {
   background-color: #333;
 }
 
-.game-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
 .game-wrapper {
-  width: 800px;
-  height: 600px;
-  max-width: 100%;
-  max-height: 80vh;
+  width: 100%;
+  height: 100%;
   background-color: #333;
   border-radius: 8px;
   overflow: hidden;
