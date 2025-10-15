@@ -4,7 +4,7 @@
     <div class="w-100x  over-h flex-row container">
       <!-- PC端：左边游戏列表，右边游戏区域 -->
       <div class="shrink-0 h-100x over-h p-relative">
-        <LeftComp />
+        <LeftComp @game-selected="handleGameSelected" />
       </div>
       <div class="flex-1 h-100x over-h flex-column">
         <!-- 游戏容器 -->
@@ -44,32 +44,35 @@ const gameName = ref("");
 store.setUserInfo(freelogApp.getCurrentUser());
 loading.value = false;
 
-// 监听路由参数变化
-watch(
-  () => route.params.id,
-  (val: any) => {
-    if (!val) return;
-    freelogApp.getExhibitById(val).then(async (res: any) => {
-      if (res.data.errCode) {
-        message.error(res.data.msg);
-        return;
+// 处理游戏选择
+const handleGameSelected = async (exhibitId: string) => {
+  if (!exhibitId) return;
+  
+  try {
+    const res = await freelogApp.getExhibitById(exhibitId);
+    if (res.data.errCode) {
+      message.error(res.data.msg);
+      return;
+    }
+    
+    gameUrl.value = await freelogApp.getExhibitFileStream(
+      res.data.data.exhibitId,
+      {
+        returnUrl: true,
       }
-      gameUrl.value = await freelogApp.getExhibitFileStream(
-        res.data.data.exhibitId,
-        {
-          returnUrl: true,
-        }
-      );
-      gameName.value = res.data.data.exhibitName;
-      if (!selfWidget) {
-        mountArticleWidget(gameUrl.value, gameName.value);
-        return;
-      }
-      selfWidgetApi.value.startGame(gameUrl.value, gameName.value);
-    });
-  },
-  { immediate: true }
-);
+    );
+    gameName.value = res.data.data.exhibitName;
+    
+    if (!selfWidget) {
+      mountArticleWidget(gameUrl.value, gameName.value);
+      return;
+    }
+    selfWidgetApi.value.startGame(gameUrl.value, gameName.value);
+  } catch (error) {
+    console.error("获取游戏信息失败:", error);
+    message.error("获取游戏信息失败");
+  }
+};
 
 // 离开记得卸载插件喔
 onUnmounted(async () => {

@@ -1,8 +1,8 @@
 <template>
-  <div class="mobile-game-list">
+  <div class="mobile-game-list" ref="gameListRef">
     <div class="game-list-container">
-      <div 
-        v-for="item in gameList" 
+      <div
+        v-for="item in gameList"
         :key="item.exhibitId"
         class="game-item"
         @click="selectGame(item)"
@@ -12,7 +12,9 @@
         </div>
         <div class="game-info">
           <div class="game-name">{{ item.exhibitName }}</div>
-          <div class="game-description">{{ item.exhibitDescription || '点击开始游戏' }}</div>
+          <div class="game-description">
+            {{ item.exhibitDescription || "点击开始游戏" }}
+          </div>
         </div>
         <div class="auth" v-if="!item.authInfo.isAuth">
           <img src="../assets/lock.png" alt="锁定" class="lock-icon" />
@@ -24,48 +26,78 @@
 
 <script lang="ts" setup>
 import { freelogApp } from "freelog-runtime";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 
 const gameList = ref([] as any[]);
-const emit = defineEmits(['game-selected']);
+const emit = defineEmits(["game-selected"]);
+const gameListRef = ref<HTMLElement | null>(null);
 
 // 获取游戏列表数据
-const fetchGameList = async () => {
+const fetchGameList = async (restoreScroll?: any) => {
+  let scrollPosition = 0;
+
+  // 如果需要恢复滚动位置，先保存当前位置
+  if (restoreScroll && gameListRef.value) {
+    scrollPosition = gameListRef.value.scrollTop;
+  }
+
   try {
     const res = await freelogApp.getExhibitListAuthByPage({
       skip: 0,
       limit: 100,
       articleResourceTypes: "nesrom,红白机",
-      allInfo: 1
+      allInfo: 1,
     });
-    gameList.value = res.data.data.dataList;
+    gameList.value = res.data.data.dataList.reverse();
     console.log("移动端游戏列表数据:", gameList.value);
+
+    // 如果需要恢复滚动位置，在DOM更新后恢复
+    if (restoreScroll && gameListRef.value) {
+      await nextTick();
+      gameListRef.value.scrollTop = scrollPosition;
+    }
   } catch (error) {
     console.error("获取游戏列表失败:", error);
   }
 };
 
 // 处理游戏选择
-const selectGame = (item: any) => {
+const selectGame = async (item: any) => {
   console.log("移动端选择游戏:", item);
-  if(!item.authInfo.isAuth){
-    return
+  function startGame() {
+    // 获取游戏文件URL
+    freelogApp
+      .getExhibitFileStream(item.exhibitId, {
+        returnUrl: true,
+      })
+      .then((url) => {
+        const gameData = {
+          exhibitId: item.exhibitId,
+          exhibitName: item.exhibitName,
+          exhibitDescription: item.exhibitDescription,
+          exhibitImage: item.exhibitImage,
+          url: url,
+        };
+        emit("game-selected", gameData);
+      })
+      .catch((error) => {
+        console.error("获取游戏文件URL失败:", error);
+      });
   }
-  // 获取游戏文件URL
-  freelogApp.getExhibitFileStream(item.exhibitId, {
-    returnUrl: true,
-  }).then(url => {
-    const gameData = {
-      exhibitId: item.exhibitId,
-      exhibitName: item.exhibitName,
-      exhibitDescription: item.exhibitDescription,
-      exhibitImage: item.exhibitImage,
-      url: url
-    };
-    emit('game-selected', gameData);
-  }).catch(error => {
-    console.error("获取游戏文件URL失败:", error);
-  });
+  if (!item.authInfo.isAuth) {
+    const res = await freelogApp.addAuth(item.exhibitId, { immediate: true });
+    if (res.status === freelogApp.resultType.SUCCESS) {
+      fetchGameList(true);
+      startGame()
+      console.log("授权成功");
+    } else if (res.status === freelogApp.resultType.USER_CANCEL) {
+      console.log("用户取消授权");
+    } else {
+      console.error("授权失败:", res.data);
+    }
+  }else{
+    startGame()
+  }
 };
 
 // 组件挂载时获取数据
@@ -76,7 +108,7 @@ onMounted(() => {
 // 暴露方法给父组件
 defineExpose({
   gameList,
-  fetchGameList
+  fetchGameList,
 });
 </script>
 
@@ -105,13 +137,13 @@ defineExpose({
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   }
-  
+
   &:active {
     transform: translateY(0);
     background: rgba(255, 255, 255, 0.15);
@@ -128,7 +160,7 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -154,16 +186,16 @@ defineExpose({
 }
 
 .auth {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .lock-icon {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
   opacity: 0.8;
   filter: brightness(0) invert(1);
 }
@@ -173,33 +205,33 @@ defineExpose({
   .mobile-game-list {
     padding: 15px;
   }
-  
+
   .game-item {
     padding: 12px;
   }
-  
+
   .game-icon {
     width: 50px;
     height: 50px;
     margin-right: 12px;
   }
-  
+
   .game-name {
     font-size: 16px;
   }
-  
+
   .game-description {
     font-size: 12px;
   }
-  
+
   .auth {
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
   }
-  
+
   .lock-icon {
-    width: 16px;
-    height: 16px;
+    width: 21px;
+    height: 21px;
   }
 }
 </style>

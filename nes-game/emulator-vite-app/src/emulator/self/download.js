@@ -213,7 +213,7 @@ export function downloadRom() {
                 if (this.textElem) {
                     this.textElem.innerText = this.localization("Download Game Data") + progress;
                 }
-            }, true, { responseType: "arraybuffer", method: "GET" });
+            }, true, { responseType: "arraybuffer", method: "GET", cookies: true });
             if (res === -1) {
                 this.startGameError(this.localization("Network Error"));
                 return;
@@ -234,7 +234,7 @@ export function downloadRom() {
         }
 
         if (!this.debug) {
-            this.downloadFile(this.config.gameUrl, null, true, { method: "HEAD" }).then(async (res) => {
+            this.downloadFile(this.config.gameUrl, null, true, { method: "HEAD", cookies: true }).then(async (res) => {
                 const name = (typeof this.config.gameUrl === "string") ? this.config.gameUrl.split("/").pop() : "game";
                 const result = await this.storage.rom.get(name);
                 if (result && result["content-length"] === res.headers["content-length"] && name !== "game") {
@@ -425,6 +425,12 @@ export function downloadFile(path, progressCB, notWithPath, opts) {
         };
         if (opts.responseType) xhr.responseType = opts.responseType;
         xhr.open(opts.method, path, true);
+        
+        // 设置 withCredentials 以支持 cookies
+        if (opts.cookies) {
+            xhr.withCredentials = true;
+        }
+        
         xhr.send();
     })
 }
