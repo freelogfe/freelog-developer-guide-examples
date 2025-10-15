@@ -8,11 +8,14 @@
         @click="selectGame(item)"
       >
         <div class="game-icon">
-          <img :src="item.exhibitImage || '/default-game-icon.png'" :alt="item.exhibitName" />
+          <img :src="item.coverImages[0]" :alt="item.exhibitName" />
         </div>
         <div class="game-info">
           <div class="game-name">{{ item.exhibitName }}</div>
           <div class="game-description">{{ item.exhibitDescription || '点击开始游戏' }}</div>
+        </div>
+        <div class="auth" v-if="!item.authInfo.isAuth">
+          <img src="../assets/lock.png" alt="锁定" class="lock-icon" />
         </div>
       </div>
     </div>
@@ -33,6 +36,7 @@ const fetchGameList = async () => {
       skip: 0,
       limit: 100,
       articleResourceTypes: "nesrom,红白机",
+      allInfo: 1
     });
     gameList.value = res.data.data.dataList;
     console.log("移动端游戏列表数据:", gameList.value);
@@ -44,7 +48,9 @@ const fetchGameList = async () => {
 // 处理游戏选择
 const selectGame = (item: any) => {
   console.log("移动端选择游戏:", item);
-  
+  if(!item.authInfo.isAuth){
+    return
+  }
   // 获取游戏文件URL
   freelogApp.getExhibitFileStream(item.exhibitId, {
     returnUrl: true,
@@ -147,6 +153,21 @@ defineExpose({
   line-height: 1.4;
 }
 
+.auth {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lock-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+  filter: brightness(0) invert(1);
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
   .mobile-game-list {
@@ -169,6 +190,16 @@ defineExpose({
   
   .game-description {
     font-size: 12px;
+  }
+  
+  .auth {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .lock-icon {
+    width: 16px;
+    height: 16px;
   }
 }
 </style>

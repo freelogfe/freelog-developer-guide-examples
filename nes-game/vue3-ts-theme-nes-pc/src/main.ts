@@ -6,7 +6,7 @@ import "./registerServiceWorker";
 import routes from "./router";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
-import "ant-design-vue/dist/antd.css";
+import "ant-design-vue/dist/reset.css";
 import Antd from "ant-design-vue";
 import { message } from "ant-design-vue";
 import "@/assets/css/index.scss";
