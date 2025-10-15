@@ -48,7 +48,7 @@ const fetchGameList = async (restoreScroll?: any) => {
       articleResourceTypes: "nesrom,红白机",
       allInfo: 1,
     });
-    gameList.value = res.data.data.dataList.reverse();
+    gameList.value = res.data.data.dataList;
     console.log("移动端游戏列表数据:", gameList.value);
 
     // 如果需要恢复滚动位置，在DOM更新后恢复
