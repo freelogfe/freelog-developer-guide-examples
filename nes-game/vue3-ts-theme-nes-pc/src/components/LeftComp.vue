@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 import { freelogApp } from "freelog-runtime";
 import { ref, onMounted, nextTick } from "vue";
-
+import { gameCores } from "../utils/device"
 const selectId = ref("");
 const data = ref([] as any[]);
 const containerRef = ref<HTMLElement | null>(null);
@@ -42,7 +42,7 @@ const fetchGameList = async (restoreScroll?: boolean) => {
     const res = await freelogApp.getExhibitListAuthByPage({
       skip: 0,
       limit: 100,
-      articleResourceTypes: "nesrom,红白机",
+      articleResourceTypes: gameCores.join(","),
       allInfo: 1,
       isLoadVersionProperty: 1,
     });
