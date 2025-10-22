@@ -1,15 +1,18 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 import { widgetApi } from "freelog-runtime";
- 
 
+export const useGameUrlStore = defineStore("game", {
+  state: () => ({
+    url: widgetApi.getData().defaultGameUrl,
+    gameName: widgetApi.getData().defaultGameName,
+    gameCore: widgetApi.getData().defaultGameCore,
+  }),
 
-export const useGameUrlStore = defineStore('game', {
-  state: () => ({ url: widgetApi.getData().defaultGameUrl,gameName: widgetApi.getData().defaultGameName }),
- 
   actions: {
-    setUrl(url: string, name: string) {
-      this.url = url
-      this.gameName = name
+    setUrl(url: string, name: string, gameCore: string) {
+      this.url = url;
+      this.gameName = name;
+      this.gameCore = gameCore;
     },
   },
-})
+});

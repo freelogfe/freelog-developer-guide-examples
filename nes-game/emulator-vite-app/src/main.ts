@@ -19,9 +19,9 @@ window.mount = () => {
 
   const data = widgetApi.getData()
   data.registerApi({
-    startGame: (url: string, name: string) => {
+    startGame: (url: string, name: string, gameCore: string) => {
       const store = useGameUrlStore();
-      store.setUrl(url, name);
+      store.setUrl(url, name, gameCore);
     },
     exit: (callback: Function) => {
       exit(callback);

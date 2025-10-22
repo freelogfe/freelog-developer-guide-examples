@@ -12,9 +12,11 @@ export async function runGame(config) {
   window.EJS_gameName = config.gameName || "";
   window.EJS_biosUrl = config.biosUrl || "";
   window.EJS_gameUrl = config.gameUrl;
-  window.EJS_core = config.core || "";
+  window.EJS_core = config.gameCore || "";
+  console.log("config",config)
   window.EJS_pathtodata = config.pathtodata || "./data/";
   window.EJS_startOnLoaded = true;
+  window.EJS_core  = config.gameCore || "";
   window.EJS_DEBUG_XX = config.debug || false;
   window.EJS_threads = config.threads || false;
   window.EJS_disableDatabases = config.disableDatabases || true;

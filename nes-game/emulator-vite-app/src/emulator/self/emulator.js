@@ -304,6 +304,7 @@ export class EmulatorJS {
             console.log("Updating configuration...");
             this.config.gameName = newConfig.gameName || this.getBaseFileName(newConfig.gameUrl);
             this.config.gameUrl = newConfig.gameUrl;
+            this.config.system = newConfig.gameCore || this.config.system;
             console.log("Updated config.gameName:", this.config.gameName);
             console.log("Updated config.gameUrl:", this.config.gameUrl);
             

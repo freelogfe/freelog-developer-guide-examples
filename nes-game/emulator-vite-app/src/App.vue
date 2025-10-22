@@ -16,7 +16,7 @@ import { register } from "./utils.js";
 const urlStore = useGameUrlStore();
 const urlValue = ref<string>(urlStore.url);
 const gameName = ref<string>(urlStore.gameName);
-
+const gameCore = ref<string>(urlStore.gameCore);
 const emulator = ref<any>(null);
 const exit = (callBack: Function) => {
   if (emulator.value) {
@@ -31,12 +31,14 @@ watch(
   (value: string) => {
     urlValue.value = value;
     gameName.value = urlStore.gameName;
+    gameCore.value = urlStore.gameCore;
     console.log("urlValue", urlValue.value);
     if (value) {
       if (emulator.value) {
         emulator.value?.emulator?.startNewGame({
           gameUrl: urlValue.value,
           gameName: gameName.value,
+          gameCore: gameCore.value,
           // other config options as needed
         });
       } else {
@@ -58,6 +60,7 @@ const loadEmulator = async () => {
   emulator.value = await runGame({
     gameUrl: urlValue.value,
     gameName: gameName.value,
+    gameCore: gameCore.value,
     core: "nes",
     container: "#game",
     pathtodata:
@@ -80,6 +83,4 @@ const loadEmulator = async () => {
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
-
-
 </style>

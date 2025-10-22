@@ -27,7 +27,7 @@ import { ref, onMounted, nextTick } from "vue";
 const selectId = ref("");
 const data = ref([] as any[]);
 const containerRef = ref<HTMLElement | null>(null);
-const emit = defineEmits(['game-selected']);
+const emit = defineEmits(["game-selected"]);
 
 // 获取游戏列表数据
 const fetchGameList = async (restoreScroll?: boolean) => {
@@ -44,6 +44,7 @@ const fetchGameList = async (restoreScroll?: boolean) => {
       limit: 100,
       articleResourceTypes: "nesrom,红白机",
       allInfo: 1,
+      isLoadVersionProperty: 1,
     });
     data.value = res.data.data.dataList;
 
@@ -54,10 +55,11 @@ const fetchGameList = async (restoreScroll?: boolean) => {
           await nextTick();
           containerRef.value.scrollTop = scrollPosition;
         }
-        return;
+      } else {
+        selectId.value = data.value[0].exhibitId;
       }
-      selectId.value = data.value[0].exhibitId;
-      emit('game-selected', selectId.value);
+      select(selectId.value)
+      // emit("game-selected", selectId.value);
     }
   } catch (error) {
     console.error("获取游戏列表失败:", error);
@@ -67,12 +69,12 @@ const fetchGameList = async (restoreScroll?: boolean) => {
 const select = async (id: string) => {
   const item = data.value.find((game: any) => game.exhibitId === id);
   selectId.value = id;
-  
+
   if (!item.authInfo.isAuth) {
     const res = await freelogApp.addAuth(id, { immediate: true });
     if (res.status === freelogApp.resultType.SUCCESS) {
       await fetchGameList(true);
-      emit('game-selected', id);
+      emit("game-selected", id);
       console.log("授权成功");
     } else if (res.status === freelogApp.resultType.USER_CANCEL) {
       console.log("用户取消授权");
@@ -81,7 +83,7 @@ const select = async (id: string) => {
     }
     return;
   } else {
-    emit('game-selected', id);
+    emit("game-selected", id);
   }
 };
 

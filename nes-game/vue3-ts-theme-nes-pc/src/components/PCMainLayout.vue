@@ -1,7 +1,7 @@
 <template>
   <div class="w-100x h-100x flex-column over-h pb-20">
     <HeaderComp />
-    <div class="w-100x  over-h flex-row container">
+    <div class="w-100x over-h flex-row container">
       <!-- PC端：左边游戏列表，右边游戏区域 -->
       <div class="shrink-0 h-100x over-h p-relative">
         <LeftComp @game-selected="handleGameSelected" />
@@ -39,6 +39,7 @@ const selfWidgetApi = ref({} as any);
 let selfWidget: any = null;
 const gameUrl = ref("");
 const gameName = ref("");
+const gameCore = ref("");
 
 // 初始化用户信息
 store.setUserInfo(freelogApp.getCurrentUser());
@@ -47,14 +48,16 @@ loading.value = false;
 // 处理游戏选择
 const handleGameSelected = async (exhibitId: string) => {
   if (!exhibitId) return;
-  
+
   try {
-    const res = await freelogApp.getExhibitById(exhibitId);
+    const res = await freelogApp.getExhibitById(exhibitId, {
+      isLoadVersionProperty: 1,
+    });
     if (res.data.errCode) {
       message.error(res.data.msg);
       return;
     }
-    
+
     gameUrl.value = await freelogApp.getExhibitFileStream(
       res.data.data.exhibitId,
       {
@@ -62,12 +65,17 @@ const handleGameSelected = async (exhibitId: string) => {
       }
     );
     gameName.value = res.data.data.exhibitName;
-    
+    gameCore.value = res.data.data.versionInfo?.exhibitProperty.gameCore as string;
     if (!selfWidget) {
-      mountArticleWidget(gameUrl.value, gameName.value);
+      mountArticleWidget(gameUrl.value, gameName.value,gameCore.value);
       return;
     }
-    selfWidgetApi.value.startGame(gameUrl.value, gameName.value);
+    console.log("startGame",res.data.data)
+    selfWidgetApi.value.startGame(
+      gameUrl.value,
+      gameName.value,
+      res.data.data.versionInfo?.exhibitProperty.gameCore
+    );
   } catch (error) {
     console.error("获取游戏信息失败:", error);
     message.error("获取游戏信息失败");
@@ -79,7 +87,7 @@ onUnmounted(async () => {
   await selfWidget?.unmount();
 });
 
-const mountArticleWidget = async (url: string, name: string) => {
+const mountArticleWidget = async (url: string, name: string, gameCore: string) => {
   console.log("nes-widget", url);
   const res = await freelogApp.getSelfDep();
   const subData = res.data.data;
@@ -96,6 +104,7 @@ const mountArticleWidget = async (url: string, name: string) => {
           data: {
             defaultGameUrl: url,
             defaultGameName: name,
+            defaultGameCore: gameCore,
             registerApi: (api: any) => {
               selfWidgetApi.value = api;
             },
@@ -115,7 +124,7 @@ const mountArticleWidget = async (url: string, name: string) => {
 </script>
 
 <style lang="scss" scoped>
-.container{
-    height: calc(100vh - 60px);
+.container {
+  height: calc(100vh - 60px);
 }
 </style>

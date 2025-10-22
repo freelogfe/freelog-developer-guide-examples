@@ -47,6 +47,7 @@ const fetchGameList = async (restoreScroll?: any) => {
       limit: 100,
       articleResourceTypes: "nesrom,红白机",
       allInfo: 1,
+      isLoadVersionProperty: 1,
     });
     gameList.value = res.data.data.dataList;
     console.log("移动端游戏列表数据:", gameList.value);
@@ -77,6 +78,7 @@ const selectGame = async (item: any) => {
           exhibitDescription: item.exhibitDescription,
           exhibitImage: item.exhibitImage,
           url: url,
+          gameCore: item.versionInfo.exhibitProperty.gameCore,
         };
         emit("game-selected", gameData);
       })
@@ -88,15 +90,15 @@ const selectGame = async (item: any) => {
     const res = await freelogApp.addAuth(item.exhibitId, { immediate: true });
     if (res.status === freelogApp.resultType.SUCCESS) {
       fetchGameList(true);
-      startGame()
+      startGame();
       console.log("授权成功");
     } else if (res.status === freelogApp.resultType.USER_CANCEL) {
       console.log("用户取消授权");
     } else {
       console.error("授权失败:", res.data);
     }
-  }else{
-    startGame()
+  } else {
+    startGame();
   }
 };
 

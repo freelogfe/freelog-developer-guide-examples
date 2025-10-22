@@ -1,6 +1,7 @@
 export interface EmulatorConfig {
   container: string;
   gameName?: string;
+  gameCore?: string;
   biosUrl?: string;
   gameUrl: string;
   core?: string;

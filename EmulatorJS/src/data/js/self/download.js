@@ -213,7 +213,7 @@ export function downloadRom() {
                 if (this.textElem) {
                     this.textElem.innerText = this.localization("Download Game Data") + progress;
                 }
-            }, true, { responseType: "arraybuffer", method: "GET" });
+            }, true, { responseType: "arraybuffer", method: "GET", cookies: true });
             if (res === -1) {
                 this.startGameError(this.localization("Network Error"));
                 return;
@@ -234,7 +234,7 @@ export function downloadRom() {
         }
 
         if (!this.debug) {
-            this.downloadFile(this.config.gameUrl, null, true, { method: "HEAD" }).then(async (res) => {
+            this.downloadFile(this.config.gameUrl, null, true, { method: "HEAD", cookies: true }).then(async (res) => {
                 const name = (typeof this.config.gameUrl === "string") ? this.config.gameUrl.split("/").pop() : "game";
                 const result = await this.storage.rom.get(name);
                 if (result && result["content-length"] === res.headers["content-length"] && name !== "game") {
@@ -265,6 +265,38 @@ export function downloadFiles() {
         this.startGame();
     })();
 }
+export function abortAllDownloads() {
+    if (!this.activeDownloads || this.activeDownloads.length === 0) {
+        console.log("No active downloads to abort");
+        return;
+    }
+    
+    console.log(`Aborting ${this.activeDownloads.length} active downloads...`);
+    
+    // 复制数组以避免在迭代时修改原数组
+    const downloadsToAbort = [...this.activeDownloads];
+    
+    downloadsToAbort.forEach((download, index) => {
+        try {
+            if (download instanceof XMLHttpRequest) {
+                // 中止 XMLHttpRequest
+                download.abort();
+                console.log(`✓ Aborted XMLHttpRequest ${index}`);
+            } else if (download instanceof AbortController) {
+                // 中止 fetch 请求
+                download.abort();
+                console.log(`✓ Aborted AbortController ${index}`);
+            }
+        } catch (e) {
+            console.warn(`Error aborting download ${index}:`, e);
+        }
+    });
+    
+    // 清空活动下载列表
+    this.activeDownloads = [];
+    console.log("✓ All downloads aborted");
+}
+
 export function downloadFile(path, progressCB, notWithPath, opts) {
     return new Promise(async cb => {
         const data = this.toData(path); //check other data types
@@ -291,8 +323,25 @@ export function downloadFile(path, progressCB, notWithPath, opts) {
                 cb({ headers: {} });
                 return;
             }
+            let aborted = false;
+            const abortController = new AbortController();
+            
+            // 将 abortController 添加到活动的下载列表中
+            if (!this.activeDownloads) {
+                this.activeDownloads = [];
+            }
+            this.activeDownloads.push(abortController);
+            
             try {
-                let res = await fetch(path)
+                let res = await fetch(path, { signal: abortController.signal });
+                
+                // 检查是否被中止
+                if (abortController.signal.aborted) {
+                    console.log("Download aborted:", path);
+                    cb(-1);
+                    return;
+                }
+                
                 if ((opts.type && opts.type.toLowerCase() === "arraybuffer") || !opts.type) {
                     res = await res.arrayBuffer();
                 } else {
@@ -300,27 +349,64 @@ export function downloadFile(path, progressCB, notWithPath, opts) {
                     try { res = JSON.parse(res) } catch (e) { }
                 }
                 if (path.startsWith("blob:")) URL.revokeObjectURL(path);
+                
+                // 从活动下载列表中移除
+                const index = this.activeDownloads.indexOf(abortController);
+                if (index > -1) {
+                    this.activeDownloads.splice(index, 1);
+                }
+                
                 cb({ data: res, headers: {} });
             } catch (e) {
-                cb(-1);
+                // 从活动下载列表中移除
+                const index = this.activeDownloads.indexOf(abortController);
+                if (index > -1) {
+                    this.activeDownloads.splice(index, 1);
+                }
+                
+                if (e.name === 'AbortError') {
+                    console.log("Download aborted:", path);
+                    cb(-1);
+                } else {
+                    cb(-1);
+                }
             }
             return;
         }
         const xhr = new XMLHttpRequest();
+        
+        // 将 xhr 添加到活动的下载列表中
+        if (!this.activeDownloads) {
+            this.activeDownloads = [];
+        }
+        this.activeDownloads.push(xhr);
+        
         if (progressCB instanceof Function) {
             xhr.addEventListener("progress", (e) => {
                 const progress = e.total ? " " + Math.floor(e.loaded / e.total * 100).toString() + "%" : " " + (e.loaded / 1048576).toFixed(2) + "MB";
                 progressCB(progress);
             });
         }
-        xhr.onload = function () {
+        xhr.onload = () => {
             if (xhr.readyState === xhr.DONE) {
                 let data = xhr.response;
                 if (xhr.status.toString().startsWith("4") || xhr.status.toString().startsWith("5")) {
+                    // 从活动下载列表中移除
+                    const index = this.activeDownloads.indexOf(xhr);
+                    if (index > -1) {
+                        this.activeDownloads.splice(index, 1);
+                    }
                     cb(-1);
                     return;
                 }
                 try { data = JSON.parse(data) } catch (e) { }
+                
+                // 从活动下载列表中移除
+                const index = this.activeDownloads.indexOf(xhr);
+                if (index > -1) {
+                    this.activeDownloads.splice(index, 1);
+                }
+                
                 cb({
                     data: data,
                     headers: {
@@ -329,9 +415,22 @@ export function downloadFile(path, progressCB, notWithPath, opts) {
                 });
             }
         }
+        xhr.onerror = () => {
+            // 从活动下载列表中移除
+            const index = this.activeDownloads.indexOf(xhr);
+            if (index > -1) {
+                this.activeDownloads.splice(index, 1);
+            }
+            cb(-1);
+        };
         if (opts.responseType) xhr.responseType = opts.responseType;
-        xhr.onerror = () => cb(-1);
         xhr.open(opts.method, path, true);
+        
+        // 设置 withCredentials 以支持 cookies
+        if (opts.cookies) {
+            xhr.withCredentials = true;
+        }
+        
         xhr.send();
     })
 }
