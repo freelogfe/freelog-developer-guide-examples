@@ -32,7 +32,9 @@ import { gameCores } from "../utils/device"
 const gameList = ref([] as any[]);
 const emit = defineEmits(["game-selected"]);
 const gameListRef = ref<HTMLElement | null>(null);
-
+const gameUrl = ref("");
+const gameName = ref("");
+const gameCore = ref("");
 // 获取游戏列表数据
 const fetchGameList = async (restoreScroll?: any) => {
   let scrollPosition = 0;
@@ -66,6 +68,11 @@ const fetchGameList = async (restoreScroll?: any) => {
 // 处理游戏选择
 const selectGame = async (item: any) => {
   console.log("移动端选择游戏:", item);
+  const resourceTypes = item.articleInfo?.resourceType;
+    gameCore.value = resourceTypes[resourceTypes.length - 1];
+    if(["nesrom","红白机"].includes(gameCore.value)){
+      gameCore.value = "nes"
+    }
   function startGame() {
     // 获取游戏文件URL
     freelogApp
@@ -79,7 +86,7 @@ const selectGame = async (item: any) => {
           exhibitDescription: item.exhibitDescription,
           exhibitImage: item.exhibitImage,
           url: url,
-          gameCore: item.versionInfo.exhibitProperty.gameCore,
+          gameCore: gameCore.value,
         };
         emit("game-selected", gameData);
       })

@@ -65,7 +65,11 @@ const handleGameSelected = async (exhibitId: string) => {
       }
     );
     gameName.value = res.data.data.exhibitName;
-    gameCore.value = res.data.data.versionInfo?.exhibitProperty.gameCore as string;
+    const resourceTypes = res.data.data.articleInfo?.resourceType;
+    gameCore.value = resourceTypes[resourceTypes.length - 1];
+    if(["nesrom","红白机"].includes(gameCore.value)){
+      gameCore.value = "nes"
+    }
     if (!selfWidget) {
       mountArticleWidget(gameUrl.value, gameName.value,gameCore.value);
       return;
