@@ -6,6 +6,7 @@ export const useGameUrlStore = defineStore("game", {
     url: widgetApi.getData().defaultGameUrl,
     gameName: widgetApi.getData().defaultGameName,
     gameCore: widgetApi.getData().defaultGameCore,
+    update: false,
   }),
 
   actions: {
@@ -13,6 +14,7 @@ export const useGameUrlStore = defineStore("game", {
       this.url = url;
       this.gameName = name;
       this.gameCore = gameCore;
+      this.update = !this.update;
     },
   },
 });

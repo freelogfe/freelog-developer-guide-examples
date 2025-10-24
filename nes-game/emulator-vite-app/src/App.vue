@@ -27,9 +27,9 @@ const exit = (callBack: Function) => {
 register(exit);
 // 监听urlStore变化
 watch(
-  () => urlStore.url,
-  (value: string) => {
-    urlValue.value = value;
+  () => urlStore.update,
+  (value: boolean) => {
+    urlValue.value = urlStore.url;
     gameName.value = urlStore.gameName;
     gameCore.value = urlStore.gameCore;
     console.log("urlValue", urlValue.value);

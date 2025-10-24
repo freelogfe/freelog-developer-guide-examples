@@ -229,12 +229,6 @@ export class EmulatorJS {
         this.handleResize();
     }
     startNewGame(newConfig) {
-        console.log("=== startNewGame called ===");
-        console.log("newConfig:", newConfig);
-        console.log("Current started:", this.started);
-        console.log("Current isSwitching:", this.isSwitching);
-        console.log("Current failedToStart:", this.failedToStart);
-        
         // 验证新配置
         if (!newConfig || !newConfig.gameUrl) {
             console.error('startNewGame: gameUrl is required');
@@ -243,26 +237,21 @@ export class EmulatorJS {
 
         // 防止重复切换
         if (this.isSwitching) {
-            console.log('Game switching already in progress, ignoring request');
             return false;
         }
 
         // 标记正在切换
-        console.log("Setting isSwitching to true");
         this.isSwitching = true;
 
         // 终止所有正在进行的下载操作
-        console.log("Aborting all active downloads...");
         try {
             this.abortAllDownloads();
-            console.log("✓ All downloads aborted successfully");
         } catch (e) {
             console.warn("Error aborting downloads:", e);
         }
 
         // 如果游戏正在运行，先停止当前游戏
         if (this.started) {
-            console.log("Game is running, stopping current game");
             this.stopCurrentGame();
         } else {
             console.log("Game is not running, proceeding directly");
@@ -270,10 +259,8 @@ export class EmulatorJS {
 
         // 立即清理旧的 textElem，避免快速切换时显示旧的进度
         if (this.textElem) {
-            console.log("Cleaning up old text element...");
             try {
                 this.textElem.remove();
-                console.log("✓ Old text element removed");
             } catch (e) {
                 console.warn("Error removing old text element:", e);
             }
@@ -281,40 +268,21 @@ export class EmulatorJS {
         }
         
         // 等待当前游戏完全停止后再启动新游戏
-        console.log("Setting timeout for game cleanup...");
         setTimeout(() => {
-            console.log("=== Timeout callback executed ===");
-            console.log("Game name:", newConfig.gameName);
-            console.log("Game URL:", newConfig.gameUrl);
-            console.log("Current Module exists:", !!this.Module);
-            console.log("Current GameManager exists:", !!this.gameManager);
-            console.log("Current textElem exists:", !!this.textElem);
-            console.log("Current failedToStart:", this.failedToStart);
-            console.log("Current this:", this);
-            console.log("Current this.config:", this.config);
-            console.log("Current this.elements:", this.elements);
-            console.log("Current this.game:", this.game);
+
             
-            // 检查关键方法是否存在
-            console.log("this.createText exists:", typeof this.createText);
-            console.log("this.downloadGameCore exists:", typeof this.downloadGameCore);
-            console.log("this.startGameError exists:", typeof this.startGameError);
+        
             
             // 更新配置，不重新初始化整个模拟器
-            console.log("Updating configuration...");
             this.config.gameName = newConfig.gameName || this.getBaseFileName(newConfig.gameUrl);
             this.config.gameUrl = newConfig.gameUrl;
             this.config.system = newConfig.gameCore || this.config.system;
-            console.log("Updated config.gameName:", this.config.gameName);
-            console.log("Updated config.gameUrl:", this.config.gameUrl);
             
             // 重置一些状态
-            console.log("Resetting game states...");
             this.started = false;
             this.paused = true;
             this.failedToStart = false;
             this.isSwitching = false;
-            console.log("States reset - started:", this.started, "failedToStart:", this.failedToStart, "isSwitching:", this.isSwitching);
             
             // 清理可能存在的旧模块引用
             if (this.Module) {
@@ -329,11 +297,8 @@ export class EmulatorJS {
             
             // 如果设置了自动启动，则直接开始游戏
             if (newConfig.autoStart !== false) {
-                console.log("Auto-starting new game");
                 try {
-                    console.log("Creating text element...");
                     this.createText();
-                    console.log("Text element created:", !!this.textElem);
                     if (this.textElem) {
                         console.log("Text element content:", this.textElem.innerText);
                         console.log("Text element classes:", this.textElem.className);
@@ -362,55 +327,41 @@ export class EmulatorJS {
     }
 
     stopCurrentGame() {
-        console.log("=== stopCurrentGame called ===");
-        console.log("Current Module exists:", !!this.Module);
-        console.log("Current GameManager exists:", !!this.gameManager);
-        console.log("Current Canvas exists:", !!this.canvas);
         
         try {
             // 触发退出事件
-            console.log("Calling exit event...");
             this.callEvent("exit");
-            console.log("✓ Exit event called successfully");
         } catch (e) {
             console.error("✗ Error calling exit event:", e);
             console.error("Error stack:", e.stack);
         }
         
         // 重置状态标志，防止重复操作
-        console.log("Resetting game states...");
         this.started = false;
         this.paused = true;
-        console.log("✓ Game states reset");
         
         // 停止当前游戏模块
         if (this.Module) {
-            console.log("Stopping module...");
             try {
                 // 暂停主循环
                 if (this.Module.pauseMainLoop) {
-                    console.log("Pausing main loop...");
                     this.Module.pauseMainLoop();
-                    console.log("✓ Main loop paused");
                 } else {
                     console.warn("pauseMainLoop method not found");
                 }
                 
                 // 清理音频上下文
                 if (this.Module.AL && this.Module.AL.currentCtx) {
-                    console.log("Cleaning audio context...");
                     this.Module.AL.currentCtx.sources.forEach((ctx, index) => {
                         console.log(`Cleaning audio source ${index}...`);
                         if (ctx.gain && ctx.gain.context) {
                             try {
                                 ctx.gain.context.close();
-                                console.log(`✓ Audio source ${index} closed`);
                             } catch (e) {
                                 console.warn(`Error closing audio source ${index}:`, e);
                             }
                         }
                     });
-                    console.log("✓ Audio context cleaned");
                 } else {
                     console.warn("No audio context to clean");
                 }
@@ -424,10 +375,8 @@ export class EmulatorJS {
 
         // 清理游戏管理器
         if (this.gameManager) {
-            console.log("Cleaning game manager...");
             try {
                 this.gameManager = null;
-                console.log("✓ Game manager cleaned");
             } catch (e) {
                 console.error('✗ Error cleaning game manager:', e);
                 console.error("Error stack:", e.stack);
@@ -438,10 +387,8 @@ export class EmulatorJS {
         
         // 清理画布
         if (this.canvas && this.canvas.parentNode) {
-            console.log("Removing old canvas...");
             try {
                 this.canvas.remove();
-                console.log("✓ Old canvas removed");
             } catch (e) {
                 console.error('✗ Error removing canvas:', e);
                 console.error("Error stack:", e.stack);
@@ -451,21 +398,17 @@ export class EmulatorJS {
         }
         
         // 重新创建画布
-        console.log("Creating new canvas...");
         try {
             this.canvas = this.createElement("canvas");
             this.canvas.classList.add("ejs_canvas");
-            console.log("✓ New canvas created");
         } catch (e) {
             console.error('✗ Error creating canvas:', e);
             console.error("Error stack:", e.stack);
         }
         
         // 重新初始化手柄相关设置
-        console.log("Resetting gamepad settings...");
         try {
             this.resetGamepadSettings();
-            console.log("✓ Gamepad settings reset");
         } catch (e) {
             console.error('✗ Error resetting gamepad:', e);
             console.error("Error stack:", e.stack);
@@ -474,10 +417,8 @@ export class EmulatorJS {
         // 保存当前模块引用，避免过早清理
         const currentModule = this.Module;
         const currentFileName = this.fileName;
-        console.log("Saved references - Module:", !!currentModule, "FileName:", currentFileName);
         
         // 不立即清理模块，让它自然清理，避免影响新游戏的启动
-        console.log("Setting delayed cleanup timeout...");
         setTimeout(() => {
             console.log("=== Delayed cleanup timeout executed ===");
             if (currentModule && currentFileName) {

@@ -45,7 +45,7 @@
             </div>
             <!-- 正常游戏容器 -->
             <div
-              v-else
+              v-show="selectItem && selectItem.authInfo.isAuth" 
               id="freelog-game"
               class="w-100x h-100x flex-column over-h"
             ></div>
