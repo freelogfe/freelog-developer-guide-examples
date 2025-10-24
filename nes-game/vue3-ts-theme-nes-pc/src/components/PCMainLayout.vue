@@ -38,7 +38,7 @@
                 <img src="../assets/lock.png" alt="锁定" class="lock-icon-large" />
                 <p class="auth-title">{{ selectItem.exhibitName }}</p>
                 <p class="auth-desc">此游戏需要授权才能游玩</p>
-                <a-button type="primary" @click="handleAuthClick" :loading="authLoading">
+                <a-button type="primary" class="fc-white" @click="handleAuthClick" :loading="authLoading">
                   获取授权
                 </a-button>
               </div>
