@@ -22,7 +22,7 @@ const exit = (callBack: Function) => {
   if (emulator.value) {
     emulator.value?.emulator?.stopCurrentGame();
   }
-  callBack();
+ callBack && callBack();
 };
 register(exit);
 // 监听urlStore变化

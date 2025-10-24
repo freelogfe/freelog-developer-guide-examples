@@ -27,7 +27,7 @@
 <script lang="ts" setup>
 import { freelogApp } from "freelog-runtime";
 import { ref, onMounted, nextTick } from "vue";
-import { gameCores } from "../utils/device"
+import { gameCores } from "../utils/device";
 
 const gameList = ref([] as any[]);
 const emit = defineEmits(["game-selected"]);
@@ -69,10 +69,10 @@ const fetchGameList = async (restoreScroll?: any) => {
 const selectGame = async (item: any) => {
   console.log("移动端选择游戏:", item);
   const resourceTypes = item.articleInfo?.resourceType;
-    gameCore.value = resourceTypes[resourceTypes.length - 1];
-    if(["nesrom","红白机"].includes(gameCore.value)){
-      gameCore.value = "nes"
-    }
+  gameCore.value = resourceTypes[resourceTypes.length - 1];
+  if (["nesrom", "红白机"].includes(gameCore.value)) {
+    gameCore.value = "nes";
+  }
   function startGame() {
     // 获取游戏文件URL
     freelogApp
@@ -97,7 +97,7 @@ const selectGame = async (item: any) => {
   if (!item.authInfo.isAuth) {
     const res = await freelogApp.addAuth(item.exhibitId, { immediate: true });
     if (res.status === freelogApp.resultType.SUCCESS) {
-      fetchGameList(true);
+      await fetchGameList(true);
       startGame();
       console.log("授权成功");
     } else if (res.status === freelogApp.resultType.USER_CANCEL) {
