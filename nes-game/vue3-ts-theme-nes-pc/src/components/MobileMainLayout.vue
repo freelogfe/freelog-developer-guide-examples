@@ -288,7 +288,7 @@ const mountArticleWidget = async () => {
     const subData = res.data.data;
 
     subData.forEach(async (sub: DependencyNodeInfo) => {
-      if (sub.articleName.includes("nes-widget")) {
+    if (sub.articleName.includes("nes-widget") || sub.articleName.includes("Emulatorjs游戏插件")) {
         // 先卸载现有的widget
         if (selfWidget) {
           await selfWidget.unmount();

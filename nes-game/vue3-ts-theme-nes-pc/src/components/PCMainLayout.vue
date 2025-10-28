@@ -248,7 +248,7 @@ const mountArticleWidget = async (
   const res = await freelogApp.getSelfDep();
   const subData = res.data.data;
   subData.forEach(async (sub: DependencyNodeInfo) => {
-    if (sub.articleName.includes("nes-widget")) {
+    if (sub.articleName.includes("nes-widget") || sub.articleName.includes("Emulatorjs游戏插件")) {
       selfWidget = await freelogApp.mountArticleWidget({
         articleId: sub.articleId,
         parentNid: sub.parentNid,
